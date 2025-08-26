@@ -2,7 +2,7 @@
 import * as State from './state.js';
 import * as API from './api.js';
 import * as UI from './ui.js';
-import { imprimirPresupuesto, exportarPresupuestoPDF, capturaYWhatsApp, generarTextoPresupuesto } from './export.js';
+import { imprimirPresupuesto, exportarPresupuestoPDF, capturaYWhatsApp, generarTextoPresupuesto, copiarParaCalendar, abrirEnCalendar } from './export.js';
 import { isValidNumber, isNotEmpty, isValidNIF, isValidPhone } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -144,6 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
             window.open(url, '_blank');
         });
+    }
+    const btnCopiarCalendar = document.getElementById('btnCopiarCalendar');
+    if (btnCopiarCalendar) {
+        btnCopiarCalendar.addEventListener('click', () => copiarParaCalendar());
+    }
+    const btnAbrirCalendar = document.getElementById('btnAbrirCalendar');
+    if (btnAbrirCalendar) {
+        btnAbrirCalendar.addEventListener('click', () => abrirEnCalendar());
     }
 
     // Eliminados listeners de inventario
@@ -308,7 +316,11 @@ document.addEventListener('DOMContentLoaded', () => {
             iva: document.getElementById('presupuesto-iva')?.value || ''
         };
 
-        const presupuestoData = {
+    const distribuidor = UI.DOMElements.presupuestoDistribuidor?.value || '';
+    const descripcion = UI.DOMElements.presupuestoDescripcion?.value || '';
+    const observaciones = UI.DOMElements.presupuestoObservaciones?.value || '';
+
+    const presupuestoData = {
             cliente: clienteData,
             fecha: fecha,
             vista_cliente: {
@@ -318,6 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
             vista_interna: {
                 grupos: currentPresupuesto.grupos,
                 totalGeneral: currentPresupuesto.totalGeneral,
+        distribuidor,
+        descripcion,
+        observaciones,
                 draft: {
                     params: draftParams,
                     tempNeumaticos: currentPresupuesto.tempNeumaticos,

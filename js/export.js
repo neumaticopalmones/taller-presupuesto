@@ -60,6 +60,120 @@ export function generarTextoPresupuesto() {
     return msg.trimEnd();
 }
 
+// Genera el texto detallado para Calendar (cita)
+export function generarTextoDetalladoCalendar(opciones = {}) {
+    const p = getCurrentPresupuesto();
+    const eur0 = (n) => `${Math.round(Number(n || 0)).toLocaleString('es-ES')}€`;
+
+    const numero = document.getElementById('presupuesto-numeroPresupuesto')?.value || '';
+    const fechaP = document.getElementById('presupuesto-fechaPresupuesto')?.value || '';
+    const fechaES = fechaP ? new Date(fechaP).toLocaleDateString('es-ES') : '';
+    const nombre = document.getElementById('presupuesto-nombreCliente')?.value || '';
+    const telefono = document.getElementById('presupuesto-telefonoCliente')?.value || '';
+
+    const grupos = gruposPorMarca(p.grupos || []);
+    const g0 = grupos[0];
+    const n0 = g0?.neumaticos?.[0];
+    const medida = g0?.medida || n0?.medida || '';
+    const cantidad = g0?.cantidad || n0?.cantidad || '';
+    const marca = n0?.nombre || '';
+    const pu = n0 ? eur0(n0.precioUnidad) : '';
+    const totalGrupo = g0 ? eur0(g0.totalGrupo) : '';
+    const totalGeneral = eur0(p.totalGeneral || 0);
+
+    // Campos añadidos al presupuesto
+    const proveedor = (document.getElementById('presupuesto-distribuidor')?.value || opciones.proveedor || document.getElementById('calendar-proveedor')?.value || '').trim();
+    const descripcion = (document.getElementById('presupuesto-descripcion')?.value || '').trim();
+    const observaciones = (document.getElementById('presupuesto-observaciones')?.value || '').trim();
+    // Opcionales extra
+    const porte = opciones.porte ?? document.getElementById('calendar-porte')?.value;
+
+    // Detalle de trabajos
+    const trabajos = (g0?.otrosTrabajos || []).map(t => `${t.concepto} ${eur0(t.total)}`).join(' ');
+    const puNum = n0 ? Math.round(Number(n0.precioUnidad || 0)) : 0;
+    // Subtotal de neumáticos: precio/ud * cantidad del neumático elegido
+    const subtotalNeumaticosNum = n0 ? Math.round(Number(n0.total || 0)) : 0;
+    const tituloBase = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' ' : ''}· PU ${puNum}-${subtotalNeumaticosNum}€${trabajos ? ' ' + trabajos : ''} total ${totalGeneral} Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''} Nº Presupuesto: ${numero}`.replace(/\s+/g, ' ').trim();
+    const titulo = observaciones ? `***${tituloBase}` : tituloBase;
+
+    // Descripción simplificada: solo lo que pides
+    const detalle = [
+        (proveedor ? `Distribuidor: ${proveedor}` : null),
+        (observaciones ? `Observaciones: ${observaciones}` : null),
+        (descripcion ? `Descripción: ${descripcion}` : null)
+    ].filter(Boolean).join('\n');
+
+    return { titulo, lineCompact: titulo, detalle };
+}
+
+export function copiarParaCalendar() {
+    const { lineCompact, detalle } = generarTextoDetalladoCalendar();
+    const texto = `${lineCompact}\n\n${detalle}`;
+    navigator.clipboard.writeText(texto).then(() => {
+        M.toast({ html: 'Texto copiado para Calendar', classes: 'green' });
+    }).catch(err => {
+        const toastId = 'toast-error-' + Date.now();
+        const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
+        const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+        M.toast({
+            html: `<span id='${toastId}' style='white-space:pre-line;'>No se pudo copiar: ${err?.message || err}</span>${copyBtn}${closeBtn}`,
+            classes: 'red',
+            displayLength: Infinity
+        });
+    });
+}
+
+export function abrirEnCalendar() {
+    const { titulo, detalle } = generarTextoDetalladoCalendar();
+    // Fechas
+    const fechaStr = document.getElementById('calendar-fecha')?.value || '';
+    const horaStr = document.getElementById('calendar-hora')?.value || '';
+    const durMin = parseInt(document.getElementById('calendar-duracion')?.value || '60');
+
+    let start = new Date();
+    if (fechaStr) {
+        const [y, m, d] = fechaStr.split('-').map(Number);
+        if (horaStr) {
+            const [hh, mm] = horaStr.split(':').map(Number);
+            start = new Date(y, (m - 1), d, hh, mm, 0);
+        } else {
+            start = new Date(y, (m - 1), d, 10, 0, 0);
+        }
+    } else {
+        // por defecto, en 1 hora desde ahora
+        start.setMinutes(start.getMinutes() + 60);
+    }
+    const end = new Date(start.getTime() + (isNaN(durMin) ? 60 : durMin) * 60000);
+
+    const fmt = (dt) => {
+        const pad = (n) => String(n).padStart(2, '0');
+        const y = dt.getFullYear();
+        const m = pad(dt.getMonth() + 1);
+        const d = pad(dt.getDate());
+        const hh = pad(dt.getHours());
+        const mm = pad(dt.getMinutes());
+        const ss = pad(dt.getSeconds());
+        return `${y}${m}${d}T${hh}${mm}${ss}`;
+    };
+
+    const dates = `${fmt(start)}/${fmt(end)}`;
+    const location = '';
+
+    // Abrir ventana de forma sincrónica para evitar bloqueos
+    let win = null;
+    try { win = window.open('about:blank', '_blank'); } catch (_) { win = null; }
+
+    let url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&details=${encodeURIComponent(detalle)}&dates=${encodeURIComponent(dates)}`;
+    if (location) {
+        url += `&location=${encodeURIComponent(location)}`;
+    }
+    if (win && !win.closed) {
+        win.location.href = url;
+    } else {
+        window.open(url, '_blank');
+    }
+}
+
 async function construirNodoA4() {
     const tabla = document.querySelector('.presupuesto-section .budget-table-container');
     if (!tabla) {

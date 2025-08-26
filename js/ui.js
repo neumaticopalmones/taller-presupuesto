@@ -48,6 +48,9 @@ export const DOMElements = {
     presupuestoNifCliente: document.getElementById('presupuesto-nifCliente'),
     presupuestoNumeroPresupuesto: document.getElementById('presupuesto-numeroPresupuesto'),
     presupuestoFechaPresupuesto: document.getElementById('presupuesto-fechaPresupuesto'),
+    presupuestoDistribuidor: document.getElementById('presupuesto-distribuidor'),
+    presupuestoDescripcion: document.getElementById('presupuesto-descripcion'),
+    presupuestoObservaciones: document.getElementById('presupuesto-observaciones'),
     listaMarcasTemp: document.getElementById('lista-marcas-temp'),
     listaOtrosTrabajosTemp: document.getElementById('lista-otros-trabajos-temp'),
     presupuestoMeta: document.getElementById('presupuesto-meta'),
@@ -349,6 +352,10 @@ export function fillPresupuestoForm(presupuesto) {
     DOMElements.presupuestoNifCliente.value = presupuesto.cliente.nif || '';
     DOMElements.presupuestoNumeroPresupuesto.value = presupuesto.numero || '';
     DOMElements.presupuestoFechaPresupuesto.value = presupuesto.fecha || '';
+    // Extras
+    if (DOMElements.presupuestoDistribuidor) DOMElements.presupuestoDistribuidor.value = presupuesto.vista_interna?.distribuidor || '';
+    if (DOMElements.presupuestoDescripcion) DOMElements.presupuestoDescripcion.value = presupuesto.vista_interna?.descripcion || '';
+    if (DOMElements.presupuestoObservaciones) DOMElements.presupuestoObservaciones.value = presupuesto.vista_interna?.observaciones || '';
     // Usar parámetros del borrador si existen; si no, usar el primer grupo
     const draftParams = presupuesto?.vista_interna?.draft?.params;
     if (draftParams) {
