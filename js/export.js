@@ -91,8 +91,9 @@ export function generarTextoDetalladoCalendar(opciones = {}) {
     // Detalle de trabajos
     const trabajos = (g0?.otrosTrabajos || []).map(t => `${t.concepto} ${eur0(t.total)}`).join(' ');
     const puNum = n0 ? Math.round(Number(n0.precioUnidad || 0)) : 0;
-    const totalGrupoNum = g0 ? Math.round(Number(g0.totalGrupo || 0)) : 0;
-    const tituloBase = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' ' : ''}· PU ${puNum}-${totalGrupoNum}€${trabajos ? ' ' + trabajos : ''} total ${totalGeneral} Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''} Nº Presupuesto: ${numero}`.replace(/\s+/g, ' ').trim();
+    // Subtotal de neumáticos: precio/ud * cantidad del neumático elegido
+    const subtotalNeumaticosNum = n0 ? Math.round(Number(n0.total || 0)) : 0;
+    const tituloBase = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' ' : ''}· PU ${puNum}-${subtotalNeumaticosNum}€${trabajos ? ' ' + trabajos : ''} total ${totalGeneral} Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''} Nº Presupuesto: ${numero}`.replace(/\s+/g, ' ').trim();
     const titulo = observaciones ? `***${tituloBase}` : tituloBase;
 
     // Descripción simplificada: solo lo que pides
