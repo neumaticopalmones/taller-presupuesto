@@ -81,27 +81,36 @@ export function generarTextoDetalladoCalendar(opciones = {}) {
     const totalGrupo = g0 ? eur0(g0.totalGrupo) : '';
     const totalGeneral = eur0(p.totalGeneral || 0);
 
-    const proveedor = opciones.proveedor || document.getElementById('calendar-proveedor')?.value || '';
+    // Campos añadidos al presupuesto
+    const proveedor = (document.getElementById('presupuesto-distribuidor')?.value || opciones.proveedor || document.getElementById('calendar-proveedor')?.value || '').trim();
+    const descripcion = (document.getElementById('presupuesto-descripcion')?.value || '').trim();
+    const observaciones = (document.getElementById('presupuesto-observaciones')?.value || '').trim();
+    // Opcionales extra
     const porte = opciones.porte ?? document.getElementById('calendar-porte')?.value;
-    const nota = opciones.nota || document.getElementById('calendar-nota')?.value || '';
 
     // Detalle de trabajos
-    const trabajos = (g0?.otrosTrabajos || []).map(t => `- ${t.concepto} – ${t.cantidad} x ${eur0(t.precioUnidad)} = ${eur0(t.total)}`).join('\n');
+    const trabajos = (g0?.otrosTrabajos || []).map(t => `${t.concepto} ${eur0(t.total)}`).join(' ');
+    const puNum = n0 ? Math.round(Number(n0.precioUnidad || 0)) : 0;
+    const totalGrupoNum = g0 ? Math.round(Number(g0.totalGrupo || 0)) : 0;
+    const tituloBase = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' ' : ''}· PU ${puNum}-${totalGrupoNum}€${trabajos ? ' ' + trabajos : ''} total ${totalGeneral} Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''} Nº Presupuesto: ${numero}`.replace(/\s+/g, ' ').trim();
+    const titulo = observaciones ? `***${tituloBase}` : tituloBase;
 
-    const lineCompact = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' · ' : ''}${pu ? 'PU ' + pu + ' · ' : ''}${totalGrupo ? 'Grupo ' + totalGrupo : ''}${proveedor ? ' (' + proveedor + ')' : ''}${porte ? ' · Porte ' + eur0(porte) : ''}${nota ? ' · Nota: ' + nota : ''}`.trim();
+    const trabajosDetalle = (g0?.otrosTrabajos || []).map(t => `- ${t.concepto} – ${t.cantidad} x ${eur0(t.precioUnidad)} = ${eur0(t.total)}`).join('\n');
     const detalle = [
+        `Distribuidor: ${proveedor || ''}`,
+        (observaciones ? `Observaciones: ${observaciones}` : null),
+        (descripcion ? `Descripción: ${descripcion}` : null),
         `Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''}`,
         `Nº Presupuesto: ${numero}${fechaES ? ' · Fecha: ' + fechaES : ''}`,
         `Medida: ${medida}${cantidad ? ' · Cantidad: ' + cantidad : ''}`,
         `Marca: ${marca}${pu ? ' · Precio/Ud: ' + pu : ''}${totalGrupo ? ' · Total grupo: ' + totalGrupo : ''}`,
-        (trabajos ? `Trabajos:\n${trabajos}` : null),
-        (proveedor || porte ? `Proveedor: ${proveedor || '-'}${porte ? ' · Porte: ' + eur0(porte) : ''}` : null),
-        (nota ? `Nota: ${nota}` : null),
+        (trabajosDetalle ? `Trabajos:\n${trabajosDetalle}` : null),
+        (porte ? `Porte: ${eur0(porte)}` : null),
         `TOTAL GENERAL: ${totalGeneral}`,
         `Taller: Neumáticos Palmones – C/ Galeón 25, Polígono 1 Palmones, Los Barrios. Tlf: 659718809`
     ].filter(Boolean).join('\n');
 
-    return { titulo: `Cita neumáticos ${medida}${marca ? ' – ' + marca : ''} – Nº ${numero}`, lineCompact, detalle };
+    return { titulo, lineCompact: titulo, detalle };
 }
 
 export function copiarParaCalendar() {

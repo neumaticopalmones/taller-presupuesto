@@ -316,7 +316,11 @@ document.addEventListener('DOMContentLoaded', () => {
             iva: document.getElementById('presupuesto-iva')?.value || ''
         };
 
-        const presupuestoData = {
+    const distribuidor = UI.DOMElements.presupuestoDistribuidor?.value || '';
+    const descripcion = UI.DOMElements.presupuestoDescripcion?.value || '';
+    const observaciones = UI.DOMElements.presupuestoObservaciones?.value || '';
+
+    const presupuestoData = {
             cliente: clienteData,
             fecha: fecha,
             vista_cliente: {
@@ -326,6 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
             vista_interna: {
                 grupos: currentPresupuesto.grupos,
                 totalGeneral: currentPresupuesto.totalGeneral,
+        distribuidor,
+        descripcion,
+        observaciones,
                 draft: {
                     params: draftParams,
                     tempNeumaticos: currentPresupuesto.tempNeumaticos,
