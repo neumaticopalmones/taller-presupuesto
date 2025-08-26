@@ -95,19 +95,11 @@ export function generarTextoDetalladoCalendar(opciones = {}) {
     const tituloBase = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' ' : ''}· PU ${puNum}-${totalGrupoNum}€${trabajos ? ' ' + trabajos : ''} total ${totalGeneral} Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''} Nº Presupuesto: ${numero}`.replace(/\s+/g, ' ').trim();
     const titulo = observaciones ? `***${tituloBase}` : tituloBase;
 
-    const trabajosDetalle = (g0?.otrosTrabajos || []).map(t => `- ${t.concepto} – ${t.cantidad} x ${eur0(t.precioUnidad)} = ${eur0(t.total)}`).join('\n');
+    // Descripción simplificada: solo lo que pides
     const detalle = [
-        `Distribuidor: ${proveedor || ''}`,
+        (proveedor ? `Distribuidor: ${proveedor}` : null),
         (observaciones ? `Observaciones: ${observaciones}` : null),
-        (descripcion ? `Descripción: ${descripcion}` : null),
-        `Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''}`,
-        `Nº Presupuesto: ${numero}${fechaES ? ' · Fecha: ' + fechaES : ''}`,
-        `Medida: ${medida}${cantidad ? ' · Cantidad: ' + cantidad : ''}`,
-        `Marca: ${marca}${pu ? ' · Precio/Ud: ' + pu : ''}${totalGrupo ? ' · Total grupo: ' + totalGrupo : ''}`,
-        (trabajosDetalle ? `Trabajos:\n${trabajosDetalle}` : null),
-        (porte ? `Porte: ${eur0(porte)}` : null),
-        `TOTAL GENERAL: ${totalGeneral}`,
-        `Taller: Neumáticos Palmones – C/ Galeón 25, Polígono 1 Palmones, Los Barrios. Tlf: 659718809`
+        (descripcion ? `Descripción: ${descripcion}` : null)
     ].filter(Boolean).join('\n');
 
     return { titulo, lineCompact: titulo, detalle };
@@ -164,13 +156,16 @@ export function abrirEnCalendar() {
     };
 
     const dates = `${fmt(start)}/${fmt(end)}`;
-    const location = 'Neumáticos Palmones, C/ Galeón 25, Polígono 1 Palmones, Los Barrios';
+    const location = '';
 
     // Abrir ventana de forma sincrónica para evitar bloqueos
     let win = null;
     try { win = window.open('about:blank', '_blank'); } catch (_) { win = null; }
 
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&details=${encodeURIComponent(detalle)}&dates=${encodeURIComponent(dates)}&location=${encodeURIComponent(location)}`;
+    let url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&details=${encodeURIComponent(detalle)}&dates=${encodeURIComponent(dates)}`;
+    if (location) {
+        url += `&location=${encodeURIComponent(location)}`;
+    }
     if (win && !win.closed) {
         win.location.href = url;
     } else {
