@@ -60,6 +60,115 @@ export function generarTextoPresupuesto() {
     return msg.trimEnd();
 }
 
+// Genera el texto detallado para Calendar (cita)
+export function generarTextoDetalladoCalendar(opciones = {}) {
+    const p = getCurrentPresupuesto();
+    const eur0 = (n) => `${Math.round(Number(n || 0)).toLocaleString('es-ES')}€`;
+
+    const numero = document.getElementById('presupuesto-numeroPresupuesto')?.value || '';
+    const fechaP = document.getElementById('presupuesto-fechaPresupuesto')?.value || '';
+    const fechaES = fechaP ? new Date(fechaP).toLocaleDateString('es-ES') : '';
+    const nombre = document.getElementById('presupuesto-nombreCliente')?.value || '';
+    const telefono = document.getElementById('presupuesto-telefonoCliente')?.value || '';
+
+    const grupos = gruposPorMarca(p.grupos || []);
+    const g0 = grupos[0];
+    const n0 = g0?.neumaticos?.[0];
+    const medida = g0?.medida || n0?.medida || '';
+    const cantidad = g0?.cantidad || n0?.cantidad || '';
+    const marca = n0?.nombre || '';
+    const pu = n0 ? eur0(n0.precioUnidad) : '';
+    const totalGrupo = g0 ? eur0(g0.totalGrupo) : '';
+    const totalGeneral = eur0(p.totalGeneral || 0);
+
+    const proveedor = opciones.proveedor || document.getElementById('calendar-proveedor')?.value || '';
+    const porte = opciones.porte ?? document.getElementById('calendar-porte')?.value;
+    const nota = opciones.nota || document.getElementById('calendar-nota')?.value || '';
+
+    // Detalle de trabajos
+    const trabajos = (g0?.otrosTrabajos || []).map(t => `- ${t.concepto} – ${t.cantidad} x ${eur0(t.precioUnidad)} = ${eur0(t.total)}`).join('\n');
+
+    const lineCompact = `${cantidad ? cantidad + '–' : ''}${medida} ${marca ? marca + ' · ' : ''}${pu ? 'PU ' + pu + ' · ' : ''}${totalGrupo ? 'Grupo ' + totalGrupo : ''}${proveedor ? ' (' + proveedor + ')' : ''}${porte ? ' · Porte ' + eur0(porte) : ''}${nota ? ' · Nota: ' + nota : ''}`.trim();
+    const detalle = [
+        `Cliente: ${nombre}${telefono ? ' · Tel: ' + telefono : ''}`,
+        `Nº Presupuesto: ${numero}${fechaES ? ' · Fecha: ' + fechaES : ''}`,
+        `Medida: ${medida}${cantidad ? ' · Cantidad: ' + cantidad : ''}`,
+        `Marca: ${marca}${pu ? ' · Precio/Ud: ' + pu : ''}${totalGrupo ? ' · Total grupo: ' + totalGrupo : ''}`,
+        (trabajos ? `Trabajos:\n${trabajos}` : null),
+        (proveedor || porte ? `Proveedor: ${proveedor || '-'}${porte ? ' · Porte: ' + eur0(porte) : ''}` : null),
+        (nota ? `Nota: ${nota}` : null),
+        `TOTAL GENERAL: ${totalGeneral}`,
+        `Taller: Neumáticos Palmones – C/ Galeón 25, Polígono 1 Palmones, Los Barrios. Tlf: 659718809`
+    ].filter(Boolean).join('\n');
+
+    return { titulo: `Cita neumáticos ${medida}${marca ? ' – ' + marca : ''} – Nº ${numero}`, lineCompact, detalle };
+}
+
+export function copiarParaCalendar() {
+    const { lineCompact, detalle } = generarTextoDetalladoCalendar();
+    const texto = `${lineCompact}\n\n${detalle}`;
+    navigator.clipboard.writeText(texto).then(() => {
+        M.toast({ html: 'Texto copiado para Calendar', classes: 'green' });
+    }).catch(err => {
+        const toastId = 'toast-error-' + Date.now();
+        const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
+        const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+        M.toast({
+            html: `<span id='${toastId}' style='white-space:pre-line;'>No se pudo copiar: ${err?.message || err}</span>${copyBtn}${closeBtn}`,
+            classes: 'red',
+            displayLength: Infinity
+        });
+    });
+}
+
+export function abrirEnCalendar() {
+    const { titulo, detalle } = generarTextoDetalladoCalendar();
+    // Fechas
+    const fechaStr = document.getElementById('calendar-fecha')?.value || '';
+    const horaStr = document.getElementById('calendar-hora')?.value || '';
+    const durMin = parseInt(document.getElementById('calendar-duracion')?.value || '60');
+
+    let start = new Date();
+    if (fechaStr) {
+        const [y, m, d] = fechaStr.split('-').map(Number);
+        if (horaStr) {
+            const [hh, mm] = horaStr.split(':').map(Number);
+            start = new Date(y, (m - 1), d, hh, mm, 0);
+        } else {
+            start = new Date(y, (m - 1), d, 10, 0, 0);
+        }
+    } else {
+        // por defecto, en 1 hora desde ahora
+        start.setMinutes(start.getMinutes() + 60);
+    }
+    const end = new Date(start.getTime() + (isNaN(durMin) ? 60 : durMin) * 60000);
+
+    const fmt = (dt) => {
+        const pad = (n) => String(n).padStart(2, '0');
+        const y = dt.getFullYear();
+        const m = pad(dt.getMonth() + 1);
+        const d = pad(dt.getDate());
+        const hh = pad(dt.getHours());
+        const mm = pad(dt.getMinutes());
+        const ss = pad(dt.getSeconds());
+        return `${y}${m}${d}T${hh}${mm}${ss}`;
+    };
+
+    const dates = `${fmt(start)}/${fmt(end)}`;
+    const location = 'Neumáticos Palmones, C/ Galeón 25, Polígono 1 Palmones, Los Barrios';
+
+    // Abrir ventana de forma sincrónica para evitar bloqueos
+    let win = null;
+    try { win = window.open('about:blank', '_blank'); } catch (_) { win = null; }
+
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&details=${encodeURIComponent(detalle)}&dates=${encodeURIComponent(dates)}&location=${encodeURIComponent(location)}`;
+    if (win && !win.closed) {
+        win.location.href = url;
+    } else {
+        window.open(url, '_blank');
+    }
+}
+
 async function construirNodoA4() {
     const tabla = document.querySelector('.presupuesto-section .budget-table-container');
     if (!tabla) {
