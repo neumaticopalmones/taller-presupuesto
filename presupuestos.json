@@ -1,0 +1,129 @@
+[
+  {
+    "numero": "20250819-039",
+    "fecha": "2025-08-19",
+    "cliente": {
+      "nombre": "paco",
+      "telefono": "659718809",
+      "nif": ""
+    },
+    "vista_cliente": {
+      "grupos": [
+        {
+          "id": "grupo-1755564902838",
+          "neumaticos": [
+            {
+              "cantidad": 2,
+              "ecotasa": 3,
+              "ganancia": 23,
+              "id": "1755564514104-x8r2e85cn",
+              "iva": 21,
+              "marca": "habilead",
+              "medida": "195/65/15 91v",
+              "neto": 52,
+              "precioUnidad": 94.38,
+              "total": 188.76
+            }
+          ],
+          "otrosTrabajos": [
+            {
+              "cantidad": 1,
+              "concepto": "asdas",
+              "id": "1755564532077-z2idbb700",
+              "precioUnidad": 46,
+              "total": 46
+            }
+          ]
+        },
+        {
+          "id": "grupo-1755568741436",
+          "neumaticos": [
+            {
+              "cantidad": 2,
+              "ecotasa": 3,
+              "ganancia": 23,
+              "id": "1755564514104-x8r2e85cn",
+              "iva": 21,
+              "marca": "habilead",
+              "medida": "195/65/15 91v",
+              "neto": 52,
+              "precioUnidad": 94.38,
+              "total": 188.76
+            },
+            {
+              "cantidad": 2,
+              "ecotasa": 3,
+              "ganancia": 23,
+              "id": "1755564518648-5t4laj0sk",
+              "iva": 21,
+              "marca": "sailun",
+              "medida": "195/65/15 91v",
+              "neto": 56,
+              "precioUnidad": 99.22,
+              "total": 198.44
+            },
+            {
+              "cantidad": 2,
+              "ecotasa": 3,
+              "ganancia": 23,
+              "id": "1755564524977-3hmwrtfqy",
+              "iva": 21,
+              "marca": "firestone",
+              "medida": "195/65/15 91v",
+              "neto": 68,
+              "precioUnidad": 113.74,
+              "total": 227.48
+            }
+          ],
+          "otrosTrabajos": [
+            {
+              "cantidad": 1,
+              "concepto": "asdas",
+              "id": "1755564532077-z2idbb700",
+              "precioUnidad": 46,
+              "total": 46
+            }
+          ]
+        }
+      ],
+      "totalGeneral": 895.4399999999999
+    },
+    "vista_interna": {
+      "medida": "195/65/15 91v",
+      "cantidad": "2",
+      "ganancia": "24",
+      "ecotasa": "3",
+      "iva": "21",
+      "marcas_temporales": [
+        {
+          "id": "1755564514104-x8r2e85cn",
+          "marca": "habilead",
+          "neto": 52
+        },
+        {
+          "id": "1755564518648-5t4laj0sk",
+          "marca": "sailun",
+          "neto": 56
+        },
+        {
+          "id": "1755564524977-3hmwrtfqy",
+          "marca": "firestone",
+          "neto": 68
+        },
+        {
+          "id": "1755640252040-dp84rnznl",
+          "marca": "dunlop",
+          "neto": 68
+        }
+      ],
+      "otros_trabajos_temporales": [
+        {
+          "concepto": "asdas",
+          "id": "1755564532077-z2idbb700",
+          "precioFinal": 46
+        }
+      ]
+    },
+    "id": "ca820caf-b6de-4deb-9a52-e3bc90b74845"
+  }
+]

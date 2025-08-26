@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neumáticos Palmones - Presupuestos</title>
+
+  <!-- Materialize CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Favicon inline para evitar 404 en /favicon.ico -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%230b63f6' width='64' height='64' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='36' font-family='Segoe UI, Arial' fill='white'%3EN%3C/text%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-wrapper blue darken-3">
+      <a href="#" class="brand-logo center">Neumáticos Palmones</a>
+      <ul id="nav-mobile" class="left hide-on-med-and-down">
+  <li><a href="#presupuestos-view" class="nav-link">Presupuestos</a></li>
+  <li><a href="#historial-view" class="nav-link">Historial</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <header class="header">
+      <h1>NEUMÁTICOS PALMONES</h1>
+      <p>
+        C/GALEON 25. POLÍGONO 1 PALMONES<br>
+        11379 Los Barrios<br>
+        neumaticospalmones@hotmail.com<br>
+        Tlf: 659718809
+      </p>
+    </header>
+
+    <!-- Datos cliente + meta -->
+    <section id="presupuestos-view" class="cliente-section no-imprimir app-section">
+      <form id="cliente-form" onsubmit="return false;">
+        <div class="form-errors" style="display:none"></div>
+        <fieldset>
+          <legend>Datos del cliente</legend>
+          <div class="row">
+            <div class="input-field col s4">
+              <input type="text" id="presupuesto-nombreCliente" class="validate">
+              <label for="presupuesto-nombreCliente">Nombre y Apellidos</label>
+            </div>
+            <div class="input-field col s4">
+              <input type="tel" id="presupuesto-telefonoCliente" class="validate">
+              <label for="presupuesto-telefonoCliente">Teléfono</label>
+            </div>
+            <div class="input-field col s4">
+              <input type="text" id="presupuesto-nifCliente" class="validate">
+              <label for="presupuesto-nifCliente">NIF/CIF</label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s6">
+              <input type="text" id="presupuesto-numeroPresupuesto" class="validate">
+              <label for="presupuesto-numeroPresupuesto">Nº de Presupuesto</label>
+            </div>
+            <div class="input-field col s6">
+              <input type="date" id="presupuesto-fechaPresupuesto" class="validate">
+              <label for="presupuesto-fechaPresupuesto" class="active">Fecha</label>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+
+    <!-- Añadir grupo -->
+    <section id="productos-view" class="productos-section no-imprimir app-section">
+      <form id="producto-form" onsubmit="return false;">
+        <div class="form-errors" style="display:none"></div>
+        <fieldset>
+          <legend>Añadir Grupo de Productos</legend>
+          <div class="row">
+            <div class="input-field col s3">
+              <input type="text" id="presupuesto-medida">
+              <label for="presupuesto-medida">Medida (para neumáticos)</label>
+            </div>
+            <div class="input-field col s2">
+              <input type="number" id="presupuesto-cantidad" min="1" value="2">
+              <label for="presupuesto-cantidad">Cantidad</label>
+            </div>
+            <div class="input-field col s2">
+              <input type="number" id="presupuesto-ganancia" step="0.01" value="0">
+              <label for="presupuesto-ganancia">Ganancia (€)</label>
+            </div>
+            <div class="input-field col s2">
+              <input type="number" id="presupuesto-ecotasa" step="0.01" value="0">
+              <label for="presupuesto-ecotasa">Ecotasa (€)</label>
+            </div>
+            <div class="input-field col s2">
+              <input type="number" id="presupuesto-iva" step="0.01" value="21">
+              <label for="presupuesto-iva">IVA (%)</label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s5">
+              <input type="text" id="presupuesto-marca-temp">
+              <label for="presupuesto-marca-temp">Marca</label>
+            </div>
+            <div class="input-field col s5">
+              <input type="number" id="presupuesto-neto-temp" step="0.01">
+              <label for="presupuesto-neto-temp">Neto (€)</label>
+            </div>
+            <div class="input-field col s2">
+              <button type="button" id="btnAgregarMarca" class="btn waves-effect waves-light">+ Añadir</button>
+            </div>
+          </div>
+          <ul id="lista-marcas-temp"></ul>
+          <hr>
+
+          <legend>Añadir Trabajo</legend>
+          <div class="row">
+            <div class="input-field col s6">
+              <input type="text" id="presupuesto-otro-concepto">
+              <label for="presupuesto-otro-concepto">Concepto</label>
+            </div>
+            <div class="input-field col s4">
+              <input type="number" id="presupuesto-otro-precio" step="0.01">
+              <label for="presupuesto-otro-precio">Precio Final (€)</label>
+            </div>
+            <div class="input-field col s2">
+              <button type="button" id="btnAgregarOtroTrabajo" class="btn waves-effect waves-light">+ Añadir</button>
+            </div>
+          </div>
+          <ul id="lista-otros-trabajos-temp"></ul>
+          <hr>
+
+          <button type="button" id="btnAgregarGrupo" class="btn-large waves-effect waves-light" style="width:100%;">Agregar Grupo al Presupuesto</button>
+        </fieldset>
+      </form>
+    </section>
+
+    <!-- Presupuesto final -->
+    <section id="presupuesto-final-view" class="presupuesto-section app-section">
+      <div class="presupuesto-meta" id="presupuesto-meta"></div>
+      <h2>Presupuesto</h2>
+      <div id="presupuesto-final-render"></div>
+    </section>
+
+    <!-- Acciones -->
+    <section id="acciones-finales-view" class="acciones-finales no-imprimir app-section">
+      <div class="left">
+        <label>
+          <input type="checkbox" id="toggleCompacto" />
+          <span>Modo compacto</span>
+        </label>
+      </div>
+
+      <div class="right">
+  <button type="button" id="btnGuardarPresupuesto" class="btn waves-effect waves-light green">Guardar</button>
+  <button type="button" id="btnGuardarComoNuevo" class="btn waves-effect waves-light blue" style="display:none;">Guardar como nuevo</button>
+  <button type="button" id="btnVerHistorial" class="btn waves-effect waves-light blue">Ver historial</button>
+  <button type="button" id="btnCancelarEdicion" class="btn waves-effect waves-light grey" style="display:none;">Cancelar</button>
+
+  <button type="button" id="btnImprimirPresupuesto" class="btn waves-effect waves-light blue">Imprimir</button>
+  <button type="button" id="btnDescargarPDF" class="btn waves-effect waves-light">Descargar PDF</button>
+  <button type="button" id="btnCapturaWhatsApp" class="btn waves-effect waves-light">Captura + WhatsApp</button>
+  <button type="button" id="btnCompartirWhatsApp" class="btn waves-effect waves-light green">WhatsApp (texto)</button>
+      </div>
+    </section>
+
+    <!-- Historial -->
+    <section id="historial-view" class="historial-section no-imprimir app-section">
+  <h2>Historial de Presupuestos</h2>
+  <button type="button" id="btnVolverPresupuestos" class="btn waves-effect waves-light grey" style="margin-bottom:16px;">Volver</button>
+  <div class="row" style="margin-bottom: 0;">
+    <div class="input-field col s4">
+      <input type="text" id="hist-buscar-nombre" />
+      <label for="hist-buscar-nombre">Nombre</label>
+    </div>
+    <div class="input-field col s4">
+      <input type="text" id="hist-buscar-telefono" />
+      <label for="hist-buscar-telefono">Teléfono</label>
+    </div>
+    <div class="input-field col s4">
+      <input type="text" id="hist-buscar-numero" />
+      <label for="hist-buscar-numero">Nº Presupuesto</label>
+    </div>
+  </div>
+  <div class="row" style="margin-top: -10px;">
+    <div class="col s12 right-align">
+      <button type="button" id="hist-buscar-btn" class="btn waves-effect waves-light blue">Buscar</button>
+      <button type="button" id="hist-limpiar-btn" class="btn waves-effect waves-light grey">Limpiar</button>
+    </div>
+  </div>
+  <ul id="lista-historial" class="collection"></ul>
+  <div id="paginacion-container"></div>
+    </section>
+
+
+
+  </div>
+
+    
+
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+  <!-- Captura HTML a imagen / PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

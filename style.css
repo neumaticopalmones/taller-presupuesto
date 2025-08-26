@@ -1,0 +1,104 @@
+/* ===== Base ===== */
+body { background-color: #f4f4f4; color: #222; }
+.container { margin-top: 20px; }
+
+/* App Sections */
+.app-section { display: none; }
+.app-section.active-section { display: block; }
+
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { margin: 0 0 6px 0; font-weight: 800; letter-spacing: .5px; color: #0b63f6; font-size: 28px; text-transform: uppercase; }
+.header p { margin: 0; line-height: 1.3; color: #444; font-size: 13px; }
+
+fieldset { border: 1px solid #ddd; padding: 16px; margin-bottom: 20px; border-radius: 8px; background: #fff; }
+legend { padding: 0 10px; font-weight: 700; color: #0b63f6; font-size: 14px; }
+
+.acciones-finales { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.acciones-finales .btn { margin-left: 8px; }
+
+/* Meta línea (Nº/Fecha) */
+.presupuesto-meta { min-height: 20px; }
+.meta-line { text-align: right; color: #444; font-size: 13px; margin-bottom: 6px; }
+
+/* ===== Tabla ===== */
+.budget-table-container { border-radius: 10px; box-shadow: 0 6px 14px rgba(0,0,0,0.08); overflow: hidden; margin-top: 12px; background: #fff; }
+.budget-table { width: 100%; border-collapse: collapse; }
+.budget-table thead { background: #0b63f6; color: #fff; }
+.budget-table th, .budget-table td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #e9eef5; font-size: 14px; vertical-align: middle; }
+.budget-table th { text-transform: lowercase; letter-spacing: .2px; font-weight: 700; }
+.budget-table tbody tr:nth-child(even) { background-color: #fafafa; }
+.budget-table tbody tr:last-child td { border-bottom: none; }
+.budget-table .group-separator td { background: transparent; border-bottom: none; height: 10px; padding: 0; }
+.action-delete { cursor: pointer; color: #ef5350; user-select: none; }
+.group-total td { border-top: 2px solid #0b63f6; background-color: #f6f9ff; font-size: 15px; text-align: right; }
+
+/* ===== Modo compacto (pantalla) ===== */
+body.compacto .budget-table th, body.compacto .budget-table td { padding: 7px 6px; font-size: 12px; }
+body.compacto .budget-table thead th { font-size: 12px; }
+body.compacto .group-total td { font-size: 12.5px; }
+body.compacto .budget-table .group-separator td { height: 5px; }
+body.compacto .header h1 { font-size: 24px; }
+body.compacto .header p { font-size: 12px; }
+body.compacto .presupuesto-section h2 { font-size: 24px; margin: 6px 0 6px; }
+body.compacto .meta-line { font-size: 12px; }
+
+/* ===== Captura A4 (como impresión) ===== */
+.a4-capture { width: 794px; padding: 24px 28px; background: #fff; color: #000; font-size: 12pt; box-shadow: none; }
+.a4-capture .header h1 { font-size: 18pt; color: #333; margin-bottom: 6px; }
+.a4-capture .header p { font-size: 10pt; color: #444; }
+.a4-title { font-size: 22pt; margin: 10px 0 10px; color: #111; }
+/* Reducir tamaño del título en capturas para clientes */
+.a4-title { font-size: 18pt; }
+.a4-capture .budget-table-container { box-shadow: none; border: 1px solid #cfcfcf; margin-top: 8px; }
+.a4-capture .budget-table thead { background: #e9eef5; color: #111; }
+.a4-capture .budget-table th, .a4-capture .budget-table td { padding: 6px 8px; font-size: 10pt; border-bottom: 1px solid #cfcfcf; }
+.a4-capture .group-total td { background: #f1f5ff; border-top: 2px solid #0b63f6; }
+.a4-capture .meta-line { text-align: right; color: #444; font-size: 10pt; margin-bottom: 4px; }
+/* Ocultar acciones y papelera en capturas */
+.a4-capture .no-imprimir,
+.a4-capture .action-delete { display: none !important; }
+
+/* ===== Impresión compacta ===== */
+@media print {
+  @page { margin: 10mm; }
+  body { background: #fff; color: #000; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .container { width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
+
+  /* No mostrar la barra de navegación en impresión */
+  nav { display: none !important; }
+
+  .no-imprimir,
+  .cliente-section, .productos-section, .acciones-finales,
+  .historial-section, .action-delete, #lista-historial .acciones { display: none !important; }
+
+  .presupuesto-section { display: block; }
+  .budget-table-container { box-shadow: none; border: 1px solid #cfcfcf; margin-top: 6px; }
+  .budget-table thead { background-color: #e9eef5 !important; color: #111; }
+
+  .budget-table th, .budget-table td { padding: 3px 5px; font-size: 9pt; border-bottom: 1px solid #cfcfcf; }
+  .group-total td { font-size: 10pt; border-top: 2px solid #0b63f6 !important; background: #f1f5ff !important; }
+
+  table, th, td { border: 1px solid #cfcfcf; border-collapse: collapse; }
+  h1, h2, h3 { color: #111; }
+  /* Reducir tamaño del título 'Presupuesto' y ocultar total general en impresión */
+  .presupuesto-section h2 { font-size: 18pt; margin: 8px 0; }
+  .presupuesto-section h4 { display: none !important; }
+}
+
+/* ===== Historial ===== */
+.collection .collection-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collection-item .historial-info {
+  flex-grow: 1; /* Takes up most of the space */
+}
+
+.collection-item .historial-total {
+  padding: 0 15px; /* Spacing */
+  font-weight: bold;
+}
+
+/* El botón de .acciones ya está centrado verticalmente gracias a align-items: center en el padre */
