@@ -244,14 +244,41 @@ async function construirNodoA4() {
     return a4;
 }
 
-async function capturarNodoComoCanvas(nodo) {
-    return await html2canvas(nodo, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+async function capturarNodoComoCanvas(nodo, { scale = 2 } = {}) {
+    // Intenta con la escala indicada y, si falla por memoria/render, reintenta con escala 1
+    try {
+        return await html2canvas(nodo, { scale, useCORS: true, backgroundColor: '#ffffff' });
+    } catch (err) {
+        if (scale !== 1) {
+            try {
+                return await html2canvas(nodo, { scale: 1, useCORS: true, backgroundColor: '#ffffff' });
+            } catch (_) {
+                throw err;
+            }
+        }
+        throw err;
+    }
 }
 
 function canvasToBlob(canvas) {
     return new Promise(resolve => {
         canvas.toBlob(blob => resolve(blob));
     });
+}
+
+function descargarBlobComo(nombre, blob) {
+    try {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nombre;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 0);
+    } catch (_) {}
 }
 
 export async function exportarPresupuestoPDF(nombre = 'presupuesto.pdf') {
@@ -294,29 +321,87 @@ export async function capturaYWhatsApp() {
     if (tel.length === 9) tel = '34' + tel;
     const saludo = `Buenas, del taller de Neumáticos Palmones te mandamos el presupuesto solicitado (Nº ${document.getElementById('presupuesto-numeroPresupuesto')?.value || ''}).`;
     const url = `https://wa.me/${tel}?text=${encodeURIComponent(saludo)}`;
-
-    // 2) Abrir la ventana/pestaña de WhatsApp de forma SINCRONA para evitar bloqueos de pop-up
+    // 2) Decidir si usaremos Web Share API (móviles) o ventana WhatsApp (escritorio)
     let waWin = null;
-    try { waWin = window.open('about:blank', '_blank'); } catch (_) { waWin = null; }
+    let mayUseWebShare = false;
+    try {
+        mayUseWebShare = !!(navigator && navigator.canShare && navigator.share);
+    } catch (_) { mayUseWebShare = false; }
+    // Si hay teléfono, preferimos abrir directamente el chat de WhatsApp del cliente
+    if (tel && tel.length > 0) {
+        mayUseWebShare = false;
+    }
+    // Nota: evitamos abrir ventanas antes de copiar para mantener el foco y mejorar la tasa de éxito del portapapeles
 
-    // 3) Construir A4 y capturar imagen
+    // 3) Construir A4 y capturar imagen (con fallback a captura simple de la tabla)
     const a4 = await construirNodoA4();
+    let canvas = null;
     if (!a4) {
-        // En caso de no haber nada que capturar, igualmente abrir WhatsApp si no se abrió
-        if (!waWin) window.open(url, '_blank'); else waWin.location.href = url;
-        return;
+        // Fallback: capturar directamente la tabla si existe
+        const tabla = document.querySelector('.presupuesto-section .budget-table-container');
+        if (tabla) {
+            try {
+                canvas = await capturarNodoComoCanvas(tabla, { scale: 2 });
+            } catch (_) {}
+        }
+        if (!canvas) {
+            if (!waWin) window.open(url, '_blank'); else waWin.location.href = url;
+            return;
+        }
     }
 
     try {
-        const canvas = await capturarNodoComoCanvas(a4);
-        const blob = await canvasToBlob(canvas);
+        if (!canvas) { canvas = await capturarNodoComoCanvas(a4, { scale: 2 }); }
+    const blob = await canvasToBlob(canvas);
+        const file = new File([blob], 'presupuesto.png', { type: 'image/png' });
 
-        // Intentar copiar la imagen al portapapeles si está soportado
+        // 3.a) Intentar Web Share API con archivo (ideal en móviles)
+        if (mayUseWebShare && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], text: saludo, title: 'Presupuesto' });
+                M.toast({ html: 'Compartido con WhatsApp (o app elegida).', classes: 'green', displayLength: 4000 });
+                // Cerrar ventana en blanco si la hubiéramos abierto (no debería en este camino)
+                try { if (waWin && !waWin.closed) waWin.close(); } catch (_) {}
+                return;
+            } catch (shareErr) {
+                // Continuar con flujo de escritorio si el share falla
+            }
+        }
+
+        // Intentar copiar la imagen al portapapeles si está soportado (antes de abrir WhatsApp)
+        // NOTA: La API de portapapeles para imágenes requiere contexto seguro (HTTPS o localhost)
+        const isSecure = (window.isSecureContext === true) || location.protocol === 'https:' || location.hostname === 'localhost';
+        if (!isSecure) {
+            // En LAN por IP (http://192.168.x.x) no se permite copiar imágenes al portapapeles.
+            // Ofrecer directamente la descarga del PNG y abrir WhatsApp.
+            try { descargarBlobComo('presupuesto.png', blob); } catch (_) {}
+            M.toast({
+                html: `Por seguridad del navegador, no se puede copiar imagen al portapapeles en esta página (no es HTTPS). He descargado <b>presupuesto.png</b>; adjúntala en WhatsApp.`,
+                classes: 'orange',
+                displayLength: 10000
+            });
+        } else {
         try {
             if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
-                ]);
+                // Primer intento
+                try {
+                    await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+                } catch (e1) {
+                    // Si falla por falta de foco, refocar y reintentar una vez
+                    const msg = (e1 && (e1.message || String(e1))) || '';
+                    if (/Document is not focused/i.test(msg)) {
+                        try {
+                try { window.focus(); } catch (_) {}
+                try { document.body && document.body.focus && document.body.focus(); } catch (_) {}
+                            await new Promise(r => setTimeout(r, 100));
+                            await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+                        } catch (e2) {
+                            throw e2;
+                        }
+                    } else {
+                        throw e1;
+                    }
+                }
                 const toastId = 'toast-info-' + Date.now();
                 const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
                 M.toast({
@@ -327,21 +412,25 @@ export async function capturaYWhatsApp() {
             } else {
                 const toastId = 'toast-warn-' + Date.now();
                 const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+                // Descarga automática como ayuda para adjuntar
+                descargarBlobComo('presupuesto.png', blob);
                 M.toast({
-                    html: `<span id='${toastId}'>Tu navegador no permite copiar imágenes al portapapeles. Abro WhatsApp igualmente; podrás pegar manualmente la imagen (Ctrl+V).</span>${closeBtn}`,
+                    html: `<span id='${toastId}'>No se pudo copiar la imagen directamente. He descargado <b>presupuesto.png</b>; adjúntala en WhatsApp si no puedes pegar (Ctrl+V).</span>${closeBtn}`,
                     classes: 'orange',
-                    displayLength: 8000
+                    displayLength: 10000
                 });
             }
         } catch (err) {
             const toastId = 'toast-error-' + Date.now();
             const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
             const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+            try { descargarBlobComo('presupuesto.png', blob); } catch (_) {}
             M.toast({
-                html: `<span id='${toastId}' style='white-space:pre-line;'>No se pudo copiar la imagen al portapapeles: ${err.message || err}. Abro WhatsApp para que puedas pegarla manualmente.</span>${copyBtn}${closeBtn}`,
+                html: `<span id='${toastId}' style='white-space:pre-line;'>No se pudo copiar la imagen al portapapeles: ${err.message || err}. He descargado <b>presupuesto.png</b>; adjúntala en WhatsApp si no puedes pegarla.</span>${copyBtn}${closeBtn}`,
                 classes: 'orange',
-                displayLength: 8000
+                displayLength: 10000
             });
+        }
         }
     } catch (error) {
         const toastId = 'toast-error-' + Date.now();
@@ -353,14 +442,20 @@ export async function capturaYWhatsApp() {
             displayLength: Infinity
         });
     } finally {
-        a4.remove();
+        if (a4 && a4.remove) a4.remove();
     }
 
-    // 4) Redirigir la ventana de WhatsApp (o abrirla si no se pudo antes)
-    if (waWin && !waWin.closed) {
-        try { waWin.location.href = url; }
-        catch (_) { window.open(url, '_blank'); }
-    } else {
-        window.open(url, '_blank');
+    // 4) Abrir WhatsApp (después de copiar, para no perder el foco)
+    try {
+        const opened = window.open(url, '_blank');
+        if (!opened) throw new Error('popup-blocked');
+    } catch (_) {
+        const openBtn = `<a class='btn-flat toast-action' href='${url}' target='_blank' rel='noopener noreferrer'>Abrir WhatsApp</a>`;
+        const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+        M.toast({
+            html: `<span>No se pudo abrir automáticamente WhatsApp (bloqueo de ventanas). Pulsa “Abrir WhatsApp”.</span>${openBtn}${closeBtn}`,
+            classes: 'orange',
+            displayLength: 10000
+        });
     }
 }

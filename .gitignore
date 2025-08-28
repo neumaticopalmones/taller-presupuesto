@@ -1,5 +1,40 @@
 # Python
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# VS Code
+.vscode/
+.history/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker / logs
+*.log
+
+# Local helpers
+host_ip.txt
+
+# Caddy certs
+caddy/certs/
+
+# Alembic cache
+migrations/__pycache__/
+# Python
+__pycache__/
 *.pyc
 *.pyo
 *.pyd

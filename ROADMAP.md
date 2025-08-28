@@ -71,3 +71,22 @@
 - Mantener numeración por año en nuevos documentos (pedido, etc.)
 - Estados como máquina de estados (validar transiciones en backend)
 - Idempotencia en integraciones mediante sync_external
+
+## Auditoría actual (pendientes inmediatos)
+
+P0 (corregir primero)
+- Sanitizar render de campos de usuario en presupuesto (ui.js): usar sanitizeHTML/textContent en marca, medida y conceptos.
+- Concurrencia al generar número de presupuesto (app.py): capturar IntegrityError y reintentar o usar contador por año.
+- CORS restringido a orígenes conocidos en producción.
+- Calendar: exigir fecha/hora antes de abrir; añadir ctz=Europe/Madrid en la URL.
+
+P1 (usabilidad/arquitectura)
+- Soporte DATABASE_URL con sslmode=require y fallback a POSTGRES_*.
+- Índices para búsquedas por nombre/teléfono (Cliente) y performance de historial.
+- “Nº Presupuesto” readonly; validaciones extra de medida/teléfono.
+- Botón “Descargar .ics” para citas.
+
+P2 (infra/mantenimiento)
+- Docker prod (FLASK_ENV=production, gunicorn) y desactivar debug.
+- Modularización incremental (features en frontend; blueprints en backend).
+- Tests mínimos: numeración anual, filtros historial, crear/editar presupuesto, sanitización UI.

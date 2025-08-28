@@ -9,6 +9,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.exc import IntegrityError
 
 # --- Utilidad para limpiar la vista antes de guardar ---
 def _clean_vista_for_db(vista_data):
@@ -162,20 +163,26 @@ def create_presupuesto():
             abort(400, description="Fecha del presupuesto es requerida.")
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
 
-        new_presupuesto = Presupuesto(
-            id=str(uuid.uuid4()),
-            numero=generar_siguiente_numero_presupuesto(),
-            fecha=fecha_obj,
-            cliente_id=cliente.id,
-            vista_cliente=vista_cliente_data,
-            vista_interna=vista_interna_data
-        )
-
-        db.session.add(new_presupuesto)
-        db.session.commit()
-
-        # Return the rehydrated object
-        return jsonify(new_presupuesto.to_dict()), 201
+        # Intentar varias veces por si hay colisión de número (uso simultáneo)
+        intentos = 5
+        for _ in range(intentos):
+            try:
+                new_presupuesto = Presupuesto(
+                    id=str(uuid.uuid4()),
+                    numero=generar_siguiente_numero_presupuesto(),
+                    fecha=fecha_obj,
+                    cliente_id=cliente.id,
+                    vista_cliente=vista_cliente_data,
+                    vista_interna=vista_interna_data
+                )
+                db.session.add(new_presupuesto)
+                db.session.commit()
+                return jsonify(new_presupuesto.to_dict()), 201
+            except IntegrityError:
+                db.session.rollback()
+                # Reintentar generando otro número
+                continue
+        abort(409, description="No se pudo generar un número de presupuesto único tras varios intentos. Intenta de nuevo.")
 
     except ValueError as e:
         db.session.rollback()

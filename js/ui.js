@@ -124,7 +124,9 @@ function safeGetState() {
 export function renderPresupuestoFinal(presupuesto) {
     const { grupos } = presupuesto;
     // Usar gruposPorMarca para procesar los grupos antes de renderizar
-    const gruposProcesados = gruposPorMarca(grupos);
+    const gruposProcesados = gruposPorMarca(grupos)
+        .slice()
+        .sort((a, b) => (a.totalGrupo || 0) - (b.totalGrupo || 0));
     const totalGeneral = gruposProcesados.reduce((acc, g) => acc + (g.totalGrupo || 0), 0);
 
     const eur0 = (n) => `${Math.round(n).toLocaleString('es-ES')}€`;
@@ -249,7 +251,9 @@ export function renderTemporaryItems(presupuesto) {
     const { tempNeumaticos, tempOtrosTrabajos } = presupuesto;
     DOMElements.listaMarcasTemp.innerHTML = '';
     if (tempNeumaticos) {
-        tempNeumaticos.forEach(neumatico => {
+        // ordenar por neto ascendente
+        const ordenados = [...tempNeumaticos].sort((a, b) => (a.neto || 0) - (b.neto || 0));
+        ordenados.forEach(neumatico => {
             const li = document.createElement('li');
             li.className = 'collection-item';
             li.innerHTML = `

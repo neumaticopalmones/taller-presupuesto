@@ -170,6 +170,48 @@ export function removeTempTrabajo(id) {
 }
 
 /**
+ * Actualiza los parámetros comunes (medida, cantidad, ganancia, ecotasa, iva)
+ * de TODOS los neumáticos temporales y recalcula PU/total con la fórmula vigente.
+ * Se usa cuando el usuario cambia valores arriba del formulario.
+ * @param {{medida?: string, cantidad?: number|string, ganancia?: number|string, ecotasa?: number|string, iva?: number|string}} params
+ */
+export function updateTempNeumaticosParams(params = {}) {
+    if (!state.currentPresupuesto || !Array.isArray(state.currentPresupuesto.tempNeumaticos)) return;
+    const medida = typeof params.medida === 'string' ? params.medida : undefined;
+    const cantidadRaw = params.cantidad;
+    const gananciaRaw = params.ganancia;
+    const ecotasaRaw = params.ecotasa;
+    const ivaRaw = params.iva;
+
+    state.currentPresupuesto.tempNeumaticos = state.currentPresupuesto.tempNeumaticos.map(n => {
+        // Usar valores nuevos si son válidos, si no mantener los actuales
+        const cantidad = Number.isFinite(parseInt(cantidadRaw)) && parseInt(cantidadRaw) > 0 ? parseInt(cantidadRaw) : (n.cantidad || 1);
+        const ganancia = Number.isFinite(parseFloat(gananciaRaw)) ? parseFloat(gananciaRaw) : (n.ganancia || 0);
+        const ecotasa = Number.isFinite(parseFloat(ecotasaRaw)) ? parseFloat(ecotasaRaw) : (n.ecotasa || 0);
+        const iva = Number.isFinite(parseFloat(ivaRaw)) ? parseFloat(ivaRaw) : (n.iva || 0);
+        const neto = Number.isFinite(parseFloat(n.neto)) ? parseFloat(n.neto) : 0;
+
+        // Fórmula: PU = round((neto + ecotasa) * (1 + IVA) + ganancia)
+        // Total = round( ((neto + ecotasa) * (1 + IVA)) * cantidad + ganancia * cantidad )
+        const baseSinGanancia = (neto + ecotasa);
+        const puSinGanancia = baseSinGanancia * (1 + (iva / 100));
+        const precioUnidad = Math.round(puSinGanancia + ganancia);
+        const total = Math.round((puSinGanancia * cantidad) + (ganancia * cantidad));
+
+        return {
+            ...n,
+            medida: medida !== undefined ? medida : n.medida,
+            cantidad,
+            ganancia,
+            ecotasa,
+            iva,
+            precioUnidad,
+            total
+        };
+    });
+}
+
+/**
  * Agrega los items temporales como un nuevo grupo al presupuesto actual
  * y limpia las listas temporales.
  */
@@ -182,7 +224,8 @@ export function addGroupToPresupuesto() {
     }
 
     // Clonar para aislar el grupo de futuras modificaciones en las listas temporales
-    const neumaticosSnapshot = (neumaticos || []).map(n => ({ ...n }));
+    const neumaticosSnapshot = (neumaticos || []).map(n => ({ ...n }))
+        .sort((a, b) => (a.neto || 0) - (b.neto || 0));
     const otrosTrabajosSnapshot = (otrosTrabajos || []).map(t => ({ ...t }));
 
     let totalGrupo = 0;
@@ -203,9 +246,74 @@ export function addGroupToPresupuesto() {
         ecotasa: n0.ecotasa,
         iva: n0.iva
     });
+    // Ordenar grupos por total de menor a mayor
+    try {
+        state.currentPresupuesto.grupos.sort((a, b) => (a.totalGrupo || 0) - (b.totalGrupo || 0));
+    } catch (_) {}
 
     // Mantener temporales (según petición del usuario)
     return true;
+}
+
+/**
+ * Actualiza parámetros y precios de TODOS los grupos ya agregados.
+ * Si un parámetro no viene definido, se mantiene el del propio grupo.
+ * Recalcula precioUnidad/total de cada neumático con la fórmula vigente
+ * y reordena las marcas dentro de cada grupo por neto ascendente.
+ * Finalmente recalcula total del grupo y total general.
+ * @param {{medida?: string, cantidad?: number|string, ganancia?: number|string, ecotasa?: number|string, iva?: number|string}} params
+ */
+export function updateGroupsWithParams(params = {}) {
+    if (!Array.isArray(state.currentPresupuesto.grupos)) return;
+    state.currentPresupuesto.grupos.forEach(grupo => {
+        if (!grupo) return;
+        // aplicar parámetros a nivel de grupo si vienen en params
+        const cantidad = Number.isFinite(parseInt(params.cantidad)) && parseInt(params.cantidad) > 0 ? parseInt(params.cantidad) : grupo.cantidad;
+        const ganancia = Number.isFinite(parseFloat(params.ganancia)) ? parseFloat(params.ganancia) : grupo.ganancia;
+        const ecotasa = Number.isFinite(parseFloat(params.ecotasa)) ? parseFloat(params.ecotasa) : grupo.ecotasa;
+        const iva = Number.isFinite(parseFloat(params.iva)) ? parseFloat(params.iva) : grupo.iva;
+        const medida = (typeof params.medida === 'string') ? params.medida : grupo.medida;
+
+        grupo.medida = medida;
+        grupo.cantidad = cantidad;
+        grupo.ganancia = ganancia;
+        grupo.ecotasa = ecotasa;
+        grupo.iva = iva;
+
+        // Recalcular cada neumático del grupo usando su neto y los params comunes
+        if (Array.isArray(grupo.neumaticos)) {
+            grupo.neumaticos = grupo.neumaticos.map(n => {
+                const neto = Number.isFinite(parseFloat(n.neto)) ? parseFloat(n.neto) : 0;
+                const baseSinGanancia = (neto + ecotasa);
+                const puSinGanancia = baseSinGanancia * (1 + (iva / 100));
+                const precioUnidad = Math.round(puSinGanancia + ganancia);
+                const total = Math.round((puSinGanancia * cantidad) + (ganancia * cantidad));
+                return {
+                    ...n,
+                    medida,
+                    cantidad,
+                    ganancia,
+                    ecotasa,
+                    iva,
+                    precioUnidad,
+                    total
+                };
+            }).sort((a, b) => (a.neto || 0) - (b.neto || 0));
+        }
+
+        // Recalcular total del grupo
+        let totalGrupo = 0;
+        (grupo.neumaticos || []).forEach(n => totalGrupo += (n.total || 0));
+        (grupo.otrosTrabajos || []).forEach(t => totalGrupo += (t.total || 0));
+        grupo.totalGrupo = Math.round(totalGrupo);
+    });
+
+    // Recalcular total general
+    calculateTotalGeneral();
+    // Ordenar grupos por total ascendente
+    try {
+        state.currentPresupuesto.grupos.sort((a, b) => (a.totalGrupo || 0) - (b.totalGrupo || 0));
+    } catch (_) {}
 }
 
 /**
@@ -300,6 +408,14 @@ export function calculateTotalGeneral() {
         totalGeneral += grupo.totalGrupo;
     });
     state.currentPresupuesto.totalGeneral = Math.round(totalGeneral);
+}
+
+/**
+ * Vacía todos los grupos del presupuesto actual sin afectar a los temporales.
+ */
+export function clearGrupos() {
+    state.currentPresupuesto.grupos = [];
+    state.currentPresupuesto.totalGeneral = 0;
 }
 
 // Inicializar el estado la primera vez que se carga el módulo

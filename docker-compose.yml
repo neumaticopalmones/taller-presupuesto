@@ -33,5 +33,18 @@ services:
       - ./:/app
     command: python app.py
 
+  caddy:
+    image: caddy:2
+    container_name: taller_caddy
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/certs:/etc/ssl/custom:ro
+
 volumes:
   postgres_data:

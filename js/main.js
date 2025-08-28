@@ -153,6 +153,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAbrirCalendar) {
         btnAbrirCalendar.addEventListener('click', () => abrirEnCalendar());
     }
+    const btnVaciarGrupos = document.getElementById('btnVaciarGrupos');
+    if (btnVaciarGrupos) {
+        btnVaciarGrupos.addEventListener('click', () => {
+            if (confirm('¿Vaciar el presupuesto (lista del cliente) sin tocar las marcas/trabajos temporales?')) {
+                State.clearGrupos();
+                UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+                M.toast({ html: 'Presupuesto vaciado.', classes: 'blue' });
+            }
+        });
+    }
 
     // Eliminados listeners de inventario
     
@@ -524,4 +534,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     init();
+
+    // Recalcular tempNeumaticos al cambiar parámetros comunes
+    const medidaEl = document.getElementById('presupuesto-medida');
+    const cantidadEl = document.getElementById('presupuesto-cantidad');
+    const gananciaEl = document.getElementById('presupuesto-ganancia');
+    const ecotasaEl = document.getElementById('presupuesto-ecotasa');
+    const ivaEl = document.getElementById('presupuesto-iva');
+    const inputsParams = [medidaEl, cantidadEl, gananciaEl, ecotasaEl, ivaEl].filter(Boolean);
+    if (inputsParams.length) {
+        const handler = () => {
+            State.updateTempNeumaticosParams({
+                medida: medidaEl?.value,
+                cantidad: cantidadEl?.value,
+                ganancia: gananciaEl?.value,
+                ecotasa: ecotasaEl?.value,
+                iva: ivaEl?.value,
+            });
+            State.updateGroupsWithParams({
+                medida: medidaEl?.value,
+                cantidad: cantidadEl?.value,
+                ganancia: gananciaEl?.value,
+                ecotasa: ecotasaEl?.value,
+                iva: ivaEl?.value,
+            });
+            State.calculateTotalGeneral();
+            UI.renderTemporaryItems(State.getCurrentPresupuesto());
+            UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+        };
+        inputsParams.forEach(inp => {
+            inp.addEventListener('input', handler);
+            inp.addEventListener('change', handler);
+        });
+    }
+
+    // Panel de conexión: ping periódico a /health
+    const connDot = document.getElementById('connDot');
+    const connText = document.getElementById('connText');
+    async function pingHealth() {
+        try {
+            const res = await fetch('/health', { cache: 'no-store' });
+            if (res.ok) {
+                connDot?.classList.add('status-ok');
+                connDot?.classList.remove('status-bad');
+                if (connText) connText.textContent = 'Conectado';
+            } else {
+                throw new Error('bad');
+            }
+        } catch (_) {
+            connDot?.classList.add('status-bad');
+            connDot?.classList.remove('status-ok');
+            if (connText) connText.textContent = 'Sin conexión';
+        }
+    }
+    pingHealth();
+    setInterval(pingHealth, 10000);
+
+    // Botón copiar URL del host
+    const btnCopyHostURL = document.getElementById('btnCopyHostURL');
+    if (btnCopyHostURL) {
+        btnCopyHostURL.addEventListener('click', async () => {
+            try {
+                const url = window.location.origin;
+                await navigator.clipboard.writeText(url);
+                M.toast({ html: `Enlace copiado: ${url}`, classes: 'green' });
+            } catch (e) {
+                M.toast({ html: 'No se pudo copiar el enlace.', classes: 'red' });
+            }
+        });
+    }
 });

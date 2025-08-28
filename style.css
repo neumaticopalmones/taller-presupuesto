@@ -85,6 +85,15 @@ body.compacto .meta-line { font-size: 12px; }
   .presupuesto-section h4 { display: none !important; }
 }
 
+.status-dot {
+  display:inline-block;
+  width:10px; height:10px; border-radius:50%;
+  background:#ccc; margin-right:6px;
+}
+.status-ok { background:#2e7d32 !important; }
+.status-bad { background:#c62828 !important; }
+}
+
 /* ===== Historial ===== */
 .collection .collection-item {
   display: flex;
