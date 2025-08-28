@@ -10,6 +10,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import UniqueConstraint, or_
+import re
 
 # --- Utilidad para limpiar la vista antes de guardar ---
 def _clean_vista_for_db(vista_data):
@@ -75,6 +77,28 @@ class Presupuesto(db.Model):
             'cliente': self.cliente.to_dict() if self.cliente else None,
             'vista_cliente': self.vista_cliente,
             'vista_interna': self.vista_interna
+        }
+
+# Nuevo: precios por medida y marca
+class Precio(db.Model):
+    __tablename__ = 'precios'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    medida = db.Column(db.String(100), nullable=False, index=True)
+    marca = db.Column(db.String(150), nullable=False, index=True)
+    neto = db.Column(db.Float, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('medida', 'marca', name='uq_medida_marca'),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'medida': self.medida,
+            'marca': self.marca,
+            'neto': self.neto,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
 
 # --- Presupuesto Routes ---
@@ -273,5 +297,126 @@ def handle_bad_request(error):
 def health():
     return jsonify({'status': 'ok'}), 200
 
+# --- Sugerencias (medidas y marcas) ---
+@app.get('/sugerencias')
+def sugerencias():
+    """
+    Devuelve sugerencias basadas en el historial guardado:
+    - medidas: lista de medidas más usadas
+    - marcas: lista de marcas más usadas
+    - combos: contador por (medida -> marca -> count)
+    """
+    try:
+        limit = request.args.get('limit', type=int)  # opcional: limitar N presupuestos recientes
+        q = Presupuesto.query.order_by(Presupuesto.fecha.desc())
+        if limit and limit > 0:
+            q = q.limit(limit)
+        rows = q.all()
+
+        from collections import Counter, defaultdict
+        medidas_counter = Counter()
+        marcas_counter = Counter()
+        combos = defaultdict(lambda: Counter())
+
+        def process_vista(v):
+            if not v or not isinstance(v, dict):
+                return
+            grupos = v.get('grupos') or []
+            for g in grupos:
+                medida = g.get('medida')
+                if medida:
+                    medidas_counter[medida] += 1
+                neumaticos = g.get('neumaticos') or []
+                for n in neumaticos:
+                    marca = n.get('nombre') or n.get('marca')
+                    if marca:
+                        marcas_counter[marca] += 1
+                        if medida:
+                            combos[medida][marca] += 1
+
+        for r in rows:
+            process_vista(r.vista_cliente)
+            process_vista(r.vista_interna)
+
+        def top_list(counter: Counter, max_items=30):
+            return [k for k, _ in counter.most_common(max_items)]
+
+        combos_out = {
+            m: [k for k, _ in c.most_common(20)] for m, c in combos.items()
+        }
+
+        return jsonify({
+            'medidas': top_list(medidas_counter, 50),
+            'marcas': top_list(marcas_counter, 50),
+            'combos': combos_out
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        abort(500, description=f"No se pudieron calcular sugerencias: {e}")
+
+# --- Precios por medida y marca ---
+def _parse_medida_bases(text: str):
+    """
+    Devuelve posibles bases de medida sin código (ej: 205/55/16 y 205/55R16) a partir de
+    un texto como "205/55/16 91V" o "205/55R16 91V" o similares.
+    """
+    if not text:
+        return []
+    s = text.strip().upper().replace('\t', ' ')
+    s = re.sub(r"\s+", " ", s)
+    # Buscar W/PR/R o W/PR/RI con o sin R entre PR y RI
+    m = re.search(r"(\d{3})[\s/]+(\d{2})[\s/]*R?(\d{2})", s)
+    if not m:
+        return []
+    w, pr, ri = m.group(1), m.group(2), m.group(3)
+    base_no_r = f"{w}/{pr}/{ri}"
+    base_r = f"{w}/{pr}R{ri}"
+    return [base_no_r, base_r]
+
+@app.get('/precios')
+def get_precios_por_medida():
+    medida = request.args.get('medida', type=str)
+    if not medida:
+        abort(400, description='Falta la medida')
+    bases = _parse_medida_bases(medida)
+    if not bases:
+        # Si no se pudo parsear, devolvemos lista vacía para no confundir
+        return jsonify([])
+    # Buscar cualquier precio cuya medida empiece por alguna base (así incluimos códigos)
+    conds = [Precio.medida.ilike(f"{b}%") for b in bases]
+    q = Precio.query.filter(or_(*conds)).order_by(Precio.updated_at.desc())
+    rows = q.all()
+    return jsonify([r.to_dict() for r in rows])
+
+@app.post('/precios')
+def upsert_precio():
+    data = request.json or {}
+    medida = (data.get('medida') or '').strip()
+    marca = (data.get('marca') or '').strip()
+    neto = data.get('neto')
+    if not medida or not marca:
+        abort(400, description='Medida y marca son obligatorias')
+    try:
+        neto_val = float(neto)
+        if neto_val < 0:
+            raise ValueError('Neto negativo')
+    except Exception:
+        abort(400, description='Neto inválido')
+
+    # Upsert por (medida, marca)
+    row = Precio.query.filter_by(medida=medida, marca=marca).first()
+    if row:
+        row.neto = neto_val
+        row.updated_at = datetime.utcnow()
+    else:
+        row = Precio(medida=medida, marca=marca, neto=neto_val)
+        db.session.add(row)
+    db.session.commit()
+    return jsonify(row.to_dict())
+
 if __name__ == '__main__':
+    # Crear tablas que no existan aún (útil para nuevas tablas como precios)
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, host='0.0.0.0')

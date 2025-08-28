@@ -164,6 +164,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Sugerencias (medidas y marcas desde historial) ---
+    const btnCargarSugerencias = document.getElementById('btnCargarSugerencias');
+    const sugLimit = document.getElementById('sug-limit');
+    const sugMedidas = document.getElementById('sug-medidas');
+    const sugMarcas = document.getElementById('sug-marcas');
+    let ultSugerencias = null;
+
+    function showToast(msg) {
+        if (window.M && M.toast) M.toast({ html: msg });
+        else alert(msg);
+    }
+
+    function renderChips(container, items, onClick) {
+        if (!container) return;
+        container.innerHTML = '';
+        if (!items || !items.length) { container.textContent = 'Sin datos'; return; }
+        items.forEach(txt => {
+            const chip = document.createElement('a');
+            chip.href = '#!';
+            chip.textContent = txt;
+            chip.className = 'chip';
+            chip.style.marginRight = '6px';
+            chip.addEventListener('click', (e) => { e.preventDefault(); onClick(txt); });
+            container.appendChild(chip);
+        });
+    }
+
+    if (btnCargarSugerencias) {
+        btnCargarSugerencias.addEventListener('click', async () => {
+            try {
+                const limitVal = sugLimit?.value ? Number(sugLimit.value) : undefined;
+                const data = await API.fetchSugerencias(limitVal);
+                ultSugerencias = data;
+                // Render medidas; al hacer clic, rellenar input y actualizar marcas por combo
+                renderChips(sugMedidas, data.medidas, (val) => {
+                    const inputMedida = document.getElementById('presupuesto-medida');
+                    if (inputMedida) {
+                        inputMedida.value = val;
+                        inputMedida.dispatchEvent(new Event('input'));
+                        if (window.M) M.updateTextFields();
+                    }
+                    const marcasParaMedida = (ultSugerencias?.combos && ultSugerencias.combos[val]) || ultSugerencias?.marcas || [];
+                    renderChips(sugMarcas, marcasParaMedida, onClickMarca);
+                    showToast(`Medida: ${val}`);
+                });
+                // Render marcas generales; al hacer clic, rellenar marca
+                const onClickMarca = (val) => {
+                    const inputMarca = document.getElementById('presupuesto-marca-temp');
+                    if (inputMarca) {
+                        inputMarca.value = val;
+                        inputMarca.dispatchEvent(new Event('input'));
+                        if (window.M) M.updateTextFields();
+                    }
+                    showToast(`Marca: ${val}`);
+                };
+                renderChips(sugMarcas, data.marcas, onClickMarca);
+                showToast('Sugerencias cargadas');
+            } catch (e) {
+                showToast(`Error cargando sugerencias: ${e.message || e}`);
+            }
+        });
+    }
+
     // Eliminados listeners de inventario
     
     // Event Delegation for dynamic elements
@@ -483,6 +546,10 @@ document.addEventListener('DOMContentLoaded', () => {
             total
         };
         State.addTempNeumatico(neumatico);
+        // Guardar/actualizar precio por medida y marca
+        try {
+            API.upsertPrecio({ medida, marca, neto: nNeto });
+        } catch (_) { /* silencioso */ }
         UI.renderTemporaryItems(State.getCurrentPresupuesto());
         document.getElementById('presupuesto-marca-temp').value = '';
         document.getElementById('presupuesto-neto-temp').value = '';
@@ -543,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ivaEl = document.getElementById('presupuesto-iva');
     const inputsParams = [medidaEl, cantidadEl, gananciaEl, ecotasaEl, ivaEl].filter(Boolean);
     if (inputsParams.length) {
-        const handler = () => {
+        const handler = async () => {
             State.updateTempNeumaticosParams({
                 medida: medidaEl?.value,
                 cantidad: cantidadEl?.value,
@@ -561,6 +628,96 @@ document.addEventListener('DOMContentLoaded', () => {
             State.calculateTotalGeneral();
             UI.renderTemporaryItems(State.getCurrentPresupuesto());
             UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+            // Cargar precios por medida y mostrar chips
+            try {
+                const list = medidaEl?.value ? await API.getPreciosPorMedida(medidaEl.value) : [];
+                const cont = document.getElementById('precios-por-medida');
+                const contFiltros = document.getElementById('precios-filtros-codigo');
+                if (cont) {
+                    cont.innerHTML = '';
+                    if (!list || !list.length) {
+                        cont.textContent = medidaEl?.value ? 'Sin precios guardados para esta medida' : '';
+                    } else {
+                        // Construir filtros por código (lo que va tras la base) ej: 91V, 94W...
+                        let codigos = new Set();
+                        const re = /(\d{3})\/(\d{2})\/?R?(\d{2})\s+(.+)$/i;
+                        list.forEach(({ medida }) => {
+                            const m = String(medida || '').toUpperCase();
+                            const mm = m.match(re);
+                            if (mm && mm[4]) {
+                                const code = mm[4].trim();
+                                if (code) codigos.add(code);
+                            }
+                        });
+                        let filtroActivo = null;
+                        // Render filtros
+                        if (contFiltros) {
+                            contFiltros.innerHTML = '';
+                            if (codigos.size) {
+                                // Botón limpiar
+                                const clear = document.createElement('a');
+                                clear.href = '#!';
+                                clear.className = 'chip grey lighten-3';
+                                clear.textContent = 'Todos';
+                                clear.addEventListener('click', (e)=>{
+                                    e.preventDefault();
+                                    filtroActivo = null;
+                                    renderLista();
+                                });
+                                contFiltros.appendChild(clear);
+                                [...codigos].sort().forEach(code => {
+                                    const chip = document.createElement('a');
+                                    chip.href = '#!';
+                                    chip.className = 'chip';
+                                    chip.textContent = code;
+                                    chip.addEventListener('click', (e) => {
+                                        e.preventDefault();
+                                        filtroActivo = code;
+                                        renderLista();
+                                    });
+                                    contFiltros.appendChild(chip);
+                                });
+                            }
+                        }
+
+                        function coincideFiltro(item) {
+                            if (!filtroActivo) return true;
+                            const m = String(item.medida || '').toUpperCase();
+                            return m.endsWith(filtroActivo.toUpperCase());
+                        }
+
+                        function renderLista() {
+                            cont.innerHTML = '';
+                            const filtered = list.filter(coincideFiltro);
+                            filtered.forEach(({ marca, neto, medida }) => {
+                            const a = document.createElement('a');
+                            a.href = '#!';
+                            a.className = 'chip';
+                            a.textContent = `${medida} · ${marca} — ${neto}`;
+                            a.title = 'Click para rellenar';
+                            a.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                const marcaInp = document.getElementById('presupuesto-marca-temp');
+                                const netoInp = document.getElementById('presupuesto-neto-temp');
+                                if (marcaInp) marcaInp.value = marca;
+                                if (netoInp) netoInp.value = neto;
+                                if (window.M) M.updateTextFields();
+                            });
+                                cont.appendChild(a);
+                            });
+                            if (!filtered.length) {
+                                const p = document.createElement('span');
+                                p.textContent = 'No hay resultados para ese código';
+                                cont.appendChild(p);
+                            }
+                        }
+
+                        renderLista();
+                    }
+                }
+            } catch (err) {
+                // silencioso
+            }
         };
         inputsParams.forEach(inp => {
             inp.addEventListener('input', handler);

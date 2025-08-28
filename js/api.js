@@ -1,4 +1,6 @@
 const API_URL = '/presupuestos';
+const SUG_URL = '/sugerencias';
+const PRE_URL = '/precios';
 
 async function handleResponse(response) {
     if (!response.ok) {
@@ -52,3 +54,25 @@ export async function deletePresupuestoById(id) {
 }
 
 // Endpoints de inventario y convertir a pedido eliminados (no implementados en backend)
+
+export async function fetchSugerencias(limit) {
+    const params = new URLSearchParams();
+    if (limit) params.set('limit', String(limit));
+    const res = await fetch(`${SUG_URL}?${params.toString()}`);
+    return handleResponse(res);
+}
+
+export async function getPreciosPorMedida(medida) {
+    const params = new URLSearchParams({ medida });
+    const res = await fetch(`${PRE_URL}?${params.toString()}`);
+    return handleResponse(res);
+}
+
+export async function upsertPrecio({ medida, marca, neto }) {
+    const res = await fetch(PRE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ medida, marca, neto })
+    });
+    return handleResponse(res);
+}

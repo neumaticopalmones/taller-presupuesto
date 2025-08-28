@@ -115,6 +115,12 @@
               <label for="presupuesto-iva">IVA (%)</label>
             </div>
           </div>
+      <div class="row" style="margin-top:-10px">
+            <div class="col s12">
+        <div id="precios-filtros-codigo" class="chips-container" style="margin-bottom:6px"></div>
+              <div id="precios-por-medida" class="chips-container"></div>
+            </div>
+          </div>
 
           <div class="row">
             <div class="input-field col s5">
@@ -252,6 +258,30 @@
   </div>
   <ul id="lista-historial" class="collection"></ul>
   <div id="paginacion-container"></div>
+  <div class="card" style="margin-top:16px;">
+    <div class="card-content">
+      <span class="card-title">Sugerencias (medidas y marcas)</span>
+      <div class="row" style="margin-bottom:0;">
+        <div class="input-field col s3">
+          <input type="number" id="sug-limit" min="1" value="200">
+          <label for="sug-limit" class="active">Analizar últimos (N) registros</label>
+        </div>
+        <div class="col s3" style="margin-top:24px;">
+          <button type="button" id="btnCargarSugerencias" class="btn waves-effect waves-light">Cargar sugerencias</button>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:0;">
+        <div class="col s6">
+          <h6>Medidas frecuentes</h6>
+          <div id="sug-medidas" class="chips-container"></div>
+        </div>
+        <div class="col s6">
+          <h6>Marcas frecuentes</h6>
+          <div id="sug-marcas" class="chips-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
     </section>
 
 
