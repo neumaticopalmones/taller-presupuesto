@@ -28,6 +28,10 @@
     ],
     "js/**/*.js": [
       "eslint --fix"
+    ],
+    "*.py": [
+      "ruff check --fix --exit-zero",
+      "black --quiet"
     ]
   },
   "devDependencies": {
