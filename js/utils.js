@@ -1,6 +1,13 @@
-export function two(n) { return String(n).padStart(2, '0'); }
-export function hoyISO() { const d = new Date(); return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`; }
-export function eur(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+export function two(n) {
+  return String(n).padStart(2, "0");
+}
+export function hoyISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`;
+}
+export function eur(n) {
+  return n.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+}
 
 /**
  * Separa los grupos que tienen múltiples neumáticos en grupos individuales por marca.
@@ -8,26 +15,26 @@ export function eur(n) { return n.toLocaleString('es-ES', { minimumFractionDigit
  * @returns {Array} Un nuevo array de grupos expandido.
  */
 export function gruposPorMarca(grupos = []) {
-    const salida = [];
-    (grupos || []).forEach(g => {
-        const trabajos = g.otrosTrabajos || [];
-        if (g.neumaticos && g.neumaticos.length > 1) {
-            g.neumaticos.forEach(n => {
-                salida.push({
-                    id: g.id,
-                    neumaticos: [n],
-                    otrosTrabajos: trabajos,
-                    // Copy other group properties if they exist
-                    medida: g.medida,
-                    cantidad: n.cantidad, // Use the individual quantity
-                    totalGrupo: n.total + trabajos.reduce((acc, t) => acc + t.total, 0)
-                });
-            });
-        } else {
-            salida.push(g);
-        }
-    });
-    return salida;
+  const salida = [];
+  (grupos || []).forEach((g) => {
+    const trabajos = g.otrosTrabajos || [];
+    if (g.neumaticos && g.neumaticos.length > 1) {
+      g.neumaticos.forEach((n) => {
+        salida.push({
+          id: g.id,
+          neumaticos: [n],
+          otrosTrabajos: trabajos,
+          // Copy other group properties if they exist
+          medida: g.medida,
+          cantidad: n.cantidad, // Use the individual quantity
+          totalGrupo: n.total + trabajos.reduce((acc, t) => acc + t.total, 0),
+        });
+      });
+    } else {
+      salida.push(g);
+    }
+  });
+  return salida;
 }
 
 // --- Validation Functions ---
@@ -38,15 +45,18 @@ export function gruposPorMarca(grupos = []) {
  * @param {object} options - Opciones de validación (min, max, allowNegative).
  * @returns {boolean} True si es un número válido, false en caso contrario.
  */
-export function isValidNumber(value, { min = -Infinity, max = Infinity, allowNegative = true } = {}) {
-    const num = parseFloat(value);
-    if (isNaN(num)) {
-        return false;
-    }
-    if (!allowNegative && num < 0) {
-        return false;
-    }
-    return num >= min && num <= max;
+export function isValidNumber(
+  value,
+  { min = -Infinity, max = Infinity, allowNegative = true } = {}
+) {
+  const num = parseFloat(value);
+  if (isNaN(num)) {
+    return false;
+  }
+  if (!allowNegative && num < 0) {
+    return false;
+  }
+  return num >= min && num <= max;
 }
 
 /**
@@ -55,7 +65,7 @@ export function isValidNumber(value, { min = -Infinity, max = Infinity, allowNeg
  * @returns {boolean} True si no está vacía, false en caso contrario.
  */
 export function isNotEmpty(value) {
-    return typeof value === 'string' && value.trim() !== '';
+  return typeof value === "string" && value.trim() !== "";
 }
 
 /**
@@ -64,11 +74,12 @@ export function isNotEmpty(value) {
  * @returns {boolean} True si tiene un formato básico válido, false en caso contrario.
  */
 export function isValidNIF(nif) {
-    if (!nif) return false;
-    nif = nif.toUpperCase().trim();
-    // Basic regex for DNI, NIE, CIF (doesn't validate checksum)
-    const regex = /^[0-9XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$|^[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-J]$/;
-    return regex.test(nif);
+  if (!nif) return false;
+  nif = nif.toUpperCase().trim();
+  // Basic regex for DNI, NIE, CIF (doesn't validate checksum)
+  const regex =
+    /^[0-9XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$|^[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-J]$/;
+  return regex.test(nif);
 }
 
 /**
@@ -77,8 +88,8 @@ export function isValidNIF(nif) {
  * @returns {boolean} True si es un número de teléfono válido, false en caso contrario.
  */
 export function isValidPhone(phone) {
-    if (!phone) return false;
-    const cleanedPhone = phone.replace(/\s/g, ''); // Remove spaces
-    const regex = /^[0-9]{9,}$/; // At least 9 digits
-    return regex.test(cleanedPhone);
+  if (!phone) return false;
+  const cleanedPhone = phone.replace(/\s/g, ""); // Remove spaces
+  const regex = /^[0-9]{9,}$/; // At least 9 digits
+  return regex.test(cleanedPhone);
 }

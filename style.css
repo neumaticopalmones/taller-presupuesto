@@ -1,98 +1,540 @@
+/* Tema y layout (claro) */
+body {
+  background: #f4f6f9 !important;
+  color: #212529 !important;
+}
+.nav-dark {
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.nav-dark .brand-logo,
+.nav-dark a,
+.nav-dark .material-icons {
+  color: #1f2937 !important;
+}
+.brand-logo {
+  font-weight: 600;
+}
+.card {
+  background: #ffffff !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.card .card-content legend {
+  color: #0b63f6;
+  font-weight: 700;
+}
+.actions-bar {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1280px;
+  z-index: 1200;
+}
+.no-imprimir#top-actions {
+  display: block;
+}
+/* Reservar espacio para la barra fija y evitar que tape contenido */
+#top-actions {
+  height: 120px;
+}
+body.extra-compacto #top-actions {
+  height: 110px;
+}
+/* Espaciado debajo de la barra fija para que no tape contenido */
+#top-actions + .header,
+#top-actions + .app-section,
+#top-actions + * .app-section,
+#top-actions ~ .cliente-section,
+#top-actions ~ .productos-section,
+#top-actions ~ .presupuesto-section,
+#top-actions ~ .acciones-finales {
+  margin-top: 0;
+}
+body.extra-compacto #top-actions ~ .cliente-section,
+body.extra-compacto #top-actions ~ .productos-section,
+body.extra-compacto #top-actions ~ .presupuesto-section,
+body.extra-compacto #top-actions ~ .acciones-finales {
+  margin-top: 0;
+}
+
+/* Fijar navegación arriba y dar padding al body para que no tape contenido */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1300;
+}
+/* Reservar espacio superior: navbar (64px) + A (0mm) + alto barra aprox (80px) */
+body {
+  padding-top: 64px;
+}
+.actions-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.actions-buttons .btn {
+  margin-left: 6px;
+}
+.btn-ghost {
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* Layout estándar (una columna) */
+.container {
+  max-width: 1320px;
+}
+
+/* Ribbon estilo compacto */
+.ribbon {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ribbon-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.ribbon-secondary {
+  gap: 8px;
+}
+.ribbon-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  background: #f8fafc;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+}
+.ribbon-group::before {
+  content: attr(data-title);
+  font-weight: 600;
+  color: #64748b;
+  margin-right: 6px;
+  border-right: 1px solid #e6ebf2;
+  padding-right: 8px;
+}
+.ribbon .btn {
+  margin-left: 0;
+}
+
+/* Chips y contenedores */
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  background: #eef2f7;
+  color: #1f2937;
+}
+.chip:hover {
+  background: #e3e9f2;
+}
+
+/* Estado de conexión */
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f44336;
+  margin-right: 6px;
+}
+.status-ok {
+  background: #4caf50 !important;
+}
+.status-bad {
+  background: #f44336 !important;
+}
+
+/* Presupuesto */
+.presupuesto-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header {
+  display: none;
+}
+
+/* Form */
+.input-field label {
+  color: #607d8b;
+}
+input,
+textarea {
+  color: #212529 !important;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
 /* ===== Base ===== */
-body { background-color: #f4f4f4; color: #222; }
-.container { margin-top: 20px; }
+body {
+  background-color: #f4f6f9;
+  color: #222;
+}
+.container {
+  margin-top: 20px;
+}
 
 /* App Sections */
-.app-section { display: none; }
-.app-section.active-section { display: block; }
+.app-section {
+  display: none;
+}
+.app-section.active-section {
+  display: block;
+}
 
-.header { text-align: center; margin-bottom: 20px; }
-.header h1 { margin: 0 0 6px 0; font-weight: 800; letter-spacing: .5px; color: #0b63f6; font-size: 28px; text-transform: uppercase; }
-.header p { margin: 0; line-height: 1.3; color: #444; font-size: 13px; }
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.header h1 {
+  margin: 0 0 6px 0;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #0b63f6;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+.header p {
+  margin: 0;
+  line-height: 1.3;
+  color: #444;
+  font-size: 13px;
+}
 
-fieldset { border: 1px solid #ddd; padding: 16px; margin-bottom: 20px; border-radius: 8px; background: #fff; }
-legend { padding: 0 10px; font-weight: 700; color: #0b63f6; font-size: 14px; }
+fieldset {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: #fff;
+}
+legend {
+  padding: 0 10px;
+  font-weight: 700;
+  color: #0b63f6;
+  font-size: 14px;
+}
 
-.acciones-finales { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.acciones-finales .btn { margin-left: 8px; }
+.acciones-finales {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.acciones-finales .btn {
+  margin-left: 8px;
+}
+
+/* Compactar separación vertical entre tarjetas principales */
+.app-section.card {
+  margin: 4px 0;
+}
+.cliente-section.card,
+.productos-section.card,
+.presupuesto-section.card {
+  margin: 4px 0;
+}
+hr {
+  margin: 8px 0;
+}
+/* Botón grande de agregar grupo, más bajo para ahorrar espacio */
+#btnAgregarGrupo.btn-large {
+  height: 44px;
+  line-height: 44px;
+  font-size: 0.95rem;
+}
 
 /* Meta línea (Nº/Fecha) */
-.presupuesto-meta { min-height: 20px; }
-.meta-line { text-align: right; color: #444; font-size: 13px; margin-bottom: 6px; }
+.presupuesto-meta {
+  min-height: 20px;
+}
+.meta-line {
+  text-align: right;
+  color: #444;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
 
 /* ===== Tabla ===== */
-.budget-table-container { border-radius: 10px; box-shadow: 0 6px 14px rgba(0,0,0,0.08); overflow: hidden; margin-top: 12px; background: #fff; }
-.budget-table { width: 100%; border-collapse: collapse; }
-.budget-table thead { background: #0b63f6; color: #fff; }
-.budget-table th, .budget-table td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #e9eef5; font-size: 14px; vertical-align: middle; }
-.budget-table th { text-transform: lowercase; letter-spacing: .2px; font-weight: 700; }
-.budget-table tbody tr:nth-child(even) { background-color: #fafafa; }
-.budget-table tbody tr:last-child td { border-bottom: none; }
-.budget-table .group-separator td { background: transparent; border-bottom: none; height: 10px; padding: 0; }
-.action-delete { cursor: pointer; color: #ef5350; user-select: none; }
-.group-total td { border-top: 2px solid #0b63f6; background-color: #f6f9ff; font-size: 15px; text-align: right; }
+.budget-table-container {
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  margin-top: 12px;
+  background: #fff;
+}
+.budget-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.budget-table thead {
+  background: #0b63f6;
+  color: #fff;
+}
+.budget-table th,
+.budget-table td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e9eef5;
+  font-size: 14px;
+  vertical-align: middle;
+}
+.budget-table th {
+  text-transform: lowercase;
+  letter-spacing: 0.2px;
+  font-weight: 700;
+}
+.budget-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+.budget-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.budget-table .group-separator td {
+  background: transparent;
+  border-bottom: none;
+  height: 10px;
+  padding: 0;
+}
+.action-delete {
+  cursor: pointer;
+  color: #ef5350;
+  user-select: none;
+}
+.group-total td {
+  border-top: 2px solid #0b63f6;
+  background-color: #f6f9ff;
+  font-size: 15px;
+  text-align: right;
+}
 
 /* ===== Modo compacto (pantalla) ===== */
-body.compacto .budget-table th, body.compacto .budget-table td { padding: 7px 6px; font-size: 12px; }
-body.compacto .budget-table thead th { font-size: 12px; }
-body.compacto .group-total td { font-size: 12.5px; }
-body.compacto .budget-table .group-separator td { height: 5px; }
-body.compacto .header h1 { font-size: 24px; }
-body.compacto .header p { font-size: 12px; }
-body.compacto .presupuesto-section h2 { font-size: 24px; margin: 6px 0 6px; }
-body.compacto .meta-line { font-size: 12px; }
+body.compacto .budget-table th,
+body.compacto .budget-table td {
+  padding: 7px 6px;
+  font-size: 12px;
+}
+body.compacto .budget-table thead th {
+  font-size: 12px;
+}
+body.compacto .group-total td {
+  font-size: 12.5px;
+}
+body.compacto .budget-table .group-separator td {
+  height: 5px;
+}
+body.compacto .header h1 {
+  font-size: 24px;
+}
+body.compacto .header p {
+  font-size: 12px;
+}
+body.compacto .presupuesto-section h2 {
+  font-size: 24px;
+  margin: 6px 0 6px;
+}
+body.compacto .meta-line {
+  font-size: 12px;
+}
 
 /* ===== Captura A4 (como impresión) ===== */
-.a4-capture { width: 794px; padding: 24px 28px; background: #fff; color: #000; font-size: 12pt; box-shadow: none; }
-.a4-capture .header h1 { font-size: 18pt; color: #333; margin-bottom: 6px; }
-.a4-capture .header p { font-size: 10pt; color: #444; }
-.a4-title { font-size: 22pt; margin: 10px 0 10px; color: #111; }
+.a4-capture {
+  width: 794px;
+  padding: 24px 28px;
+  background: #fff;
+  color: #000;
+  font-size: 12pt;
+  box-shadow: none;
+}
+.a4-capture .header h1 {
+  font-size: 18pt;
+  color: #333;
+  margin-bottom: 6px;
+}
+.a4-capture .header p {
+  font-size: 10pt;
+  color: #444;
+}
+.a4-title {
+  font-size: 22pt;
+  margin: 10px 0 10px;
+  color: #111;
+}
 /* Reducir tamaño del título en capturas para clientes */
-.a4-title { font-size: 18pt; }
-.a4-capture .budget-table-container { box-shadow: none; border: 1px solid #cfcfcf; margin-top: 8px; }
-.a4-capture .budget-table thead { background: #e9eef5; color: #111; }
-.a4-capture .budget-table th, .a4-capture .budget-table td { padding: 6px 8px; font-size: 10pt; border-bottom: 1px solid #cfcfcf; }
-.a4-capture .group-total td { background: #f1f5ff; border-top: 2px solid #0b63f6; }
-.a4-capture .meta-line { text-align: right; color: #444; font-size: 10pt; margin-bottom: 4px; }
+.a4-title {
+  font-size: 18pt;
+}
+.a4-capture .budget-table-container {
+  box-shadow: none;
+  border: 1px solid #cfcfcf;
+  margin-top: 8px;
+}
+.a4-capture .budget-table thead {
+  background: #e9eef5;
+  color: #111;
+}
+.a4-capture .budget-table th,
+.a4-capture .budget-table td {
+  padding: 6px 8px;
+  font-size: 10pt;
+  border-bottom: 1px solid #cfcfcf;
+}
+.a4-capture .group-total td {
+  background: #f1f5ff;
+  border-top: 2px solid #0b63f6;
+}
+.a4-capture .meta-line {
+  text-align: right;
+  color: #444;
+  font-size: 10pt;
+  margin-bottom: 4px;
+}
 /* Ocultar acciones y papelera en capturas */
 .a4-capture .no-imprimir,
-.a4-capture .action-delete { display: none !important; }
+.a4-capture .action-delete {
+  display: none !important;
+}
+
+/* ===== A4 compacto para WhatsApp (más contenido en menos espacio) ===== */
+.a4-capture.compacto .header h1 {
+  font-size: 16pt;
+}
+.a4-capture.compacto .header p {
+  font-size: 9pt;
+}
+.a4-capture.compacto .a4-title {
+  font-size: 16pt;
+  margin: 6px 0 6px;
+}
+.a4-capture.compacto .meta-line {
+  font-size: 9.5pt;
+  margin-bottom: 2px;
+}
+.a4-capture.compacto .budget-table th,
+.a4-capture.compacto .budget-table td {
+  padding: 4px 6px;
+  font-size: 9.5pt;
+}
+.a4-capture.compacto .group-total td {
+  font-size: 10pt;
+}
+
+/* Aún más compacto pensado para compartir por apps (WhatsApp) */
+.a4-capture.compacto-wa {
+  width: 760px;
+  padding: 18px 20px;
+}
+.a4-capture.compacto-wa .budget-table th,
+.a4-capture.compacto-wa .budget-table td {
+  padding: 3px 5px;
+  font-size: 9pt;
+}
+.a4-capture.compacto-wa .header h1 {
+  font-size: 15pt;
+}
+.a4-capture.compacto-wa .a4-title {
+  font-size: 15pt;
+}
 
 /* ===== Impresión compacta ===== */
 @media print {
-  @page { margin: 10mm; }
-  body { background: #fff; color: #000; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .container { width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
+  @page {
+    margin: 10mm;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding-top: 0 !important;
+  }
+  .container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
 
   /* No mostrar la barra de navegación en impresión */
-  nav { display: none !important; }
+  nav {
+    display: none !important;
+  }
+  /* Asegurar layout estándar también en impresión */
 
   .no-imprimir,
-  .cliente-section, .productos-section, .acciones-finales,
-  .historial-section, .action-delete, #lista-historial .acciones { display: none !important; }
+  .cliente-section,
+  .productos-section,
+  .acciones-finales,
+  .historial-section,
+  .action-delete,
+  #lista-historial .acciones {
+    display: none !important;
+  }
 
-  .presupuesto-section { display: block; }
-  .budget-table-container { box-shadow: none; border: 1px solid #cfcfcf; margin-top: 6px; }
-  .budget-table thead { background-color: #e9eef5 !important; color: #111; }
+  .presupuesto-section {
+    display: block;
+  }
+  .budget-table-container {
+    box-shadow: none;
+    border: 1px solid #cfcfcf;
+    margin-top: 6px;
+  }
+  .budget-table thead {
+    background-color: #e9eef5 !important;
+    color: #111;
+  }
 
-  .budget-table th, .budget-table td { padding: 3px 5px; font-size: 9pt; border-bottom: 1px solid #cfcfcf; }
-  .group-total td { font-size: 10pt; border-top: 2px solid #0b63f6 !important; background: #f1f5ff !important; }
+  .budget-table th,
+  .budget-table td {
+    padding: 3px 5px;
+    font-size: 9pt;
+    border-bottom: 1px solid #cfcfcf;
+  }
+  .group-total td {
+    font-size: 10pt;
+    border-top: 2px solid #0b63f6 !important;
+    background: #f1f5ff !important;
+  }
 
-  table, th, td { border: 1px solid #cfcfcf; border-collapse: collapse; }
-  h1, h2, h3 { color: #111; }
+  table,
+  th,
+  td {
+    border: 1px solid #cfcfcf;
+    border-collapse: collapse;
+  }
+  h1,
+  h2,
+  h3 {
+    color: #111;
+  }
   /* Reducir tamaño del título 'Presupuesto' y ocultar total general en impresión */
-  .presupuesto-section h2 { font-size: 18pt; margin: 8px 0; }
-  .presupuesto-section h4 { display: none !important; }
+  .presupuesto-section h2 {
+    font-size: 18pt;
+    margin: 8px 0;
+  }
+  .presupuesto-section h4 {
+    display: none !important;
+  }
 }
 
-.status-dot {
-  display:inline-block;
-  width:10px; height:10px; border-radius:50%;
-  background:#ccc; margin-right:6px;
-}
-.status-ok { background:#2e7d32 !important; }
-.status-bad { background:#c62828 !important; }
-}
+/* (Eliminado duplicado de status-dot/ok/bad con llave extra) */
 
 /* ===== Historial ===== */
 .collection .collection-item {
@@ -111,3 +553,162 @@ body.compacto .meta-line { font-size: 12px; }
 }
 
 /* El botón de .acciones ya está centrado verticalmente gracias a align-items: center en el padre */
+/* === Compact UI overrides === */
+#top-actions .actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#top-actions .btn {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  box-shadow: none;
+  text-transform: uppercase;
+}
+#top-actions .btn .material-icons {
+  font-size: 18px;
+  line-height: 30px;
+}
+.actions-bar .card-content {
+  padding: 4px 8px;
+}
+.card {
+  border-radius: 8px !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04) !important;
+}
+.card .card-content {
+  padding: 12px 14px;
+}
+.chips-container .chip {
+  height: 28px;
+  line-height: 28px;
+  padding: 0 10px;
+  border-radius: 16px;
+}
+.input-field {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.input-field input[type="text"],
+.input-field input[type="number"],
+.input-field input[type="date"],
+.input-field input[type="tel"] {
+  height: 1.9rem;
+}
+/* Texto normal en campos */
+.input-field input[type="text"],
+.input-field input[type="number"],
+.input-field input[type="date"],
+.input-field input[type="tel"],
+.input-field input[type="tel"]::placeholder,
+.input-field input[type="text"]::placeholder {
+  font-size: 1rem;
+}
+fieldset {
+  padding: 8px;
+  margin-bottom: 10px;
+  border-color: #e6ebf2;
+  border-radius: 6px;
+}
+.app-section .row {
+  margin-bottom: 4px;
+}
+.budget-table th,
+.budget-table td {
+  padding: 6px 6px;
+}
+legend {
+  font-size: 13px;
+}
+label {
+  font-size: 1rem;
+}
+#top-actions .btn {
+  font-size: 0.95rem;
+}
+.chip {
+  font-size: 0.95rem;
+}
+.budget-table th,
+.budget-table td {
+  font-size: 14px;
+}
+/* Controles superiores más compactos sin cambiar tipografía */
+#top-actions .top-prefs label span {
+  font-size: 0.95rem;
+}
+#top-actions .top-prefs input[type="checkbox"] + span {
+  padding-left: 22px;
+}
+#top-actions .top-prefs .btn {
+  height: 28px;
+  line-height: 28px;
+  padding: 0 10px;
+}
+/* Más compacto en la tabla del presupuesto (pantalla) */
+.presupuesto-section .budget-table th,
+.presupuesto-section .budget-table td {
+  padding: 6px 6px;
+}
+.presupuesto-section .group-total td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.presupuesto-section .btn-small {
+  height: 28px;
+  line-height: 28px;
+  padding: 0 10px;
+}
+.presupuesto-section h2 {
+  margin: 8px 0 8px;
+  font-size: 26px;
+}
+.presupuesto-section .meta-line {
+  margin-bottom: 4px;
+}
+
+/* ===== Extra-compacto (sin reducir tipografía) ===== */
+body.extra-compacto #top-actions .btn {
+  height: 32px;
+  line-height: 32px;
+  padding: 0 10px;
+}
+body.extra-compacto #top-actions .btn .material-icons {
+  line-height: 32px;
+  font-size: 18px;
+}
+body.extra-compacto .actions-bar .card-content {
+  padding: 6px 8px;
+}
+body.extra-compacto .card .card-content {
+  padding: 10px 12px;
+}
+body.extra-compacto fieldset {
+  padding: 8px;
+  margin-bottom: 10px;
+}
+body.extra-compacto .input-field {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+body.extra-compacto .input-field input[type="text"],
+body.extra-compacto .input-field input[type="number"],
+body.extra-compacto .input-field input[type="date"],
+body.extra-compacto .input-field input[type="tel"] {
+  height: 2rem;
+}
+body.extra-compacto .chips-container .chip {
+  height: 24px;
+  line-height: 24px;
+  padding: 0 8px;
+  border-radius: 14px;
+}
+body.extra-compacto .app-section .row {
+  margin-bottom: 6px;
+}
+body.extra-compacto .budget-table th,
+body.extra-compacto .budget-table td {
+  padding: 8px 8px;
+}

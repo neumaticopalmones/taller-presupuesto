@@ -1,763 +1,861 @@
 // js/main.js
-import * as State from './state.js';
-import * as API from './api.js';
-import * as UI from './ui.js';
-import { imprimirPresupuesto, exportarPresupuestoPDF, capturaYWhatsApp, generarTextoPresupuesto, copiarParaCalendar, abrirEnCalendar } from './export.js';
-import { isValidNumber, isNotEmpty, isValidNIF, isValidPhone } from './utils.js';
+import * as State from "./state.js";
+import * as API from "./api.js";
+import * as UI from "./ui.js";
+import {
+  imprimirPresupuesto,
+  exportarPresupuestoPDF,
+  capturaYWhatsApp,
+  generarTextoPresupuesto,
+  copiarParaCalendar,
+  abrirEnCalendar,
+} from "./export.js";
+import { isValidNumber, isNotEmpty } from "./utils.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Estado local para filtros de historial
-    let filtrosHist = { nombre: '', telefono: '', numero: '' };
-    // Botón Volver en historial
-    const btnVolver = document.getElementById('btnVolverPresupuestos');
-    if (btnVolver) {
-        btnVolver.addEventListener('click', () => {
-            handleShowView('presupuestos-view');
-        });
-    }
-    // --- Event Listeners ---
-
-    // Navigation
-    UI.DOMElements.navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const viewId = e.target.getAttribute('href').substring(1);
-            handleShowView(viewId);
-        });
+document.addEventListener("DOMContentLoaded", () => {
+  // Estado local para filtros de historial
+  let filtrosHist = { nombre: "", telefono: "", numero: "" };
+  // Botón Volver en historial
+  const btnVolver = document.getElementById("btnVolverPresupuestos");
+  if (btnVolver) {
+    btnVolver.addEventListener("click", () => {
+      handleShowView("presupuestos-view");
     });
+  }
+  // --- Event Listeners ---
 
-    // Buttons
-    document.getElementById('btnAgregarMarca').addEventListener('click', handleAddMarca);
-    document.getElementById('btnAgregarOtroTrabajo').addEventListener('click', handleAddTrabajo);
-    document.getElementById('btnAgregarGrupo').addEventListener('click', handleAddGrupo);
-    document.getElementById('btnGuardarPresupuesto').addEventListener('click', handleSavePresupuesto);
-    document.getElementById('btnCancelarEdicion').addEventListener('click', handleResetPresupuestoForm);
-    // Botón Ver historial
-    document.getElementById('btnVerHistorial').addEventListener('click', () => {
-        handleShowView('historial-view');
+  // Navigation
+  UI.DOMElements.navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const viewId = e.target.getAttribute("href").substring(1);
+      handleShowView(viewId);
     });
+  });
 
-    // Historial: buscar/limpiar
-    const btnBuscarHist = document.getElementById('hist-buscar-btn');
-    const btnLimpiarHist = document.getElementById('hist-limpiar-btn');
-    const inpNom = document.getElementById('hist-buscar-nombre');
-    const inpTel = document.getElementById('hist-buscar-telefono');
-    const inpNum = document.getElementById('hist-buscar-numero');
-    if (btnBuscarHist && btnLimpiarHist && inpNom && inpTel && inpNum) {
-        btnBuscarHist.addEventListener('click', () => {
-            filtrosHist = {
-                nombre: inpNom.value.trim(),
-                telefono: inpTel.value.trim(),
-                numero: inpNum.value.trim(),
-            };
-            handleFetchPresupuestos(1);
-        });
-        btnLimpiarHist.addEventListener('click', () => {
-            filtrosHist = { nombre: '', telefono: '', numero: '' };
-            inpNom.value = '';
-            inpTel.value = '';
-            inpNum.value = '';
-            M.updateTextFields();
-            handleFetchPresupuestos(1);
-        });
-        // Enter en campos → buscar
-        [inpNom, inpTel, inpNum].forEach(inp => inp.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                btnBuscarHist.click();
-            }
-        }));
-    }
-    // Botón Guardar como nuevo
-    const btnGuardarComoNuevo = document.getElementById('btnGuardarComoNuevo');
-    if (btnGuardarComoNuevo) {
-        btnGuardarComoNuevo.addEventListener('click', () => {
-            handleSavePresupuesto(true); // true = guardar como nuevo
-        });
-    }
+  // Buttons
+  document.getElementById("btnAgregarMarca").addEventListener("click", handleAddMarca);
+  document.getElementById("btnAgregarOtroTrabajo").addEventListener("click", handleAddTrabajo);
+  document.getElementById("btnAgregarGrupo").addEventListener("click", handleAddGrupo);
+  document.getElementById("btnGuardarPresupuesto").addEventListener("click", handleSavePresupuesto);
+  document
+    .getElementById("btnCancelarEdicion")
+    .addEventListener("click", handleResetPresupuestoForm);
+  // Botón Ver historial
+  document.getElementById("btnVerHistorial").addEventListener("click", () => {
+    handleShowView("historial-view");
+  });
 
-    // Flujo de teclado para añadir varias marcas rápidamente
-    const marcaInput = document.getElementById('presupuesto-marca-temp');
-    const netoInput = document.getElementById('presupuesto-neto-temp');
-    if (marcaInput && netoInput) {
-        // Enter en Marca → ir a Neto
-        marcaInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                netoInput.focus();
-            }
-        });
-        // Tab o Enter en Neto → añadir y volver a Marca (si valores válidos)
-        netoInput.addEventListener('keydown', (e) => {
-            const key = e.key;
-            const tryAdd = () => {
-                const m = marcaInput.value?.trim();
-                const n = netoInput.value;
-                if (m && isValidNumber(n, { min: 0, allowNegative: false })) {
-                    handleAddMarca();
-                    marcaInput.focus();
-                    return true;
-                }
-                return false;
-            };
-            if (key === 'Enter') {
-                e.preventDefault();
-                tryAdd();
-            } else if (key === 'Tab' && !e.shiftKey) {
-                // Solo interceptamos Tab hacia delante si podemos añadir
-                const added = tryAdd();
-                if (added) e.preventDefault();
-            }
-        });
-    }
-
-    // Botones de exportación / compartir
-    const btnImprimir = document.getElementById('btnImprimirPresupuesto');
-    if (btnImprimir) {
-        btnImprimir.addEventListener('click', () => {
-            imprimirPresupuesto();
-        });
-    }
-    const btnDescargarPDF = document.getElementById('btnDescargarPDF');
-    if (btnDescargarPDF) {
-        btnDescargarPDF.addEventListener('click', async () => {
-            await exportarPresupuestoPDF('presupuesto.pdf');
-        });
-    }
-    const btnCapturaWA = document.getElementById('btnCapturaWhatsApp');
-    if (btnCapturaWA) {
-        btnCapturaWA.addEventListener('click', async () => {
-            await capturaYWhatsApp();
-        });
-    }
-    const btnCompartirWA = document.getElementById('btnCompartirWhatsApp');
-    if (btnCompartirWA) {
-        btnCompartirWA.addEventListener('click', () => {
-            const texto = generarTextoPresupuesto();
-            const telRaw = UI.DOMElements.presupuestoTelefonoCliente?.value || '';
-            let tel = (telRaw || '').replace(/\D/g, '');
-            if (!tel) {
-                M.toast({ html: 'Introduce el teléfono del cliente', classes: 'red' });
-                return;
-            }
-            if (tel.length === 9) tel = '34' + tel;
-            const url = `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
-        });
-    }
-    const btnCopiarCalendar = document.getElementById('btnCopiarCalendar');
-    if (btnCopiarCalendar) {
-        btnCopiarCalendar.addEventListener('click', () => copiarParaCalendar());
-    }
-    const btnAbrirCalendar = document.getElementById('btnAbrirCalendar');
-    if (btnAbrirCalendar) {
-        btnAbrirCalendar.addEventListener('click', () => abrirEnCalendar());
-    }
-    const btnVaciarGrupos = document.getElementById('btnVaciarGrupos');
-    if (btnVaciarGrupos) {
-        btnVaciarGrupos.addEventListener('click', () => {
-            if (confirm('¿Vaciar el presupuesto (lista del cliente) sin tocar las marcas/trabajos temporales?')) {
-                State.clearGrupos();
-                UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
-                M.toast({ html: 'Presupuesto vaciado.', classes: 'blue' });
-            }
-        });
-    }
-
-    // --- Sugerencias (medidas y marcas desde historial) ---
-    const btnCargarSugerencias = document.getElementById('btnCargarSugerencias');
-    const sugLimit = document.getElementById('sug-limit');
-    const sugMedidas = document.getElementById('sug-medidas');
-    const sugMarcas = document.getElementById('sug-marcas');
-    let ultSugerencias = null;
-
-    function showToast(msg) {
-        if (window.M && M.toast) M.toast({ html: msg });
-        else alert(msg);
-    }
-
-    function renderChips(container, items, onClick) {
-        if (!container) return;
-        container.innerHTML = '';
-        if (!items || !items.length) { container.textContent = 'Sin datos'; return; }
-        items.forEach(txt => {
-            const chip = document.createElement('a');
-            chip.href = '#!';
-            chip.textContent = txt;
-            chip.className = 'chip';
-            chip.style.marginRight = '6px';
-            chip.addEventListener('click', (e) => { e.preventDefault(); onClick(txt); });
-            container.appendChild(chip);
-        });
-    }
-
-    if (btnCargarSugerencias) {
-        btnCargarSugerencias.addEventListener('click', async () => {
-            try {
-                const limitVal = sugLimit?.value ? Number(sugLimit.value) : undefined;
-                const data = await API.fetchSugerencias(limitVal);
-                ultSugerencias = data;
-                // Render medidas; al hacer clic, rellenar input y actualizar marcas por combo
-                renderChips(sugMedidas, data.medidas, (val) => {
-                    const inputMedida = document.getElementById('presupuesto-medida');
-                    if (inputMedida) {
-                        inputMedida.value = val;
-                        inputMedida.dispatchEvent(new Event('input'));
-                        if (window.M) M.updateTextFields();
-                    }
-                    const marcasParaMedida = (ultSugerencias?.combos && ultSugerencias.combos[val]) || ultSugerencias?.marcas || [];
-                    renderChips(sugMarcas, marcasParaMedida, onClickMarca);
-                    showToast(`Medida: ${val}`);
-                });
-                // Render marcas generales; al hacer clic, rellenar marca
-                const onClickMarca = (val) => {
-                    const inputMarca = document.getElementById('presupuesto-marca-temp');
-                    if (inputMarca) {
-                        inputMarca.value = val;
-                        inputMarca.dispatchEvent(new Event('input'));
-                        if (window.M) M.updateTextFields();
-                    }
-                    showToast(`Marca: ${val}`);
-                };
-                renderChips(sugMarcas, data.marcas, onClickMarca);
-                showToast('Sugerencias cargadas');
-            } catch (e) {
-                showToast(`Error cargando sugerencias: ${e.message || e}`);
-            }
-        });
-    }
-
-    // Eliminados listeners de inventario
-    
-    // Event Delegation for dynamic elements
-    document.body.addEventListener('click', (e) => {
-        const target = e.target;
-        // Historial Actions
-        if (target.matches('.edit-presupuesto')) {
-            handleLoadPresupuestoForEdit(target.dataset.id);
+  // Historial: buscar/limpiar
+  const btnBuscarHist = document.getElementById("hist-buscar-btn");
+  const btnLimpiarHist = document.getElementById("hist-limpiar-btn");
+  const inpNom = document.getElementById("hist-buscar-nombre");
+  const inpTel = document.getElementById("hist-buscar-telefono");
+  const inpNum = document.getElementById("hist-buscar-numero");
+  if (btnBuscarHist && btnLimpiarHist && inpNom && inpTel && inpNum) {
+    btnBuscarHist.addEventListener("click", () => {
+      filtrosHist = {
+        nombre: inpNom.value.trim(),
+        telefono: inpTel.value.trim(),
+        numero: inpNum.value.trim(),
+      };
+      handleFetchPresupuestos(1);
+    });
+    btnLimpiarHist.addEventListener("click", () => {
+      filtrosHist = { nombre: "", telefono: "", numero: "" };
+      inpNom.value = "";
+      inpTel.value = "";
+      inpNum.value = "";
+      M.updateTextFields();
+      handleFetchPresupuestos(1);
+    });
+    // Enter en campos → buscar
+    [inpNom, inpTel, inpNum].forEach((inp) =>
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          btnBuscarHist.click();
         }
-        if (target.matches('.delete-presupuesto')) {
-            handleDeletePresupuesto(target.dataset.id);
+      })
+    );
+  }
+  // Botón Guardar como nuevo
+  const btnGuardarComoNuevo = document.getElementById("btnGuardarComoNuevo");
+  if (btnGuardarComoNuevo) {
+    btnGuardarComoNuevo.addEventListener("click", () => {
+      handleSavePresupuesto(true); // true = guardar como nuevo
+    });
+  }
+
+  // Flujo de teclado para añadir varias marcas rápidamente
+  const marcaInput = document.getElementById("presupuesto-marca-temp");
+  const netoInput = document.getElementById("presupuesto-neto-temp");
+  if (marcaInput && netoInput) {
+    // Enter en Marca → ir a Neto
+    marcaInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        netoInput.focus();
+      }
+    });
+    // Tab o Enter en Neto → añadir y volver a Marca (si valores válidos)
+    netoInput.addEventListener("keydown", (e) => {
+      const key = e.key;
+      const tryAdd = () => {
+        const m = marcaInput.value?.trim();
+        const n = netoInput.value;
+        if (m && isValidNumber(n, { min: 0, allowNegative: false })) {
+          handleAddMarca();
+          marcaInput.focus();
+          return true;
         }
+        return false;
+      };
+      if (key === "Enter") {
+        e.preventDefault();
+        tryAdd();
+      } else if (key === "Tab" && !e.shiftKey) {
+        // Solo interceptamos Tab hacia delante si podemos añadir
+        const added = tryAdd();
+        if (added) e.preventDefault();
+      }
+    });
+  }
+
+  // Botones de exportación / compartir
+  const btnImprimir = document.getElementById("btnImprimirPresupuesto");
+  if (btnImprimir) {
+    btnImprimir.addEventListener("click", () => {
+      imprimirPresupuesto();
+    });
+  }
+  const btnDescargarPDF = document.getElementById("btnDescargarPDF");
+  if (btnDescargarPDF) {
+    btnDescargarPDF.addEventListener("click", async () => {
+      await exportarPresupuestoPDF("presupuesto.pdf");
+    });
+  }
+  const btnCapturaWA = document.getElementById("btnCapturaWhatsApp");
+  if (btnCapturaWA) {
+    btnCapturaWA.addEventListener("click", async () => {
+      await capturaYWhatsApp();
+    });
+  }
+  const btnCompartirWA = document.getElementById("btnCompartirWhatsApp");
+  if (btnCompartirWA) {
+    btnCompartirWA.addEventListener("click", () => {
+      const texto = generarTextoPresupuesto();
+      const telRaw = UI.DOMElements.presupuestoTelefonoCliente?.value || "";
+      let tel = (telRaw || "").replace(/\D/g, "");
+      if (!tel) {
+        M.toast({ html: "Introduce el teléfono del cliente", classes: "red" });
+        return;
+      }
+      if (tel.length === 9) tel = "34" + tel;
+      const url = `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
+      window.open(url, "_blank");
+    });
+  }
+  const btnCopiarCalendar = document.getElementById("btnCopiarCalendar");
+  if (btnCopiarCalendar) {
+    btnCopiarCalendar.addEventListener("click", () => copiarParaCalendar());
+  }
+  const btnAbrirCalendar = document.getElementById("btnAbrirCalendar");
+  if (btnAbrirCalendar) {
+    btnAbrirCalendar.addEventListener("click", () => abrirEnCalendar());
+  }
+  const btnVaciarGrupos = document.getElementById("btnVaciarGrupos");
+  if (btnVaciarGrupos) {
+    btnVaciarGrupos.addEventListener("click", () => {
+      if (
+        confirm(
+          "¿Vaciar el presupuesto (lista del cliente) sin tocar las marcas/trabajos temporales?"
+        )
+      ) {
+        State.clearGrupos();
+        UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+        M.toast({ html: "Presupuesto vaciado.", classes: "blue" });
+      }
+    });
+  }
+
+  // --- Sugerencias (medidas y marcas desde historial) ---
+  const btnCargarSugerencias = document.getElementById("btnCargarSugerencias");
+  const sugLimit = document.getElementById("sug-limit");
+  const sugMedidas = document.getElementById("sug-medidas");
+  const sugMarcas = document.getElementById("sug-marcas");
+  let ultSugerencias = null;
+
+  function showToast(msg) {
+    if (window.M && M.toast) M.toast({ html: msg });
+    else alert(msg);
+  }
+
+  function renderChips(container, items, onClick) {
+    if (!container) return;
+    container.innerHTML = "";
+    if (!items || !items.length) {
+      container.textContent = "Sin datos";
+      return;
+    }
+    items.forEach((txt) => {
+      const chip = document.createElement("a");
+      chip.href = "#!";
+      chip.textContent = txt;
+      chip.className = "chip";
+      chip.style.marginRight = "6px";
+      chip.addEventListener("click", (e) => {
+        e.preventDefault();
+        onClick(txt);
+      });
+      container.appendChild(chip);
+    });
+  }
+
+  if (btnCargarSugerencias) {
+    btnCargarSugerencias.addEventListener("click", async () => {
+      try {
+        const limitVal = sugLimit?.value ? Number(sugLimit.value) : undefined;
+        const data = await API.fetchSugerencias(limitVal);
+        ultSugerencias = data;
+        // Render medidas; al hacer clic, rellenar input y actualizar marcas por combo
+        renderChips(sugMedidas, data.medidas, (val) => {
+          const inputMedida = document.getElementById("presupuesto-medida");
+          if (inputMedida) {
+            inputMedida.value = val;
+            inputMedida.dispatchEvent(new Event("input"));
+            if (window.M) M.updateTextFields();
+          }
+          const marcasParaMedida =
+            (ultSugerencias?.combos && ultSugerencias.combos[val]) || ultSugerencias?.marcas || [];
+          renderChips(sugMarcas, marcasParaMedida, onClickMarca);
+          showToast(`Medida: ${val}`);
+        });
+        // Render marcas generales; al hacer clic, rellenar marca
+        const onClickMarca = (val) => {
+          const inputMarca = document.getElementById("presupuesto-marca-temp");
+          if (inputMarca) {
+            inputMarca.value = val;
+            inputMarca.dispatchEvent(new Event("input"));
+            if (window.M) M.updateTextFields();
+          }
+          showToast(`Marca: ${val}`);
+        };
+        renderChips(sugMarcas, data.marcas, onClickMarca);
+        showToast("Sugerencias cargadas");
+      } catch (e) {
+        showToast(`Error cargando sugerencias: ${e.message || e}`);
+      }
+    });
+  }
+
+  // Eliminados listeners de inventario
+
+  // Event Delegation for dynamic elements
+  document.body.addEventListener("click", (e) => {
+    const target = e.target;
+    // Historial Actions
+    if (target.matches(".edit-presupuesto")) {
+      handleLoadPresupuestoForEdit(target.dataset.id);
+    }
+    if (target.matches(".delete-presupuesto")) {
+      handleDeletePresupuesto(target.dataset.id);
+    }
     // Botón convertir a pedido eliminado (endpoint no existe)
     // Eliminadas acciones de inventario
-        // Pagination
-    if (target.closest('.page-link')) {
-            const page = parseInt(target.closest('.page-link').dataset.page);
-            if (!isNaN(page)) {
+    // Pagination
+    if (target.closest(".page-link")) {
+      const page = parseInt(target.closest(".page-link").dataset.page, 10);
+      if (!isNaN(page)) {
         handleFetchPresupuestos(page);
-            }
-        }
-        // Temp items
-        if (target.matches('.remove-temp-item')) {
-            const { id, type } = target.dataset;
-            if (type === 'neumatico') {
-                State.removeTempNeumatico(id);
-            } else if (type === 'trabajo') {
-                State.removeTempTrabajo(id);
-            }
-            UI.renderTemporaryItems(State.getCurrentPresupuesto());
-        }
-        // Presupuesto items
-        if (target.matches('.action-delete')) {
-            const { groupId, elementId, tipo } = target.dataset;
-            if (groupId && elementId && tipo) {
-                State.removeElementFromGroup(groupId, elementId, tipo);
-                UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
-            }
-        }
-        // Elegir una marca dentro de un grupo
-        if (target.matches('.choose-marca')) {
-            e.preventDefault();
-            const { groupId, neumaticoId } = target.dataset;
-            if (groupId && neumaticoId) {
-                State.chooseMarcaForGroup(groupId, neumaticoId);
-                UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
-                M.toast({ html: 'Marca seleccionada para el grupo.', classes: 'green' });
-            }
-        }
-        // Elegir marca y limpiar grupos de la misma medida
-        if (target.matches('.choose-marca-clean')) {
-            e.preventDefault();
-            const { groupId, neumaticoId } = target.dataset;
-            if (groupId && neumaticoId) {
-                State.chooseMarcaAndRemoveSameMeasure(groupId, neumaticoId);
-                UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
-                M.toast({ html: 'Marca elegida y medidas duplicadas limpiadas.', classes: 'green' });
-            }
-        }
-        // Vaciar temporales
-        if (target.matches('#btnVaciarTemporales')) {
-            e.preventDefault();
-            State.clearTemporales();
-            UI.renderTemporaryItems(State.getCurrentPresupuesto());
-            M.toast({ html: 'Temporales vaciados.', classes: 'blue' });
-        }
-    });
-
-    // Toggle mostrar info interna (solo en pantalla)
-    document.body.addEventListener('change', (e) => {
-        const target = e.target;
-        if (target && target.id === 'toggleInterno') {
-            const show = !!target.checked;
-            document.querySelectorAll('.solo-interno').forEach(el => {
-                el.style.display = show ? '' : 'none';
-            });
-            try { localStorage.setItem('mostrarInfoInterna', show ? '1' : '0'); } catch (_) {}
-        }
-    });
-
-    // Other Listeners
-    document.getElementById('toggleCompacto').addEventListener('change', (e) => {
-        document.body.classList.toggle('compacto', e.target.checked);
-    });
-
-
-    // --- Handlers ---
-
-    function handleShowView(viewId) {
-        UI.showView(viewId);
-        State.setCurrentView(viewId);
-        if (viewId === 'historial-view') {
-            handleFetchPresupuestos();
-        }
+      }
     }
-
-    function handleResetPresupuestoForm() {
-        State.resetState();
-        UI.resetPresupuestoForm();
-        const btnGuardarComoNuevo = document.getElementById('btnGuardarComoNuevo');
-        if (btnGuardarComoNuevo) btnGuardarComoNuevo.style.display = 'none';
+    // Temp items
+    if (target.matches(".remove-temp-item")) {
+      const { id, type } = target.dataset;
+      if (type === "neumatico") {
+        State.removeTempNeumatico(id);
+      } else if (type === "trabajo") {
+        State.removeTempTrabajo(id);
+      }
+      UI.renderTemporaryItems(State.getCurrentPresupuesto());
     }
-
-    async function handleFetchPresupuestos(page = 1) {
-        try {
-            const data = await API.fetchHistorial(page, filtrosHist);
-            State.setHistorial(data.presupuestos);
-            State.setPaginacion(data);
-            UI.renderPresupuestosList(State.getHistorial());
-            UI.renderPagination(State.getPaginacion());
-            // Rellenar de nuevo los inputs con filtros actuales
-            const inpNom = document.getElementById('hist-buscar-nombre');
-            const inpTel = document.getElementById('hist-buscar-telefono');
-            const inpNum = document.getElementById('hist-buscar-numero');
-            if (inpNom && inpTel && inpNum) {
-                inpNom.value = filtrosHist.nombre || '';
-                inpTel.value = filtrosHist.telefono || '';
-                inpNum.value = filtrosHist.numero || '';
-                M.updateTextFields();
-            }
-        } catch (error) {
-            const toastId = 'toast-error-' + Date.now();
-            const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
-            const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
-            M.toast({
-                html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${error.message || error}</span>${copyBtn}${closeBtn}`,
-                classes: 'red',
-                displayLength: Infinity
-            });
-        }
+    // Presupuesto items
+    if (target.matches(".action-delete")) {
+      const { groupId, elementId, tipo } = target.dataset;
+      if (groupId && elementId && tipo) {
+        State.removeElementFromGroup(groupId, elementId, tipo);
+        UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+      }
     }
+    // Elegir una marca dentro de un grupo
+    if (target.matches(".choose-marca")) {
+      e.preventDefault();
+      const { groupId, neumaticoId } = target.dataset;
+      if (groupId && neumaticoId) {
+        State.chooseMarcaForGroup(groupId, neumaticoId);
+        UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+        M.toast({ html: "Marca seleccionada para el grupo.", classes: "green" });
+      }
+    }
+    // Elegir marca y limpiar grupos de la misma medida
+    if (target.matches(".choose-marca-clean")) {
+      e.preventDefault();
+      const { groupId, neumaticoId } = target.dataset;
+      if (groupId && neumaticoId) {
+        State.chooseMarcaAndRemoveSameMeasure(groupId, neumaticoId);
+        UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+        M.toast({ html: "Marca elegida y medidas duplicadas limpiadas.", classes: "green" });
+      }
+    }
+    // Vaciar temporales
+    if (target.matches("#btnVaciarTemporales")) {
+      e.preventDefault();
+      State.clearTemporales();
+      UI.renderTemporaryItems(State.getCurrentPresupuesto());
+      M.toast({ html: "Temporales vaciados.", classes: "blue" });
+    }
+  });
 
-    async function handleSavePresupuesto() {
-        State.calculateTotalGeneral();
-        const currentPresupuesto = State.getCurrentPresupuesto();
-        const clienteData = {
-            nombre: UI.DOMElements.presupuestoNombreCliente.value,
-            telefono: UI.DOMElements.presupuestoTelefonoCliente.value,
-            nif: UI.DOMElements.presupuestoNifCliente.value
-        };
+  // Toggle mostrar info interna (solo en pantalla)
+  document.body.addEventListener("change", (e) => {
+    const target = e.target;
+    if (target && target.id === "toggleInterno") {
+      const show = !!target.checked;
+      document.querySelectorAll(".solo-interno").forEach((el) => {
+        el.style.display = show ? "" : "none";
+      });
+      try {
+        localStorage.setItem("mostrarInfoInterna", show ? "1" : "0");
+      } catch (_) {}
+    }
+  });
 
-        // El backend genera el número, así que no lo envíes si es nuevo
-        let fecha = UI.DOMElements.presupuestoFechaPresupuesto.value;
-        if (!fecha) {
-            const hoy = new Date();
-            const yyyy = hoy.getFullYear();
-            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-            const dd = String(hoy.getDate()).padStart(2, '0');
-            fecha = `${yyyy}-${mm}-${dd}`;
-            if (UI.DOMElements.presupuestoFechaPresupuesto) {
-                UI.DOMElements.presupuestoFechaPresupuesto.value = fecha;
-            }
-        }
-        // Capturar borrador (parámetros del formulario + temporales)
-        const draftParams = {
-            medida: document.getElementById('presupuesto-medida')?.value || '',
-            cantidad: document.getElementById('presupuesto-cantidad')?.value || '',
-            ganancia: document.getElementById('presupuesto-ganancia')?.value || '',
-            ecotasa: document.getElementById('presupuesto-ecotasa')?.value || '',
-            iva: document.getElementById('presupuesto-iva')?.value || ''
-        };
+  // Other Listeners
+  const toggleCompacto = document.getElementById("toggleCompacto");
+  const toggleCompactoTop = document.getElementById("toggleCompactoTop");
+  if (toggleCompacto) {
+    // init from localStorage
+    try {
+      const saved = localStorage.getItem("ui.compacto");
+      const onSaved = saved === "1";
+      if (toggleCompacto) toggleCompacto.checked = onSaved;
+      if (toggleCompactoTop) toggleCompactoTop.checked = onSaved;
+      if (onSaved) {
+        document.body.classList.add("compacto");
+      }
+    } catch (_) {}
+    const applyCompact = (on) => {
+      document.body.classList.toggle("compacto", on);
+      try {
+        localStorage.setItem("ui.compacto", on ? "1" : "0");
+      } catch (_) {}
+      if (toggleCompacto && toggleCompacto.checked !== on) toggleCompacto.checked = on;
+      if (toggleCompactoTop && toggleCompactoTop.checked !== on) toggleCompactoTop.checked = on;
+    };
+    toggleCompacto.addEventListener("change", (e) => applyCompact(!!e.target.checked));
+    if (toggleCompactoTop)
+      toggleCompactoTop.addEventListener("change", (e) => applyCompact(!!e.target.checked));
+  }
 
-    const distribuidor = UI.DOMElements.presupuestoDistribuidor?.value || '';
-    const descripcion = UI.DOMElements.presupuestoDescripcion?.value || '';
-    const observaciones = UI.DOMElements.presupuestoObservaciones?.value || '';
+  // Extra-compacto toggle
+  const toggleExtraCompacto = document.getElementById("toggleExtraCompacto");
+  const toggleExtraCompactoTop = document.getElementById("toggleExtraCompactoTop");
+  if (toggleExtraCompacto) {
+    // init from localStorage
+    try {
+      const saved = localStorage.getItem("ui.extraCompacto");
+      const onSaved = saved === "1";
+      if (toggleExtraCompacto) toggleExtraCompacto.checked = onSaved;
+      if (toggleExtraCompactoTop) toggleExtraCompactoTop.checked = onSaved;
+      if (onSaved) document.body.classList.add("extra-compacto");
+    } catch (_) {}
+    const applyExtra = (on) => {
+      document.body.classList.toggle("extra-compacto", on);
+      try {
+        localStorage.setItem("ui.extraCompacto", on ? "1" : "0");
+      } catch (_) {}
+      if (toggleExtraCompacto && toggleExtraCompacto.checked !== on)
+        toggleExtraCompacto.checked = on;
+      if (toggleExtraCompactoTop && toggleExtraCompactoTop.checked !== on)
+        toggleExtraCompactoTop.checked = on;
+    };
+    toggleExtraCompacto.addEventListener("change", (e) => applyExtra(!!e.target.checked));
+    if (toggleExtraCompactoTop)
+      toggleExtraCompactoTop.addEventListener("change", (e) => applyExtra(!!e.target.checked));
+  }
+
+  // Botón Cancelar en barra superior: reusa el inferior
+  const btnCancelarTop = document.getElementById("btnCancelarEdicionTop");
+  const btnCancelar = document.getElementById("btnCancelarEdicion");
+  if (btnCancelarTop && btnCancelar) {
+    // Visibilidad sincronizada
+    const obs = new MutationObserver(() => {
+      btnCancelarTop.style.display = btnCancelar.style.display || "none";
+    });
+    obs.observe(btnCancelar, { attributes: true, attributeFilter: ["style", "class"] });
+    btnCancelarTop.addEventListener("click", () => btnCancelar.click());
+    // Estado inicial
+    btnCancelarTop.style.display = btnCancelar.style.display || "none";
+  }
+
+  // --- Handlers ---
+
+  function handleShowView(viewId) {
+    UI.showView(viewId);
+    State.setCurrentView(viewId);
+    if (viewId === "historial-view") {
+      handleFetchPresupuestos();
+    }
+  }
+
+  function handleResetPresupuestoForm() {
+    State.resetState();
+    UI.resetPresupuestoForm();
+    const btnGuardarComoNuevo = document.getElementById("btnGuardarComoNuevo");
+    if (btnGuardarComoNuevo) btnGuardarComoNuevo.style.display = "none";
+  }
+
+  async function handleFetchPresupuestos(page = 1) {
+    try {
+      const data = await API.fetchHistorial(page, filtrosHist);
+      State.setHistorial(data.presupuestos);
+      State.setPaginacion(data);
+      UI.renderPresupuestosList(State.getHistorial());
+      UI.renderPagination(State.getPaginacion());
+      // Rellenar de nuevo los inputs con filtros actuales
+      const inpNom = document.getElementById("hist-buscar-nombre");
+      const inpTel = document.getElementById("hist-buscar-telefono");
+      const inpNum = document.getElementById("hist-buscar-numero");
+      if (inpNom && inpTel && inpNum) {
+        inpNom.value = filtrosHist.nombre || "";
+        inpTel.value = filtrosHist.telefono || "";
+        inpNum.value = filtrosHist.numero || "";
+        M.updateTextFields();
+      }
+    } catch (error) {
+      const toastId = "toast-error-" + Date.now();
+      const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
+      const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+      M.toast({
+        html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${error.message || error}</span>${copyBtn}${closeBtn}`,
+        classes: "red",
+        displayLength: Infinity,
+      });
+    }
+  }
+
+  async function handleSavePresupuesto() {
+    State.calculateTotalGeneral();
+    const currentPresupuesto = State.getCurrentPresupuesto();
+    const clienteData = {
+      nombre: UI.DOMElements.presupuestoNombreCliente.value,
+      telefono: UI.DOMElements.presupuestoTelefonoCliente.value,
+      nif: UI.DOMElements.presupuestoNifCliente.value,
+    };
+
+    // El backend genera el número, así que no lo envíes si es nuevo
+    let fecha = UI.DOMElements.presupuestoFechaPresupuesto.value;
+    if (!fecha) {
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+      const dd = String(hoy.getDate()).padStart(2, "0");
+      fecha = `${yyyy}-${mm}-${dd}`;
+      if (UI.DOMElements.presupuestoFechaPresupuesto) {
+        UI.DOMElements.presupuestoFechaPresupuesto.value = fecha;
+      }
+    }
+    // Capturar borrador (parámetros del formulario + temporales)
+    const draftParams = {
+      medida: document.getElementById("presupuesto-medida")?.value || "",
+      cantidad: document.getElementById("presupuesto-cantidad")?.value || "",
+      ganancia: document.getElementById("presupuesto-ganancia")?.value || "",
+      ecotasa: document.getElementById("presupuesto-ecotasa")?.value || "",
+      iva: document.getElementById("presupuesto-iva")?.value || "",
+    };
+
+    const distribuidor = UI.DOMElements.presupuestoDistribuidor?.value || "";
+    const descripcion = UI.DOMElements.presupuestoDescripcion?.value || "";
+    const observaciones = UI.DOMElements.presupuestoObservaciones?.value || "";
 
     const presupuestoData = {
-            cliente: clienteData,
-            fecha: fecha,
-            vista_cliente: {
-                grupos: currentPresupuesto.grupos,
-                totalGeneral: currentPresupuesto.totalGeneral
-            },
-            vista_interna: {
-                grupos: currentPresupuesto.grupos,
-                totalGeneral: currentPresupuesto.totalGeneral,
+      cliente: clienteData,
+      fecha: fecha,
+      vista_cliente: {
+        grupos: currentPresupuesto.grupos,
+        totalGeneral: currentPresupuesto.totalGeneral,
+      },
+      vista_interna: {
+        grupos: currentPresupuesto.grupos,
+        totalGeneral: currentPresupuesto.totalGeneral,
         distribuidor,
         descripcion,
         observaciones,
-                draft: {
-                    params: draftParams,
-                    tempNeumaticos: currentPresupuesto.tempNeumaticos,
-                    tempOtrosTrabajos: currentPresupuesto.tempOtrosTrabajos
-                }
-            }
-        };
+        draft: {
+          params: draftParams,
+          tempNeumaticos: currentPresupuesto.tempNeumaticos,
+          tempOtrosTrabajos: currentPresupuesto.tempOtrosTrabajos,
+        },
+      },
+    };
 
-        try {
-            // Si se pasa true como argumento, forzar guardar como nuevo (POST)
-            let guardarComoNuevo = false;
-            if (arguments.length > 0 && arguments[0] === true) guardarComoNuevo = true;
-            const idParaGuardar = guardarComoNuevo ? null : State.getCurrentEditPresupuestoId();
-            const saved = await API.savePresupuesto(idParaGuardar, presupuestoData);
-            // Mostrar el número generado si es nuevo
-            if (saved && saved.numero) {
-                if (UI.DOMElements.presupuestoNumeroPresupuesto) {
-                    UI.DOMElements.presupuestoNumeroPresupuesto.value = saved.numero;
-                }
-                M.toast({html: `Presupuesto guardado con éxito. Nº: <b>${saved.numero}</b>`, classes: 'green'});
-            } else {
-                M.toast({html: 'Presupuesto guardado con éxito!', classes: 'green'});
-            }
-            handleResetPresupuestoForm();
-            handleShowView('historial-view');
-        } catch (error) {
-            // Mostrar mensaje detallado del backend si existe
-            let msg = error.message || 'Error desconocido al guardar presupuesto.';
-            if (error.stack) {
-                msg += `<br><small>${error.stack}</small>`;
-            }
-            // Botón copiar
-            const toastId = 'toast-error-' + Date.now();
-            const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
-            const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
-            M.toast({
-                html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${msg}</span>${copyBtn}${closeBtn}`,
-                classes: 'red',
-                displayLength: Infinity
-            });
+    try {
+      // Si se pasa true como argumento, forzar guardar como nuevo (POST)
+      let guardarComoNuevo = false;
+      if (arguments.length > 0 && arguments[0] === true) guardarComoNuevo = true;
+      const idParaGuardar = guardarComoNuevo ? null : State.getCurrentEditPresupuestoId();
+      const saved = await API.savePresupuesto(idParaGuardar, presupuestoData);
+      // Mostrar el número generado si es nuevo
+      if (saved && saved.numero) {
+        if (UI.DOMElements.presupuestoNumeroPresupuesto) {
+          UI.DOMElements.presupuestoNumeroPresupuesto.value = saved.numero;
         }
+        M.toast({
+          html: `Presupuesto guardado con éxito. Nº: <b>${saved.numero}</b>`,
+          classes: "green",
+        });
+      } else {
+        M.toast({ html: "Presupuesto guardado con éxito!", classes: "green" });
+      }
+      handleResetPresupuestoForm();
+      handleShowView("historial-view");
+    } catch (error) {
+      // Mostrar mensaje detallado del backend si existe
+      let msg = error.message || "Error desconocido al guardar presupuesto.";
+      if (error.stack) {
+        msg += `<br><small>${error.stack}</small>`;
+      }
+      // Botón copiar
+      const toastId = "toast-error-" + Date.now();
+      const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
+      const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+      M.toast({
+        html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${msg}</span>${copyBtn}${closeBtn}`,
+        classes: "red",
+        displayLength: Infinity,
+      });
     }
+  }
 
-    async function handleLoadPresupuestoForEdit(presupuestoId) {
-        try {
-            const presupuesto = await API.fetchPresupuestoById(presupuestoId);
-            State.loadPresupuestoForEdit(presupuesto);
-            const loadedState = State.getCurrentPresupuesto();
-            // Usar el objeto crudo del API para rellenar parámetros desde draft
-            UI.fillPresupuestoForm(presupuesto);
-            UI.renderPresupuestoFinal(loadedState);
-            UI.renderTemporaryItems(loadedState);
-            handleShowView('presupuestos-view');
-            // Mostrar botón Guardar como nuevo
-            const btnGuardarComoNuevo = document.getElementById('btnGuardarComoNuevo');
-            if (btnGuardarComoNuevo) btnGuardarComoNuevo.style.display = 'inline-block';
-        } catch (error) {
-            const toastId = 'toast-error-' + Date.now();
-            const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
-            const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
-            M.toast({
-                html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${error.message || error}</span>${copyBtn}${closeBtn}`,
-                classes: 'red',
-                displayLength: Infinity
-            });
-        }
+  async function handleLoadPresupuestoForEdit(presupuestoId) {
+    try {
+      const presupuesto = await API.fetchPresupuestoById(presupuestoId);
+      State.loadPresupuestoForEdit(presupuesto);
+      const loadedState = State.getCurrentPresupuesto();
+      // Usar el objeto crudo del API para rellenar parámetros desde draft
+      UI.fillPresupuestoForm(presupuesto);
+      UI.renderPresupuestoFinal(loadedState);
+      UI.renderTemporaryItems(loadedState);
+      handleShowView("presupuestos-view");
+      // Mostrar botón Guardar como nuevo
+      const btnGuardarComoNuevo = document.getElementById("btnGuardarComoNuevo");
+      if (btnGuardarComoNuevo) btnGuardarComoNuevo.style.display = "inline-block";
+    } catch (error) {
+      const toastId = "toast-error-" + Date.now();
+      const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
+      const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+      M.toast({
+        html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${error.message || error}</span>${copyBtn}${closeBtn}`,
+        classes: "red",
+        displayLength: Infinity,
+      });
     }
+  }
 
-    async function handleDeletePresupuesto(presupuestoId) {
-        if (confirm('¿Estás seguro de que quieres eliminar este presupuesto?')) {
-            try {
-                await API.deletePresupuestoById(presupuestoId);
-                M.toast({html: 'Presupuesto eliminado con éxito!', classes: 'green'});
-                handleFetchPresupuestos();
-            } catch (error) {
-                const toastId = 'toast-error-' + Date.now();
-                const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
-                const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
-                M.toast({
-                    html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${error.message || error}</span>${copyBtn}${closeBtn}`,
-                    classes: 'red',
-                    displayLength: Infinity
-                });
-            }
-        }
+  async function handleDeletePresupuesto(presupuestoId) {
+    if (confirm("¿Estás seguro de que quieres eliminar este presupuesto?")) {
+      try {
+        await API.deletePresupuestoById(presupuestoId);
+        M.toast({ html: "Presupuesto eliminado con éxito!", classes: "green" });
+        handleFetchPresupuestos();
+      } catch (error) {
+        const toastId = "toast-error-" + Date.now();
+        const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
+        const closeBtn = `<button class='btn-flat toast-action' onclick='this.closest(".toast").remove()'>Cerrar</button>`;
+        M.toast({
+          html: `<span id='${toastId}' style='white-space:pre-line;'>Error: ${error.message || error}</span>${copyBtn}${closeBtn}`,
+          classes: "red",
+          displayLength: Infinity,
+        });
+      }
     }
+  }
 
-    // función convertir a pedido eliminada
+  // función convertir a pedido eliminada
 
-    // Eliminadas funciones de inventario
-    
-    function handleAddMarca() {
-        const medida = document.getElementById('presupuesto-medida').value;
-        const cantidad = document.getElementById('presupuesto-cantidad').value;
-        const ganancia = document.getElementById('presupuesto-ganancia').value;
-        const ecotasa = document.getElementById('presupuesto-ecotasa').value;
-        const iva = document.getElementById('presupuesto-iva').value;
-        const marca = document.getElementById('presupuesto-marca-temp').value;
-        const neto = document.getElementById('presupuesto-neto-temp').value;
+  // Eliminadas funciones de inventario
 
-        let errores = [];
-        if (!isNotEmpty(medida)) errores.push('La medida es obligatoria.');
-        if (!isValidNumber(cantidad, { min: 1, allowNegative: false })) errores.push('Cantidad inválida.');
-        if (!isNotEmpty(marca)) errores.push('La marca es obligatoria.');
-        if (!isValidNumber(neto, { min: 0, allowNegative: false })) errores.push('Neto inválido.');
-        if (!isValidNumber(ganancia, { min: 0, allowNegative: false })) errores.push('Ganancia inválida.');
-        if (!isValidNumber(ecotasa, { min: 0, allowNegative: false })) errores.push('Ecotasa inválida.');
-        if (!isValidNumber(iva, { min: 0, max: 100, allowNegative: false })) errores.push('IVA inválido.');
+  function handleAddMarca() {
+    const medida = document.getElementById("presupuesto-medida").value;
+    const cantidad = document.getElementById("presupuesto-cantidad").value;
+    const ganancia = document.getElementById("presupuesto-ganancia").value;
+    const ecotasa = document.getElementById("presupuesto-ecotasa").value;
+    const iva = document.getElementById("presupuesto-iva").value;
+    const marca = document.getElementById("presupuesto-marca-temp").value;
+    const neto = document.getElementById("presupuesto-neto-temp").value;
 
-        if (errores.length > 0) {
-            UI.showFormErrors('producto-form', errores);
-            return;
-        }
-        UI.clearFormErrors('producto-form');
+    const errores = [];
+    if (!isNotEmpty(medida)) errores.push("La medida es obligatoria.");
+    if (!isValidNumber(cantidad, { min: 1, allowNegative: false }))
+      errores.push("Cantidad inválida.");
+    if (!isNotEmpty(marca)) errores.push("La marca es obligatoria.");
+    if (!isValidNumber(neto, { min: 0, allowNegative: false })) errores.push("Neto inválido.");
+    if (!isValidNumber(ganancia, { min: 0, allowNegative: false }))
+      errores.push("Ganancia inválida.");
+    if (!isValidNumber(ecotasa, { min: 0, allowNegative: false }))
+      errores.push("Ecotasa inválida.");
+    if (!isValidNumber(iva, { min: 0, max: 100, allowNegative: false }))
+      errores.push("IVA inválido.");
 
-        const nCantidad = parseInt(cantidad);
-        const nGanancia = parseFloat(ganancia);
-        const nEcotasa = parseFloat(ecotasa);
-        const nIva = parseFloat(iva);
-        const nNeto = parseFloat(neto);
+    if (errores.length > 0) {
+      UI.showFormErrors("producto-form", errores);
+      return;
+    }
+    UI.clearFormErrors("producto-form");
+
+    const nCantidad = parseInt(cantidad, 10);
+    const nGanancia = parseFloat(ganancia);
+    const nEcotasa = parseFloat(ecotasa);
+    const nIva = parseFloat(iva);
+    const nNeto = parseFloat(neto);
     // Fórmula solicitada: (NETO + ECOTASA + IVA) y DESPUÉS se suma GANANCIA
     // Por unidad: PU = round((neto + ecotasa) * (1 + IVA) + ganancia)
     // Total: round( ((neto + ecotasa) * (1 + IVA)) * cantidad + ganancia * cantidad )
-    const baseSinGanancia = (nNeto + nEcotasa);
-    const puSinGanancia = baseSinGanancia * (1 + (nIva / 100));
+    const baseSinGanancia = nNeto + nEcotasa;
+    const puSinGanancia = baseSinGanancia * (1 + nIva / 100);
     const precioUnidad = Math.round(puSinGanancia + nGanancia);
-    const total = Math.round((puSinGanancia * nCantidad) + (nGanancia * nCantidad));
-        const neumatico = {
-            id: `neumatico-${Date.now()}`,
-            medida,
-            cantidad: nCantidad,
-            ganancia: nGanancia,
-            ecotasa: nEcotasa,
-            iva: nIva,
-            nombre: marca,
-            neto: nNeto,
-            precioUnidad,
-            total
-        };
-        State.addTempNeumatico(neumatico);
-        // Guardar/actualizar precio por medida y marca
-        try {
-            API.upsertPrecio({ medida, marca, neto: nNeto });
-        } catch (_) { /* silencioso */ }
-        UI.renderTemporaryItems(State.getCurrentPresupuesto());
-        document.getElementById('presupuesto-marca-temp').value = '';
-        document.getElementById('presupuesto-neto-temp').value = '';
-        M.updateTextFields();
+    const total = Math.round(puSinGanancia * nCantidad + nGanancia * nCantidad);
+    const neumatico = {
+      id: `neumatico-${Date.now()}`,
+      medida,
+      cantidad: nCantidad,
+      ganancia: nGanancia,
+      ecotasa: nEcotasa,
+      iva: nIva,
+      nombre: marca,
+      neto: nNeto,
+      precioUnidad,
+      total,
+    };
+    State.addTempNeumatico(neumatico);
+    // Guardar/actualizar precio por medida y marca
+    try {
+      API.upsertPrecio({ medida, marca, neto: nNeto });
+    } catch (_) {
+      /* silencioso */
+    }
+    UI.renderTemporaryItems(State.getCurrentPresupuesto());
+    document.getElementById("presupuesto-marca-temp").value = "";
+    document.getElementById("presupuesto-neto-temp").value = "";
+    M.updateTextFields();
     // Volver a enfocar Marca para facilitar múltiples entradas
-    const marcaRef = document.getElementById('presupuesto-marca-temp');
+    const marcaRef = document.getElementById("presupuesto-marca-temp");
     if (marcaRef) marcaRef.focus();
-    }
+  }
 
-    function handleAddTrabajo() {
-        const concepto = document.getElementById('presupuesto-otro-concepto').value;
-        const precioFinal = document.getElementById('presupuesto-otro-precio').value;
-        let errores = [];
-        if (!isNotEmpty(concepto)) errores.push('El concepto es obligatorio.');
-        if (!isValidNumber(precioFinal, { min: 0, allowNegative: false })) errores.push('Precio inválido.');
-        if (errores.length > 0) {
-            UI.showFormErrors('producto-form', errores);
-            return;
-        }
-        UI.clearFormErrors('producto-form');
-        const nPrecioFinal = Math.round(parseFloat(precioFinal));
-        const trabajo = {
-            id: `trabajo-${Date.now()}`,
-            concepto,
-            cantidad: 1,
-            precioUnidad: nPrecioFinal,
-            total: nPrecioFinal
-        };
-        State.addTempTrabajo(trabajo);
-        UI.renderTemporaryItems(State.getCurrentPresupuesto());
-        document.getElementById('presupuesto-otro-concepto').value = '';
-        document.getElementById('presupuesto-otro-precio').value = '';
-        M.updateTextFields();
+  function handleAddTrabajo() {
+    const concepto = document.getElementById("presupuesto-otro-concepto").value;
+    const precioFinal = document.getElementById("presupuesto-otro-precio").value;
+    const errores = [];
+    if (!isNotEmpty(concepto)) errores.push("El concepto es obligatorio.");
+    if (!isValidNumber(precioFinal, { min: 0, allowNegative: false }))
+      errores.push("Precio inválido.");
+    if (errores.length > 0) {
+      UI.showFormErrors("producto-form", errores);
+      return;
     }
-    
-    function handleAddGrupo() {
-        const added = State.addGroupToPresupuesto();
-        if (added) {
-            UI.renderTemporaryItems(State.getCurrentPresupuesto());
-            State.calculateTotalGeneral();
-            UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
-        }
+    UI.clearFormErrors("producto-form");
+    const nPrecioFinal = Math.round(parseFloat(precioFinal));
+    const trabajo = {
+      id: `trabajo-${Date.now()}`,
+      concepto,
+      cantidad: 1,
+      precioUnidad: nPrecioFinal,
+      total: nPrecioFinal,
+    };
+    State.addTempTrabajo(trabajo);
+    UI.renderTemporaryItems(State.getCurrentPresupuesto());
+    document.getElementById("presupuesto-otro-concepto").value = "";
+    document.getElementById("presupuesto-otro-precio").value = "";
+    M.updateTextFields();
+  }
+
+  function handleAddGrupo() {
+    const added = State.addGroupToPresupuesto();
+    if (added) {
+      UI.renderTemporaryItems(State.getCurrentPresupuesto());
+      State.calculateTotalGeneral();
+      UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
     }
+  }
 
-    // --- Initial Load ---
-    function init() {
-        handleShowView('presupuestos-view'); 
-        M.AutoInit();
-    }
+  // --- Initial Load ---
+  function init() {
+    handleShowView("presupuestos-view");
+    M.AutoInit();
+  }
 
-    init();
+  init();
 
-    // Recalcular tempNeumaticos al cambiar parámetros comunes
-    const medidaEl = document.getElementById('presupuesto-medida');
-    const cantidadEl = document.getElementById('presupuesto-cantidad');
-    const gananciaEl = document.getElementById('presupuesto-ganancia');
-    const ecotasaEl = document.getElementById('presupuesto-ecotasa');
-    const ivaEl = document.getElementById('presupuesto-iva');
-    const inputsParams = [medidaEl, cantidadEl, gananciaEl, ecotasaEl, ivaEl].filter(Boolean);
-    if (inputsParams.length) {
-        const handler = async () => {
-            State.updateTempNeumaticosParams({
-                medida: medidaEl?.value,
-                cantidad: cantidadEl?.value,
-                ganancia: gananciaEl?.value,
-                ecotasa: ecotasaEl?.value,
-                iva: ivaEl?.value,
+  // Recalcular tempNeumaticos al cambiar parámetros comunes
+  const medidaEl = document.getElementById("presupuesto-medida");
+  const cantidadEl = document.getElementById("presupuesto-cantidad");
+  const gananciaEl = document.getElementById("presupuesto-ganancia");
+  const ecotasaEl = document.getElementById("presupuesto-ecotasa");
+  const ivaEl = document.getElementById("presupuesto-iva");
+  const inputsParams = [medidaEl, cantidadEl, gananciaEl, ecotasaEl, ivaEl].filter(Boolean);
+  if (inputsParams.length) {
+    const handler = async () => {
+      State.updateTempNeumaticosParams({
+        medida: medidaEl?.value,
+        cantidad: cantidadEl?.value,
+        ganancia: gananciaEl?.value,
+        ecotasa: ecotasaEl?.value,
+        iva: ivaEl?.value,
+      });
+      State.updateGroupsWithParams({
+        medida: medidaEl?.value,
+        cantidad: cantidadEl?.value,
+        ganancia: gananciaEl?.value,
+        ecotasa: ecotasaEl?.value,
+        iva: ivaEl?.value,
+      });
+      State.calculateTotalGeneral();
+      UI.renderTemporaryItems(State.getCurrentPresupuesto());
+      UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
+      // Cargar precios por medida y mostrar chips
+      try {
+        const list = medidaEl?.value ? await API.getPreciosPorMedida(medidaEl.value) : [];
+        const cont = document.getElementById("precios-por-medida");
+        const contFiltros = document.getElementById("precios-filtros-codigo");
+        if (cont) {
+          cont.innerHTML = "";
+          if (!list || !list.length) {
+            cont.textContent = medidaEl?.value ? "Sin precios guardados para esta medida" : "";
+          } else {
+            // Construir filtros por código (lo que va tras la base) ej: 91V, 94W...
+            const codigos = new Set();
+            const re = /(\d{3})\/(\d{2})\/?R?(\d{2})\s+(.+)$/i;
+            list.forEach(({ medida }) => {
+              const m = String(medida || "").toUpperCase();
+              const mm = m.match(re);
+              if (mm && mm[4]) {
+                const code = mm[4].trim();
+                if (code) codigos.add(code);
+              }
             });
-            State.updateGroupsWithParams({
-                medida: medidaEl?.value,
-                cantidad: cantidadEl?.value,
-                ganancia: gananciaEl?.value,
-                ecotasa: ecotasaEl?.value,
-                iva: ivaEl?.value,
-            });
-            State.calculateTotalGeneral();
-            UI.renderTemporaryItems(State.getCurrentPresupuesto());
-            UI.renderPresupuestoFinal(State.getCurrentPresupuesto());
-            // Cargar precios por medida y mostrar chips
-            try {
-                const list = medidaEl?.value ? await API.getPreciosPorMedida(medidaEl.value) : [];
-                const cont = document.getElementById('precios-por-medida');
-                const contFiltros = document.getElementById('precios-filtros-codigo');
-                if (cont) {
-                    cont.innerHTML = '';
-                    if (!list || !list.length) {
-                        cont.textContent = medidaEl?.value ? 'Sin precios guardados para esta medida' : '';
-                    } else {
-                        // Construir filtros por código (lo que va tras la base) ej: 91V, 94W...
-                        let codigos = new Set();
-                        const re = /(\d{3})\/(\d{2})\/?R?(\d{2})\s+(.+)$/i;
-                        list.forEach(({ medida }) => {
-                            const m = String(medida || '').toUpperCase();
-                            const mm = m.match(re);
-                            if (mm && mm[4]) {
-                                const code = mm[4].trim();
-                                if (code) codigos.add(code);
-                            }
-                        });
-                        let filtroActivo = null;
-                        // Render filtros
-                        if (contFiltros) {
-                            contFiltros.innerHTML = '';
-                            if (codigos.size) {
-                                // Botón limpiar
-                                const clear = document.createElement('a');
-                                clear.href = '#!';
-                                clear.className = 'chip grey lighten-3';
-                                clear.textContent = 'Todos';
-                                clear.addEventListener('click', (e)=>{
-                                    e.preventDefault();
-                                    filtroActivo = null;
-                                    renderLista();
-                                });
-                                contFiltros.appendChild(clear);
-                                [...codigos].sort().forEach(code => {
-                                    const chip = document.createElement('a');
-                                    chip.href = '#!';
-                                    chip.className = 'chip';
-                                    chip.textContent = code;
-                                    chip.addEventListener('click', (e) => {
-                                        e.preventDefault();
-                                        filtroActivo = code;
-                                        renderLista();
-                                    });
-                                    contFiltros.appendChild(chip);
-                                });
-                            }
-                        }
-
-                        function coincideFiltro(item) {
-                            if (!filtroActivo) return true;
-                            const m = String(item.medida || '').toUpperCase();
-                            return m.endsWith(filtroActivo.toUpperCase());
-                        }
-
-                        function renderLista() {
-                            cont.innerHTML = '';
-                            const filtered = list.filter(coincideFiltro);
-                            filtered.forEach(({ marca, neto, medida }) => {
-                            const a = document.createElement('a');
-                            a.href = '#!';
-                            a.className = 'chip';
-                            a.textContent = `${medida} · ${marca} — ${neto}`;
-                            a.title = 'Click para rellenar';
-                            a.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                const marcaInp = document.getElementById('presupuesto-marca-temp');
-                                const netoInp = document.getElementById('presupuesto-neto-temp');
-                                if (marcaInp) marcaInp.value = marca;
-                                if (netoInp) netoInp.value = neto;
-                                if (window.M) M.updateTextFields();
-                            });
-                                cont.appendChild(a);
-                            });
-                            if (!filtered.length) {
-                                const p = document.createElement('span');
-                                p.textContent = 'No hay resultados para ese código';
-                                cont.appendChild(p);
-                            }
-                        }
-
-                        renderLista();
-                    }
-                }
-            } catch (err) {
-                // silencioso
+            let filtroActivo = null;
+            // Render filtros
+            if (contFiltros) {
+              contFiltros.innerHTML = "";
+              if (codigos.size) {
+                // Botón limpiar
+                const clear = document.createElement("a");
+                clear.href = "#!";
+                clear.className = "chip grey lighten-3";
+                clear.textContent = "Todos";
+                clear.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  filtroActivo = null;
+                  renderLista();
+                });
+                contFiltros.appendChild(clear);
+                [...codigos].sort().forEach((code) => {
+                  const chip = document.createElement("a");
+                  chip.href = "#!";
+                  chip.className = "chip";
+                  chip.textContent = code;
+                  chip.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    filtroActivo = code;
+                    renderLista();
+                  });
+                  contFiltros.appendChild(chip);
+                });
+              }
             }
-        };
-        inputsParams.forEach(inp => {
-            inp.addEventListener('input', handler);
-            inp.addEventListener('change', handler);
-        });
-    }
 
-    // Panel de conexión: ping periódico a /health
-    const connDot = document.getElementById('connDot');
-    const connText = document.getElementById('connText');
-    async function pingHealth() {
-        try {
-            const res = await fetch('/health', { cache: 'no-store' });
-            if (res.ok) {
-                connDot?.classList.add('status-ok');
-                connDot?.classList.remove('status-bad');
-                if (connText) connText.textContent = 'Conectado';
-            } else {
-                throw new Error('bad');
+            function coincideFiltro(item) {
+              if (!filtroActivo) return true;
+              const m = String(item.medida || "").toUpperCase();
+              return m.endsWith(filtroActivo.toUpperCase());
             }
-        } catch (_) {
-            connDot?.classList.add('status-bad');
-            connDot?.classList.remove('status-ok');
-            if (connText) connText.textContent = 'Sin conexión';
+
+            function renderLista() {
+              cont.innerHTML = "";
+              const filtered = list.filter(coincideFiltro);
+              filtered.forEach(({ marca, neto, medida }) => {
+                const a = document.createElement("a");
+                a.href = "#!";
+                a.className = "chip";
+                a.textContent = `${medida} · ${marca} — ${neto}`;
+                a.title = "Click para rellenar";
+                a.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  const marcaInp = document.getElementById("presupuesto-marca-temp");
+                  const netoInp = document.getElementById("presupuesto-neto-temp");
+                  if (marcaInp) marcaInp.value = marca;
+                  if (netoInp) netoInp.value = neto;
+                  if (window.M) M.updateTextFields();
+                });
+                cont.appendChild(a);
+              });
+              if (!filtered.length) {
+                const p = document.createElement("span");
+                p.textContent = "No hay resultados para ese código";
+                cont.appendChild(p);
+              }
+            }
+
+            renderLista();
+          }
         }
-    }
-    pingHealth();
-    setInterval(pingHealth, 10000);
+      } catch (_err) {
+        // silencioso
+      }
+    };
+    inputsParams.forEach((inp) => {
+      inp.addEventListener("input", handler);
+      inp.addEventListener("change", handler);
+    });
+    // Ejecutar una vez al iniciar por si ya hay medida cargada
+    handler();
+  }
 
-    // Botón copiar URL del host
-    const btnCopyHostURL = document.getElementById('btnCopyHostURL');
-    if (btnCopyHostURL) {
-        btnCopyHostURL.addEventListener('click', async () => {
-            try {
-                const url = window.location.origin;
-                await navigator.clipboard.writeText(url);
-                M.toast({ html: `Enlace copiado: ${url}`, classes: 'green' });
-            } catch (e) {
-                M.toast({ html: 'No se pudo copiar el enlace.', classes: 'red' });
-            }
-        });
+  // Panel de conexión: ping periódico a /health
+  const connDot = document.getElementById("connDot");
+  const connText = document.getElementById("connText");
+  async function pingHealth() {
+    try {
+      const res = await fetch("/health", { cache: "no-store" });
+      if (res.ok) {
+        connDot?.classList.add("status-ok");
+        connDot?.classList.remove("status-bad");
+        if (connText) connText.textContent = "Conectado";
+      } else {
+        throw new Error("bad");
+      }
+    } catch (_) {
+      connDot?.classList.add("status-bad");
+      connDot?.classList.remove("status-ok");
+      if (connText) connText.textContent = "Sin conexión";
     }
+  }
+  pingHealth();
+  setInterval(pingHealth, 10000);
+
+  // Botón copiar URL del host
+  const btnCopyHostURL = document.getElementById("btnCopyHostURL");
+  if (btnCopyHostURL) {
+    btnCopyHostURL.addEventListener("click", async () => {
+      try {
+        const url = window.location.origin;
+        await navigator.clipboard.writeText(url);
+        M.toast({ html: `Enlace copiado: ${url}`, classes: "green" });
+      } catch (_e) {
+        M.toast({ html: "No se pudo copiar el enlace.", classes: "red" });
+      }
+    });
+  }
 });

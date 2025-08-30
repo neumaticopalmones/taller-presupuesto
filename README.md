@@ -1,6 +1,7 @@
 # Aplicación Presupuestos Neumáticos
 
 ## Requisitos
+
 - Python 3.11+ (parece que usas 3.13)
 - PostgreSQL (puedes usar Docker)
 
@@ -43,6 +44,7 @@ docker compose up -d
 ```
 
 ## Endpoints
+
 - GET /presupuestos?page=1
 - POST /presupuestos
 - GET /presupuestos/<id>
@@ -51,12 +53,14 @@ docker compose up -d
 - GET /health
 
 ## Notas
+
 - El número de presupuesto lo genera el backend automáticamente por año.
 - Se ha eliminado la conversión a pedido e inventario (no implementados en backend).
 
 ## Sincronización con GitHub (2 PCs)
 
 Host (PC principal):
+
 1. Instala Git si no lo tienes: https://git-scm.com/download/win
 2. En la carpeta del proyecto, inicializa y sube a GitHub:
 
@@ -70,6 +74,7 @@ git push -u origin main
 ```
 
 PC2:
+
 1. Clona el repo en una carpeta nueva:
 
 ```
