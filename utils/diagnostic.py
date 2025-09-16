@@ -16,7 +16,9 @@ with app.test_client():
         print(f"Total presupuestos: {total_presupuestos}")
 
         # Buscar un pedido específico que sabemos tiene presupuesto
-        pedido = Pedido.query.filter(Pedido.presupuesto_id == "780953f3-27e5-4657-9c01-243e9a969639").first()
+        pedido = Pedido.query.filter(
+            Pedido.presupuesto_id == "780953f3-27e5-4657-9c01-243e9a969639"
+        ).first()
         if pedido:
             print(f"\nPedido específico encontrado: {pedido.id[:8]}...")
             print(f"presupuesto_id: {pedido.presupuesto_id}")
@@ -37,9 +39,11 @@ with app.test_client():
             print(f"pedido.presupuesto (lazy): {pedido.presupuesto}")
 
             # Probar con joinedload
-            pedido_joined = Pedido.query.options(
-                joinedload(Pedido.presupuesto).joinedload(Presupuesto.cliente)
-            ).filter(Pedido.id == pedido.id).first()
+            pedido_joined = (
+                Pedido.query.options(joinedload(Pedido.presupuesto).joinedload(Presupuesto.cliente))
+                .filter(Pedido.id == pedido.id)
+                .first()
+            )
 
             print(f"pedido_joined.presupuesto: {pedido_joined.presupuesto}")
 

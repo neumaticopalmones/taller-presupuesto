@@ -1,17 +1,6 @@
-# Servir HTTPS local con dominio personalizado y proxy hacia Flask
+# Configuración simplificada para desarrollo local - solo HTTP
 
-# Reemplaza taller.local con tu dominio local elegido
-{
-	# Opcional: logging, acme ca local, etc.
-}
-
-taller.local:443 {
+:80 {
 	encode gzip
-	# Cargar certificados locales generados con mkcert
-	tls /etc/ssl/custom/taller.local.pem /etc/ssl/custom/taller.local-key.pem
 	reverse_proxy web:5000
-}
-
-taller.local:80 {
-	redir https://taller.local{uri}
 }

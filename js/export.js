@@ -226,7 +226,8 @@ async function construirNodoA4(opts = {}) {
   if (document.body.classList.contains("compacto")) a4.classList.add("compacto");
   if (opts.compactWA) a4.classList.add("compacto", "compacto-wa");
 
-  const headerClone = document.querySelector(".header").cloneNode(true);
+  const headerElement = document.querySelector(".business-header-modern") || document.querySelector("header");
+  const headerClone = headerElement ? headerElement.cloneNode(true) : null;
 
   const meta = document.createElement("div");
   meta.className = "meta-line";
@@ -267,7 +268,9 @@ async function construirNodoA4(opts = {}) {
     });
   } catch (_) {}
 
-  a4.appendChild(headerClone);
+  if (headerClone) {
+    a4.appendChild(headerClone);
+  }
   a4.appendChild(meta);
   a4.appendChild(title);
   a4.appendChild(tablaClone);

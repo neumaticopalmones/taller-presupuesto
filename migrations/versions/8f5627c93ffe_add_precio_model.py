@@ -21,8 +21,8 @@ def upgrade():
     with op.batch_alter_table('pedido', schema=None) as batch_op:
         batch_op.drop_index('ix_pedido_presupuesto')
         batch_op.create_index(
-            batch_op.f('ix_pedido_presupuesto_id'), 
-            ['presupuesto_id'], 
+            batch_op.f('ix_pedido_presupuesto_id'),
+            ['presupuesto_id'],
             unique=False
         )
         batch_op.drop_constraint('pedido_presupuesto_id_fkey', type_='foreignkey')
@@ -36,10 +36,10 @@ def downgrade():
     with op.batch_alter_table('pedido', schema=None) as batch_op:
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.create_foreign_key(
-            'pedido_presupuesto_id_fkey', 
-            'presupuesto', 
-            ['presupuesto_id'], 
-            ['id'], 
+            'pedido_presupuesto_id_fkey',
+            'presupuesto',
+            ['presupuesto_id'],
+            ['id'],
             ondelete='SET NULL'
         )
         batch_op.drop_index(batch_op.f('ix_pedido_presupuesto_id'))

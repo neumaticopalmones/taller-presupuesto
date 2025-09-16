@@ -12,6 +12,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Copiar y hacer ejecutable el script de inicio
+COPY start.sh ./
+RUN chmod +x start.sh
+
 ENV FLASK_ENV=production \
     PYTHONUNBUFFERED=1 \
     HOST=0.0.0.0 \
@@ -19,4 +23,4 @@ ENV FLASK_ENV=production \
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-w", "4", "-k", "gthread", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["./start.sh"]

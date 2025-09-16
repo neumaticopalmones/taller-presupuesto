@@ -339,24 +339,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Auto-añadir la marca si todos los campos están completos
         setTimeout(() => {
-          console.log("🔥 [AUTO-ADD] INICIANDO AUTO-ADD PARA MARCA:", val);
+          console.log("🔥 [AUTO-ADD] Procesando auto-añadir para marca:", val);
 
           const medida = document.getElementById("presupuesto-medida").value.trim();
           const cantidad = document.getElementById("presupuesto-cantidad").value.trim();
-          const ganancia = document.getElementById("presupuesto-ganancia").value.trim();
-          const ecotasa = document.getElementById("presupuesto-ecotasa").value.trim();
-          const iva = document.getElementById("presupuesto-iva").value.trim();
           const neto = document.getElementById("presupuesto-neto-temp").value.trim();
-
-          // Debug SUPER detallado
-          console.log("🔍 [AUTO-ADD] VALORES CAPTURADOS:");
-          console.log("  Medida:", `"${medida}"`, medida ? "✅" : "❌ VACÍO");
-          console.log("  Cantidad:", `"${cantidad}"`, cantidad ? "✅" : "❌ VACÍO");
-          console.log("  Marca:", `"${val}"`, val ? "✅" : "❌ VACÍO");
-          console.log("  Neto:", `"${neto}"`, neto ? "✅" : "❌ VACÍO");
-          console.log("  Ganancia:", `"${ganancia}"`, ganancia ? "⚠️" : "❌ VACÍO (opcional)");
-          console.log("  Ecotasa:", `"${ecotasa}"`, ecotasa ? "⚠️" : "❌ VACÍO (opcional)");
-          console.log("  IVA:", `"${iva}"`, iva ? "⚠️" : "❌ VACÍO (opcional)");
 
           // Verificar que todos los campos requeridos están completos (SIMPLIFICADO - solo 4 campos esenciales)
           const validaciones = {
@@ -366,43 +353,28 @@ document.addEventListener("DOMContentLoaded", () => {
             neto: isValidNumber(neto, { min: 0, allowNegative: false }),
           };
 
-          console.log("🔍 [AUTO-ADD] VALIDACIONES DETALLADAS (4 campos esenciales):");
-          Object.keys(validaciones).forEach((campo) => {
-            const status = validaciones[campo] ? "✅ VÁLIDO" : "❌ INVÁLIDO";
-            console.log(`  ${campo}: ${status}`);
-          });
-
           const todasValidas = Object.values(validaciones).every((v) => v);
-          console.log(
-            "🎯 [AUTO-ADD] RESULTADO VALIDACIÓN:",
-            todasValidas ? "✅ TODAS VÁLIDAS" : "❌ FALTAN CAMPOS"
-          );
+          console.log("🎯 [AUTO-ADD] Validación:", todasValidas ? "✅ VÁLIDA" : "❌ FALTAN CAMPOS");
 
           if (todasValidas) {
             // Simular click en el botón "Añadir Marca" en lugar de llamar directamente a la función
             const btnAddMarca = document.getElementById("btnAgregarMarca");
             if (btnAddMarca) {
-              console.log("🚀 [AUTO-ADD] EJECUTANDO CLICK AUTOMÁTICO EN BOTÓN...");
-              console.log("🔘 [AUTO-ADD] Estado del botón antes del click:");
-              console.log("  Disabled:", btnAddMarca.disabled);
-              console.log("  Visible:", btnAddMarca.style.display !== "none");
-              console.log("  Texto:", btnAddMarca.textContent);
-
+              console.log("🚀 [AUTO-ADD] Ejecutando auto-añadir...");
               btnAddMarca.click();
-
-              console.log("✅ [AUTO-ADD] CLICK EJECUTADO - Marca añadida automáticamente!");
+              console.log("✅ [AUTO-ADD] Marca añadida automáticamente!");
               showToast(`¡Marca ${val} añadida automáticamente!`, "success");
             } else {
-              console.log("❌ [AUTO-ADD] ERROR: Botón 'Añadir Marca' no encontrado en DOM");
+              console.log("❌ [AUTO-ADD] ERROR: Botón 'Añadir Marca' no encontrado");
             }
           } else {
             const erroresDetallados = [];
             if (!validaciones.medida) erroresDetallados.push("Medida vacía");
-            if (!validaciones.cantidad) erroresDetallados.push("Cantidad inválida (min: 1)");
+            if (!validaciones.cantidad) erroresDetallados.push("Cantidad inválida");
             if (!validaciones.marca) erroresDetallados.push("Marca vacía");
-            if (!validaciones.neto) erroresDetallados.push("Neto inválido (min: 0)");
+            if (!validaciones.neto) erroresDetallados.push("Neto inválido");
 
-            console.log("❌ [AUTO-ADD] VALIDACIÓN FALLÓ. Errores:", erroresDetallados.join(", "));
+            console.log("❌ [AUTO-ADD] Faltan campos:", erroresDetallados.join(", "));
             showToast(`⚠️ Para auto-add faltan: ${erroresDetallados.join(", ")}`, "warning");
           }
         }, 1000); // Aumenté el timeout a 1 segundo para dar tiempo a que se llene el precio
@@ -424,21 +396,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Auto-añadir si todos los campos están completos
         setTimeout(() => {
           const cantidad = document.getElementById("presupuesto-cantidad").value.trim();
-          const ganancia = document.getElementById("presupuesto-ganancia").value.trim();
-          const ecotasa = document.getElementById("presupuesto-ecotasa").value.trim();
-          const iva = document.getElementById("presupuesto-iva").value.trim();
           const marca = document.getElementById("presupuesto-marca-temp").value.trim();
           const neto = document.getElementById("presupuesto-neto-temp").value.trim();
-
-          // Debug: mostrar valores actuales
-          console.log("🔍 DEBUG Auto-añadir medida:");
-          console.log("Medida:", val);
-          console.log("Cantidad:", cantidad || "(vacío)");
-          console.log("Marca:", marca || "(vacío)");
-          console.log("Neto:", neto || "(vacío)");
-          console.log("Ganancia:", ganancia || "(vacío)");
-          console.log("Ecotasa:", ecotasa || "(vacío)");
-          console.log("IVA:", iva || "(vacío)");
 
           // Verificar que todos los campos requeridos están completos (SIMPLIFICADO - solo 4 campos esenciales)
           const validaciones = {
@@ -448,12 +407,11 @@ document.addEventListener("DOMContentLoaded", () => {
             neto: isValidNumber(neto, { min: 0, allowNegative: false }),
           };
 
-          console.log("🔍 VALIDACIONES DETALLADAS (desde medida - 4 campos esenciales):");
-          Object.keys(validaciones).forEach((campo) => {
-            console.log(`  ${campo}:`, validaciones[campo] ? "✅ VÁLIDO" : "❌ INVÁLIDO");
-          });
-
           const todasValidas = Object.values(validaciones).every((v) => v);
+          console.log(
+            "🔍 [AUTO-ADD] Desde medida - Validación:",
+            todasValidas ? "✅ VÁLIDA" : "❌ FALTAN CAMPOS"
+          );
 
           if (todasValidas) {
             // Simular click en el botón "Añadir Marca" en lugar de llamar directamente a la función

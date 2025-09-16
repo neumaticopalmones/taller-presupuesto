@@ -64,11 +64,9 @@ services:
     depends_on:
       - web
     ports:
-      - "80:80"
-      - "443:443"
+      - "3000:80" # Puerto 3000 local -> puerto 80 del contenedor
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./caddy/certs:/etc/ssl/custom:ro
 
 volumes:
   postgres_data:

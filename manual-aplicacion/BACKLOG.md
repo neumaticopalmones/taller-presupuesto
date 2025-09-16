@@ -12,6 +12,10 @@ Lista viva de mejoras y evoluciones pendientes. Marca con [x] al completar.
 
 - [ ] (P1) **FUNCIONALIDAD STOCK**: Empezar con la parte del stock - Analizar requisitos de gestión de inventario - Diseñar estructura para control de stock - Implementar funcionalidad básica de stock
 
+- [ ] (P1) **DEPLOY EN NUBE**: Subir aplicación a Railway para acceso multi-ordenador - Crear cuenta en Railway (gratuito) - Configurar variables de entorno - Deploy inicial y pruebas - Configurar acceso desde taller + casa - Ver GUIA_RAILWAY_FACIL.md para pasos detallados
+
+---
+
 ---
 
 ## Leyenda Prioridad (orientativa)

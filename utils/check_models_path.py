@@ -4,6 +4,7 @@ from app import app
 import models
 import inspect
 
+
 def check_models_path():
     with app.app_context():
         print("=== CHECKING MODELS PATH ===")
@@ -17,6 +18,7 @@ def check_models_path():
             print(f"to_dict source preview: {source[:200]}...")
         except:
             print("Could not get source")
+
 
 if __name__ == "__main__":
     check_models_path()
