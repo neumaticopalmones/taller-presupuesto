@@ -105,45 +105,47 @@ def _exempt_static_and_health():  # pragma: no cover - lógica sencilla
 
 
 # Función auxiliar para obtener variables de entorno excluyendo valores 'None'
-def get_env_var(var_name):
-    value = os.environ.get(var_name)
+
+
+# Limpieza robusta de variables de entorno
+def clean_env(value: str | None) -> str | None:
     if not value:
         return None
-    if value.lower() in ["none", "ninguno"]:
+    v = value.strip().lower()
+    if v in ["none", "ninguno", "null", ""]:
         return None
     return value
 
 
-DB_USER = get_env_var("POSTGRES_USER")
-DB_PASSWORD = get_env_var("POSTGRES_PASSWORD")
-DB_HOST = get_env_var("POSTGRES_HOST")
-DB_PORT = get_env_var("POSTGRES_PORT")
-DB_NAME = get_env_var("POSTGRES_DB")
+# Leer y limpiar todas las variables relevantes
+DB_USER = clean_env(os.environ.get("POSTGRES_USER"))
+DB_PASSWORD = clean_env(os.environ.get("POSTGRES_PASSWORD"))
+DB_HOST = clean_env(os.environ.get("POSTGRES_HOST"))
+DB_PORT = clean_env(os.environ.get("POSTGRES_PORT"))
+DB_NAME = clean_env(os.environ.get("POSTGRES_DB"))
+DATABASE_URL = clean_env(os.environ.get("DATABASE_URL"))
 
-# Configuración de SQLAlchemy con override por DATABASE_URL
-db_url = get_env_var("DATABASE_URL")
-if not db_url:
-    # Solo construir URL si todas las variables están presentes
-    if all([DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME]):
-        db_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    else:
-        # Fallback para desarrollo local
-        db_url = "postgresql://postgres:password@localhost:5432/presupuestos"
+# Logs de depuración para ver exactamente qué llega
+print("DEBUG → Variables de entorno:")
+print("POSTGRES_USER:", DB_USER)
+print("POSTGRES_PASSWORD:", DB_PASSWORD)
+print("POSTGRES_HOST:", DB_HOST)
+print("POSTGRES_PORT:", DB_PORT)
+print("POSTGRES_DB:", DB_NAME)
+print("DATABASE_URL:", DATABASE_URL)
 
-# Asegurar que la URL usa el driver psycopg (para psycopg v3)
-if db_url.startswith("postgresql://"):
-    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+# Construcción robusta de la URL de la base de datos
+if DATABASE_URL:
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+elif all([DB_USER, DB_PASSWORD, DB_HOST, DB_NAME]):
+    port = DB_PORT if DB_PORT else "5432"
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{port}/{DB_NAME}"
+    )
+else:
+    print("⚠️ No se encontró configuración válida de BD, usando SQLite local.")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///local.db"
 
-# Debug logging para Railway
-print(f"[DEBUG] DB_USER: {DB_USER}")
-print(f"[DEBUG] DB_PASSWORD: {'***' if DB_PASSWORD else None}")
-print(f"[DEBUG] DB_HOST: {DB_HOST}")
-print(f"[DEBUG] DB_PORT: {DB_PORT}")
-print(f"[DEBUG] DB_NAME: {DB_NAME}")
-print(f"[DEBUG] Using database URL: {db_url[:50]}...")  # Solo primeros 50 chars por seguridad
-print(f"[DEBUG] DATABASE_URL env var exists: {bool(get_env_var('DATABASE_URL'))}")
-
-app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 try:
     from extensions import db, migrate  # usar instancias globales
