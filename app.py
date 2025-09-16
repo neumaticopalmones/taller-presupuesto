@@ -107,7 +107,11 @@ def _exempt_static_and_health():  # pragma: no cover - lógica sencilla
 # Función auxiliar para obtener variables de entorno excluyendo valores 'None'
 def get_env_var(var_name):
     value = os.environ.get(var_name)
-    return value if value and value.lower() != "none" else None
+    if not value:
+        return None
+    if value.lower() in ["none", "ninguno"]:
+        return None
+    return value
 
 
 DB_USER = get_env_var("POSTGRES_USER")
