@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test de Navegación</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .test-result {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        margin: 5px;
+        padding: 10px 15px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Test de Navegación y Funcionalidad</h1>
+
+    <div class="test-result info"><strong>Estado:</strong> Ejecutando tests...</div>
+
+    <button onclick="testPresupuestosAPI()">Test API Presupuestos</button>
+    <button onclick="testPedidosAPI()">Test API Pedidos</button>
+    <button onclick="testMainNavigation()">Test Navegación Principal</button>
+    <button onclick="runAllTests()">Ejecutar Todos los Tests</button>
+
+    <div id="results"></div>
+
+    <script>
+      const results = document.getElementById("results");
+
+      function addResult(message, type = "info") {
+        const div = document.createElement("div");
+        div.className = `test-result ${type}`;
+        div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+        results.appendChild(div);
+        console.log(`[${type.toUpperCase()}] ${message}`);
+      }
+
+      async function testPresupuestosAPI() {
+        try {
+          addResult("Probando API de presupuestos...", "info");
+          const response = await fetch("/presupuestos");
+          if (response.ok) {
+            const data = await response.json();
+            addResult(
+              `✅ API Presupuestos OK - ${data.presupuestos?.length || 0} presupuestos encontrados`,
+              "success"
+            );
+            return true;
+          } else {
+            addResult(`❌ API Presupuestos falló: ${response.status}`, "error");
+            return false;
+          }
+        } catch (error) {
+          addResult(`❌ Error en API Presupuestos: ${error.message}`, "error");
+          return false;
+        }
+      }
+
+      async function testPedidosAPI() {
+        try {
+          addResult("Probando API de pedidos...", "info");
+          const response = await fetch("/api/pedidos");
+          if (response.ok) {
+            const data = await response.json();
+            addResult(
+              `✅ API Pedidos OK - ${data.pedidos?.length || 0} pedidos encontrados`,
+              "success"
+            );
+            return true;
+          } else {
+            addResult(`❌ API Pedidos falló: ${response.status}`, "error");
+            return false;
+          }
+        } catch (error) {
+          addResult(`❌ Error en API Pedidos: ${error.message}`, "error");
+          return false;
+        }
+      }
+
+      async function testMainNavigation() {
+        try {
+          addResult("Probando funciones de navegación...", "info");
+
+          // Simular estar en la aplicación principal
+          const mainApp = window.parent || window;
+
+          // Verificar si las funciones principales existen
+          if (typeof mainApp.handleShowView === "function") {
+            addResult("✅ Función handleShowView encontrada", "success");
+          } else {
+            addResult(
+              "⚠️ Función handleShowView no encontrada - puede estar en módulo ES6",
+              "info"
+            );
+          }
+
+          // Test de navegación básica
+          const testViews = ["presupuestos-view", "historial-view", "pedidos-view"];
+          let navTests = 0;
+
+          for (const view of testViews) {
+            const element = document.getElementById(view) || mainApp.document?.getElementById(view);
+            if (element) {
+              addResult(`✅ Vista ${view} encontrada en DOM`, "success");
+              navTests++;
+            } else {
+              addResult(`⚠️ Vista ${view} no encontrada (normal en test aislado)`, "info");
+            }
+          }
+
+          if (navTests > 0) {
+            addResult(`✅ Navegación: ${navTests}/3 vistas encontradas`, "success");
+          }
+
+          return true;
+        } catch (error) {
+          addResult(`❌ Error en test de navegación: ${error.message}`, "error");
+          return false;
+        }
+      }
+
+      async function runAllTests() {
+        addResult("🚀 Iniciando batería completa de tests...", "info");
+        results.innerHTML = "";
+
+        const tests = [testPresupuestosAPI, testPedidosAPI, testMainNavigation];
+
+        let passed = 0;
+        for (const test of tests) {
+          const result = await test();
+          if (result) passed++;
+          await new Promise((resolve) => setTimeout(resolve, 500)); // Pequeña pausa
+        }
+
+        addResult(
+          `🏁 Tests completados: ${passed}/${tests.length} exitosos`,
+          passed === tests.length ? "success" : "info"
+        );
+      }
+
+      // Auto-ejecutar tests al cargar
+      window.addEventListener("load", () => {
+        setTimeout(runAllTests, 1000);
+      });
+    </script>
+  </body>
+</html>

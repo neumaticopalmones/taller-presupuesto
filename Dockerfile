@@ -12,11 +12,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV FLASK_ENV=development \
+ENV FLASK_ENV=production \
     PYTHONUNBUFFERED=1 \
     HOST=0.0.0.0 \
     PORT=5000
 
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-w", "4", "-k", "gthread", "-b", "0.0.0.0:5000", "app:app"]

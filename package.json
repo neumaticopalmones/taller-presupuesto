@@ -1,0 +1,59 @@
+{
+  "name": "aplicacion-javascrip-y-python",
+  "version": "1.0.0",
+  "description": "- Python 3.11+ (parece que usas 3.13)\r - PostgreSQL (puedes usar Docker)",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "lint": "eslint js/**/*.js",
+    "lint:fix": "eslint js/**/*.js --fix",
+    "format": "prettier **/*.{js,css,html,json,md} --write",
+    "format:check": "prettier **/*.{js,css,html,json,md} --check",
+    "lint:check": "eslint js/**/*.js",
+    "py:ruff:fix": "venv\\Scripts\\python.exe -m ruff check --fix",
+    "py:ruff:check": "python -m ruff check",
+    "py:black": "venv\\Scripts\\python.exe -m black --quiet .",
+    "py:black:check": "python -m black --check .",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neumaticopalmones/taller-presupuesto.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neumaticopalmones/taller-presupuesto/issues"
+  },
+  "homepage": "https://github.com/neumaticopalmones/taller-presupuesto#readme",
+  "private": "true",
+  "lint-staged": {
+    "*.{js,css,html,md,json}": [
+      "prettier --write"
+    ],
+    "js/**/*.js": [
+      "eslint --fix"
+    ],
+    "*.py": [
+      "npm run py:ruff:fix",
+      "npm run py:black"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.5.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "globals": "^16.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2"
+  }
+}

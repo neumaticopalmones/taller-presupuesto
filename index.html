@@ -1,302 +1,948 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Neumáticos Palmones - Presupuestos</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neumáticos Palmones - Presupuestos</title>
 
-  <!-- Materialize CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-  <!-- Favicon inline para evitar 404 en /favicon.ico -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%230b63f6' width='64' height='64' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='36' font-family='Segoe UI, Arial' fill='white'%3EN%3C/text%3E%3C/svg%3E">
+    <!-- Favicon inline para evitar 404 en /favicon.ico -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%230b63f6' width='64' height='64' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='36' font-family='Segoe UI, Arial' fill='white'%3EN%3C/text%3E%3C/svg%3E"
+    />
 
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <nav>
-    <div class="nav-wrapper blue darken-3">
-      <a href="#" class="brand-logo center">Neumáticos Palmones</a>
-      <ul id="nav-mobile" class="left hide-on-med-and-down">
-  <li><a href="#presupuestos-view" class="nav-link">Presupuestos</a></li>
-  <li><a href="#historial-view" class="nav-link">Historial</a></li>
-      </ul>
-    </div>
-  </nav>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="navbar-modern">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo modern-logo">
+          <i class="material-icons left">build</i>
+          Presupuestos Taller
+        </a>
+        <span id="loaded-presupuesto-badge" class="badge new blue modern-badge" style="display: none; margin-left: 10px;" data-badge-caption=""></span>
 
-  <div class="container">
+        <!-- Acciones principales -->
+        <ul id="nav-mobile" class="right nav-actions-list">
+          <!-- Grupo: Gestión de Pedidos -->
+          <li class="nav-group">
+            <a href="#!" id="btnVerPedidos" class="btn-modern purple waves-effect waves-light tooltipped" data-tooltip="Ver y gestionar pedidos">
+              <i class="material-icons left">shopping_cart</i>Pedidos
+            </a>
+          </li>
 
-    <header class="header">
-      <h1>NEUMÁTICOS PALMONES</h1>
-      <p>
-        C/GALEON 25. POLÍGONO 1 PALMONES<br>
-        11379 Los Barrios<br>
-        neumaticospalmones@hotmail.com<br>
-        Tlf: 659718809
-      </p>
-    </header>
+          <!-- Grupo: Presupuestos -->
+          <li class="nav-group">
+            <a href="#!" id="btnNuevoPresupuesto" class="btn-modern waves-effect waves-light tooltipped" data-tooltip="Crear nuevo presupuesto">
+              <i class="material-icons left">add</i>Nuevo
+            </a>
+          </li>
+          <li class="nav-group">
+            <a href="#!" id="btnGuardarPresupuesto" class="btn-modern green waves-effect waves-light tooltipped" data-tooltip="Guardar presupuesto actual">
+              <i class="material-icons left">save</i>Guardar
+            </a>
+          </li>
+          <li class="nav-group">
+            <a href="#!" id="btnCancelarEdicionTop" class="btn-modern orange waves-effect waves-light tooltipped" style="display: none;" data-tooltip="Cancelar edición">
+              <i class="material-icons left">cancel</i>Cancelar
+            </a>
+          </li>
+          <li class="nav-group">
+            <a href="#!" id="btnVerHistorial" class="btn-modern blue waves-effect waves-light tooltipped" data-tooltip="Ver historial de presupuestos">
+              <i class="material-icons left">history</i>Historial
+            </a>
+          </li>
 
-    <!-- Datos cliente + meta -->
-    <section id="presupuestos-view" class="cliente-section no-imprimir app-section">
-      <form id="cliente-form" onsubmit="return false;">
-        <div class="form-errors" style="display:none"></div>
-        <fieldset>
-          <legend>Datos del cliente</legend>
-          <div class="row">
-            <div class="input-field col s4">
-              <input type="text" id="presupuesto-nombreCliente" class="validate">
-              <label for="presupuesto-nombreCliente">Nombre y Apellidos</label>
-            </div>
-            <div class="input-field col s4">
-              <input type="tel" id="presupuesto-telefonoCliente" class="validate">
-              <label for="presupuesto-telefonoCliente">Teléfono</label>
-            </div>
-            <div class="input-field col s4">
-              <input type="text" id="presupuesto-nifCliente" class="validate">
-              <label for="presupuesto-nifCliente">NIF/CIF</label>
-            </div>
-          </div>
+          <!-- Dropdown Exportar -->
+          <li class="nav-dropdown">
+            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-export">
+              <i class="material-icons left">file_download</i>Exportar<i class="material-icons right">arrow_drop_down</i>
+            </a>
+          </li>
+          <ul id="dropdown-export" class="dropdown-content modern-dropdown">
+            <li><a href="#!" id="btnImprimirPresupuesto"><i class="material-icons left">print</i>Imprimir</a></li>
+            <li><a href="#!" id="btnDescargarPDF"><i class="material-icons left">picture_as_pdf</i>Descargar PDF</a></li>
+            <li><a href="#!" id="btnCapturaWhatsApp"><i class="material-icons left">photo_camera</i>Captura para WhatsApp</a></li>
+          </ul>
 
-          <div class="row">
-            <div class="input-field col s6">
-              <input type="text" id="presupuesto-numeroPresupuesto" class="validate">
-              <label for="presupuesto-numeroPresupuesto">Nº de Presupuesto</label>
-            </div>
-            <div class="input-field col s6">
-              <input type="date" id="presupuesto-fechaPresupuesto" class="validate">
-              <label for="presupuesto-fechaPresupuesto" class="active">Fecha</label>
-            </div>
-          </div>
+          <!-- Dropdown Compartir -->
+          <li class="nav-dropdown">
+            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-share">
+              <i class="material-icons left">share</i>Compartir<i class="material-icons right">arrow_drop_down</i>
+            </a>
+          </li>
+          <ul id="dropdown-share" class="dropdown-content modern-dropdown">
+            <li><a href="#!" id="btnCompartirWhatsApp"><i class="material-icons left">message</i>Texto a WhatsApp</a></li>
+            <li><a href="#!" id="btnCopiarCalendar"><i class="material-icons left">event</i>Copiar para Calendar</a></li>
+            <li><a href="#!" id="btnAbrirCalendar"><i class="material-icons left">open_in_new</i>Abrir en Calendar</a></li>
+          </ul>
 
-          <div class="row">
-            <div class="input-field col s4">
-              <input type="text" id="presupuesto-distribuidor" class="validate">
-              <label for="presupuesto-distribuidor">Distribuidor</label>
-            </div>
-            <div class="input-field col s4">
-              <input type="text" id="presupuesto-descripcion" class="validate">
-              <label for="presupuesto-descripcion">Descripción (para Calendar)</label>
-            </div>
-            <div class="input-field col s4">
-              <input type="text" id="presupuesto-observaciones" class="validate">
-              <label for="presupuesto-observaciones">Observaciones (*** en título si rellenas)</label>
-            </div>
-          </div>
-        </fieldset>
-      </form>
-    </section>
+          <!-- Dropdown Acciones -->
+          <li class="nav-dropdown">
+            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-actions">
+              <i class="material-icons left">more_vert</i>Acciones<i class="material-icons right">arrow_drop_down</i>
+            </a>
+          </li>
+          <ul id="dropdown-actions" class="dropdown-content modern-dropdown">
+            <li><a href="#!" id="btnVaciarGrupos"><i class="material-icons left">clear_all</i>Vaciar Presupuesto</a></li>
+            <li><a href="#!" id="btnVaciarTemporales"><i class="material-icons left">delete_sweep</i>Vaciar Temporales</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" id="btnGuardarComoNuevo" style="display: none;"><i class="material-icons left">content_copy</i>Guardar como Nuevo</a></li>
+          </ul>
 
-    <!-- Añadir grupo -->
-    <section id="productos-view" class="productos-section no-imprimir app-section">
-      <form id="producto-form" onsubmit="return false;">
-        <div class="form-errors" style="display:none"></div>
-        <fieldset>
-          <legend>Añadir Grupo de Productos</legend>
-          <div class="row">
-            <div class="input-field col s3">
-              <input type="text" id="presupuesto-medida">
-              <label for="presupuesto-medida">Medida (para neumáticos)</label>
-            </div>
-            <div class="input-field col s2">
-              <input type="number" id="presupuesto-cantidad" min="1" value="2">
-              <label for="presupuesto-cantidad">Cantidad</label>
-            </div>
-            <div class="input-field col s2">
-              <input type="number" id="presupuesto-ganancia" step="0.01" value="0">
-              <label for="presupuesto-ganancia">Ganancia (€)</label>
-            </div>
-            <div class="input-field col s2">
-              <input type="number" id="presupuesto-ecotasa" step="0.01" value="0">
-              <label for="presupuesto-ecotasa">Ecotasa (€)</label>
-            </div>
-            <div class="input-field col s2">
-              <input type="number" id="presupuesto-iva" step="0.01" value="21">
-              <label for="presupuesto-iva">IVA (%)</label>
-            </div>
-          </div>
-      <div class="row" style="margin-top:-10px">
-            <div class="col s12">
-        <div id="precios-filtros-codigo" class="chips-container" style="margin-bottom:6px"></div>
-              <div id="precios-por-medida" class="chips-container"></div>
-            </div>
-          </div>
+          <!-- Dropdown Vista -->
+          <li class="nav-dropdown">
+            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-view">
+              <i class="material-icons left">visibility</i>Vista<i class="material-icons right">arrow_drop_down</i>
+            </a>
+          </li>
+          <ul id="dropdown-view" class="dropdown-content modern-dropdown">
+            <li class="switch-item">
+              <div class="switch">
+                <label>
+                  <i class="material-icons tiny">view_comfortable</i> Normal
+                  <input type="checkbox" id="toggleCompactoTop">
+                  <span class="lever"></span>
+                  Compacto <i class="material-icons tiny">view_compact</i>
+                </label>
+              </div>
+            </li>
+            <li class="switch-item">
+              <div class="switch">
+                <label>
+                  <i class="material-icons tiny">view_stream</i> Normal
+                  <input type="checkbox" id="toggleExtraCompactoTop">
+                  <span class="lever"></span>
+                  Extra Compacto <i class="material-icons tiny">view_list</i>
+                </label>
+              </div>
+            </li>
+          </ul>
 
-          <div class="row">
-            <div class="input-field col s5">
-              <input type="text" id="presupuesto-marca-temp">
-              <label for="presupuesto-marca-temp">Marca</label>
-            </div>
-            <div class="input-field col s5">
-              <input type="number" id="presupuesto-neto-temp" step="0.01">
-              <label for="presupuesto-neto-temp">Neto (€)</label>
-            </div>
-            <div class="input-field col s2">
-              <button type="button" id="btnAgregarMarca" class="btn waves-effect waves-light">+ Añadir</button>
-            </div>
-          </div>
-          <ul id="lista-marcas-temp"></ul>
-          <hr>
+          <!-- Herramientas -->
+          <li class="nav-divider"></li>
+          <li class="nav-tool">
+            <a href="#!" id="btnCargarSugerencias" class="btn-flat-modern waves-effect tooltipped" data-tooltip="Cargar sugerencias de medidas y marcas">
+              <i class="material-icons">lightbulb_outline</i>
+            </a>
+          </li>
+          <li class="nav-tool">
+            <a href="#!" id="btnCopyHostURL" class="btn-flat-modern waves-effect tooltipped" data-tooltip="Copiar URL para otros dispositivos">
+              <i class="material-icons">link</i>
+            </a>
+          </li>
+        </ul>
 
-          <legend>Añadir Trabajo</legend>
-          <div class="row">
-            <div class="input-field col s6">
-              <input type="text" id="presupuesto-otro-concepto">
-              <label for="presupuesto-otro-concepto">Concepto</label>
-            </div>
-            <div class="input-field col s4">
-              <input type="number" id="presupuesto-otro-precio" step="0.01">
-              <label for="presupuesto-otro-precio">Precio Final (€)</label>
-            </div>
-            <div class="input-field col s2">
-              <button type="button" id="btnAgregarOtroTrabajo" class="btn waves-effect waves-light">+ Añadir</button>
-            </div>
-          </div>
-          <ul id="lista-otros-trabajos-temp"></ul>
-          <hr>
-
-          <button type="button" id="btnAgregarGrupo" class="btn-large waves-effect waves-light" style="width:100%;">Agregar Grupo al Presupuesto</button>
-        </fieldset>
-      </form>
-    </section>
-
-    <!-- Presupuesto final -->
-    <section id="presupuesto-final-view" class="presupuesto-section app-section">
-      <div class="presupuesto-meta" id="presupuesto-meta"></div>
-      <h2>Presupuesto</h2>
-      <div id="presupuesto-final-render"></div>
-    </section>
-
-    <!-- Acciones -->
-    <section id="acciones-finales-view" class="acciones-finales no-imprimir app-section">
-      <div class="left">
-        <label>
-          <input type="checkbox" id="toggleCompacto" />
-          <span>Modo compacto</span>
-        </label>
+        <!-- Mobile menu -->
+        <ul class="sidenav" id="mobile-demo">
+          <li><a href="#presupuestos-view"><i class="material-icons left">assignment</i>Presupuestos</a></li>
+          <li><a href="#historial-view"><i class="material-icons left">history</i>Historial</a></li>
+        </ul>
       </div>
+    </nav>
 
-      <div class="right">
-  <button type="button" id="btnGuardarPresupuesto" class="btn waves-effect waves-light green">Guardar</button>
-  <button type="button" id="btnGuardarComoNuevo" class="btn waves-effect waves-light blue" style="display:none;">Guardar como nuevo</button>
-  <button type="button" id="btnVerHistorial" class="btn waves-effect waves-light blue">Ver historial</button>
-  <button type="button" id="btnCancelarEdicion" class="btn waves-effect waves-light grey" style="display:none;">Cancelar</button>
-
-  <button type="button" id="btnImprimirPresupuesto" class="btn waves-effect waves-light blue">Imprimir</button>
-  <button type="button" id="btnDescargarPDF" class="btn waves-effect waves-light">Descargar PDF</button>
-  <button type="button" id="btnCapturaWhatsApp" class="btn waves-effect waves-light">Captura + WhatsApp</button>
-  <button type="button" id="btnCompartirWhatsApp" class="btn waves-effect waves-light green">WhatsApp (texto)</button>
-  <!-- Calendar helpers -->
-  <button type="button" id="btnCopiarCalendar" class="btn waves-effect waves-light orange">Copiar para Calendar</button>
-  <button type="button" id="btnAbrirCalendar" class="btn waves-effect waves-light orange darken-2">Abrir en Calendar</button>
-  <button type="button" id="btnVaciarGrupos" class="btn waves-effect waves-light red">Vaciar presupuesto</button>
-      </div>
-      <div class="left" style="margin-top:10px; display:flex; align-items:center; gap:10px;">
-        <span><span id="connDot" class="status-dot" title="Estado de conexión"></span><span id="connText">Comprobando conexión…</span></span>
-        <button type="button" id="btnCopyHostURL" class="btn-flat">Copiar enlace</button>
-      </div>
-    </section>
-
-    <!-- Campos extra para Calendar -->
-    <section class="no-imprimir app-section" style="margin-top:10px;">
-      <fieldset>
-        <legend>Datos para Calendar (opcionales)</legend>
-        <div class="row" style="margin-bottom:0;">
-          <div class="input-field col s3">
-            <input type="date" id="calendar-fecha" />
-            <label for="calendar-fecha" class="active">Fecha cita</label>
+    <div class="container dashboard-container">
+      <!-- Business Header modernizado -->
+      <header class="business-header-modern">
+        <div class="business-card">
+          <div class="business-info">
+            <h1 class="business-title">
+              <i class="material-icons left">business</i>
+              NEUMÁTICOS PALMONES
+            </h1>
+            <div class="business-details">
+              <div class="detail-item">
+                <i class="material-icons tiny">location_on</i>
+                <span>C/GALEON 25. POLÍGONO 1 PALMONES, 11379 Los Barrios</span>
+              </div>
+              <div class="detail-item">
+                <i class="material-icons tiny">email</i>
+                <span>neumaticospalmones@hotmail.com</span>
+              </div>
+              <div class="detail-item">
+                <i class="material-icons tiny">phone</i>
+                <span>659 718 809</span>
+              </div>
+            </div>
           </div>
-          <div class="input-field col s3">
-            <input type="time" id="calendar-hora" />
-            <label for="calendar-hora" class="active">Hora</label>
-          </div>
-          <div class="input-field col s2">
-            <input type="number" id="calendar-duracion" min="15" step="15" value="60" />
-            <label for="calendar-duracion" class="active">Duración (min)</label>
-          </div>
-          <div class="input-field col s2">
-            <input type="text" id="calendar-proveedor" />
-            <label for="calendar-proveedor">Proveedor</label>
-          </div>
-          <div class="input-field col s2">
-            <input type="number" id="calendar-porte" step="0.01" />
-            <label for="calendar-porte">Porte (€)</label>
+          <div class="business-logo">
+            <i class="material-icons">tire_repair</i>
           </div>
         </div>
-        <div class="row" style="margin-bottom:0;">
-          <div class="input-field col s12">
-            <input type="text" id="calendar-nota" />
-            <label for="calendar-nota">Nota</label>
+      </header>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Datos cliente + meta -->
+        <section id="presupuestos-view" class="dashboard-card cliente-section no-imprimir">
+          <div class="card-header">
+            <h2><i class="material-icons left">person</i>Datos del Cliente</h2>
+            <div class="card-actions">
+              <button class="btn-icon-small tooltipped" data-tooltip="Limpiar formulario">
+                <i class="material-icons">clear</i>
+              </button>
+              <button class="btn-icon-small tooltipped" data-tooltip="Autocompletar desde historial">
+                <i class="material-icons">history</i>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <form id="cliente-form" onsubmit="return false;">
+              <div class="form-errors" style="display: none"></div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-nombreCliente" class="validate" />
+                    <label for="presupuesto-nombreCliente">Nombre y Apellidos</label>
+                    <i class="material-icons prefix">person</i>
+                  </div>
+                  <div class="input-field-modern">
+                    <input type="tel" id="presupuesto-telefonoCliente" class="validate" />
+                    <label for="presupuesto-telefonoCliente">Teléfono</label>
+                    <i class="material-icons prefix">phone</i>
+                  </div>
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-nifCliente" class="validate" />
+                    <label for="presupuesto-nifCliente">NIF/CIF</label>
+                    <i class="material-icons prefix">badge</i>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-numeroPresupuesto" class="validate" />
+                    <label for="presupuesto-numeroPresupuesto">Nº de Presupuesto</label>
+                    <i class="material-icons prefix">receipt_long</i>
+                  </div>
+                  <div class="input-field-modern">
+                    <input type="date" id="presupuesto-fechaPresupuesto" class="validate" />
+                    <label for="presupuesto-fechaPresupuesto" class="active">Fecha</label>
+                    <i class="material-icons prefix">event</i>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-distribuidor" class="validate" />
+                    <label for="presupuesto-distribuidor">Distribuidor</label>
+                    <i class="material-icons prefix">store</i>
+                  </div>
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-descripcion" class="validate" />
+                    <label for="presupuesto-descripcion">Descripción (para Calendar)</label>
+                    <i class="material-icons prefix">description</i>
+                  </div>
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-observaciones" class="validate" />
+                    <label for="presupuesto-observaciones">Observaciones (*** en título si rellenas)</label>
+                    <i class="material-icons prefix">note</i>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Añadir grupo -->
+        <section id="productos-view" class="dashboard-card productos-section no-imprimir">
+          <div class="card-header">
+            <h2><i class="material-icons left">add_shopping_cart</i>Añadir Productos</h2>
+            <div class="card-actions">
+              <button class="btn-icon-small tooltipped" data-tooltip="Limpiar formulario">
+                <i class="material-icons">clear</i>
+              </button>
+              <button class="btn-icon-small tooltipped" data-tooltip="Cargar plantilla">
+                <i class="material-icons">template</i>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <form id="producto-form" onsubmit="return false;">
+              <div class="form-errors" style="display: none"></div>
+
+              <!-- Grupo de Productos -->
+              <div class="product-group">
+                <h3 class="group-title">
+                  <i class="material-icons left">tire_repair</i>Grupo de Neumáticos
+                </h3>
+                <div class="form-grid">
+                  <div class="form-row">
+                    <div class="input-field-modern">
+                      <input type="text" id="presupuesto-medida" />
+                      <label for="presupuesto-medida">Medida</label>
+                      <i class="material-icons prefix">straighten</i>
+                    </div>
+                    <div class="input-field-modern input-small">
+                      <input type="number" id="presupuesto-cantidad" min="1" value="2" />
+                      <label for="presupuesto-cantidad">Cantidad</label>
+                      <i class="material-icons prefix">confirmation_number</i>
+                    </div>
+                    <div class="input-field-modern input-small">
+                      <input type="number" id="presupuesto-ganancia" step="0.01" value="0" />
+                      <label for="presupuesto-ganancia">Ganancia (€)</label>
+                      <i class="material-icons prefix">trending_up</i>
+                    </div>
+                    <div class="input-field-modern input-small">
+                      <input type="number" id="presupuesto-ecotasa" step="0.01" value="0" />
+                      <label for="presupuesto-ecotasa">Ecotasa (€)</label>
+                      <i class="material-icons prefix">eco</i>
+                    </div>
+                    <div class="input-field-modern input-small">
+                      <input type="number" id="presupuesto-iva" step="0.01" value="21" />
+                      <label for="presupuesto-iva">IVA (%)</label>
+                      <i class="material-icons prefix">percent</i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="suggestions-area">
+                  <div class="chips-container-modern" id="precios-filtros-codigo"></div>
+                  <div class="chips-container-modern" id="precios-por-medida"></div>
+                </div>
+
+                <div class="brands-section">
+                  <h4 class="subsection-title">
+                    <i class="material-icons left">branding_watermark</i>Marcas y Precios
+                  </h4>
+                  <div class="form-row">
+                    <div class="input-field-modern">
+                      <input type="text" id="presupuesto-marca-temp" />
+                      <label for="presupuesto-marca-temp">Marca</label>
+                      <i class="material-icons prefix">label</i>
+                    </div>
+                    <div class="input-field-modern">
+                      <input type="number" id="presupuesto-neto-temp" step="0.01" />
+                      <label for="presupuesto-neto-temp">Precio Neto (€)</label>
+                      <i class="material-icons prefix">euro</i>
+                    </div>
+                    <div class="input-actions">
+                      <button type="button" id="btnAgregarMarca" class="btn-action-modern green">
+                        <i class="material-icons left">add</i>Añadir Marca
+                      </button>
+                    </div>
+                  </div>
+                  <ul id="lista-marcas-temp" class="brands-list-modern"></ul>
+                </div>
+              </div>
+
+              <!-- Trabajos Adicionales -->
+              <div class="work-group">
+                <h3 class="group-title">
+                  <i class="material-icons left">build</i>Trabajos Adicionales
+                </h3>
+                <div class="form-row">
+                  <div class="input-field-modern">
+                    <input type="text" id="presupuesto-otro-concepto" />
+                    <label for="presupuesto-otro-concepto">Concepto</label>
+                    <i class="material-icons prefix">work</i>
+                  </div>
+                  <div class="input-field-modern">
+                    <input type="number" id="presupuesto-otro-precio" step="0.01" />
+                    <label for="presupuesto-otro-precio">Precio Final (€)</label>
+                    <i class="material-icons prefix">euro</i>
+                  </div>
+                  <div class="input-actions">
+                    <button type="button" id="btnAgregarOtroTrabajo" class="btn-action-modern blue">
+                      <i class="material-icons left">add</i>Añadir Trabajo
+                    </button>
+                  </div>
+                </div>
+                <ul id="lista-otros-trabajos-temp" class="work-list-modern"></ul>
+              </div>
+
+              <!-- Botón principal -->
+              <div class="main-action">
+                <button type="button" id="btnAgregarGrupo" class="btn-main-action">
+                  <i class="material-icons left">playlist_add</i>
+                  <span>Agregar Grupo al Presupuesto</span>
+                  <div class="btn-highlight"></div>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Presupuesto final -->
+        <section id="presupuesto-final-view" class="dashboard-card presupuesto-section">
+          <div class="card-header">
+            <h2><i class="material-icons left">receipt</i>Presupuesto Final</h2>
+            <div class="card-actions">
+              <button class="btn-icon-small tooltipped" data-tooltip="Vista previa">
+                <i class="material-icons">preview</i>
+              </button>
+              <button class="btn-icon-small tooltipped" data-tooltip="Configurar formato">
+                <i class="material-icons">settings</i>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="presupuesto-meta" id="presupuesto-meta"></div>
+            <div id="presupuesto-final-render" class="presupuesto-render"></div>
+          </div>
+        </section>
+
+        <!-- Controles y acciones -->
+        <section id="acciones-finales-view" class="dashboard-card acciones-finales no-imprimir">
+          <div class="card-header">
+            <h2><i class="material-icons left">tune</i>Controles</h2>
+          </div>
+          <div class="card-content">
+            <div class="controls-grid">
+              <div class="view-controls">
+                <h4>Vista</h4>
+                <div class="switch-group">
+                  <label class="switch-modern">
+                    <input type="checkbox" id="toggleCompacto" />
+                    <span class="switch-slider"></span>
+                    <span class="switch-label">
+                      <i class="material-icons left">view_compact</i>
+                      Modo compacto
+                    </span>
+                  </label>
+                  <label class="switch-modern">
+                    <input type="checkbox" id="toggleExtraCompacto" />
+                    <span class="switch-slider"></span>
+                    <span class="switch-label">
+                      <i class="material-icons left">view_list</i>
+                      Extra-compacto
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-controls">
+                <h4>Acciones</h4>
+                <div class="action-buttons">
+                  <button type="button" id="btnCancelarEdicion" class="btn-secondary-modern" style="display: none">
+                    <i class="material-icons left">undo</i>Cancelar Edición
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div> <!-- End dashboard-grid -->
           </div>
         </div>
-      </fieldset>
-    </section>
+      </section>
 
-    <!-- Historial -->
-    <section id="historial-view" class="historial-section no-imprimir app-section">
-  <h2>Historial de Presupuestos</h2>
-  <button type="button" id="btnVolverPresupuestos" class="btn waves-effect waves-light grey" style="margin-bottom:16px;">Volver</button>
-  <div class="row" style="margin-bottom: 0;">
-    <div class="input-field col s4">
-      <input type="text" id="hist-buscar-nombre" />
-      <label for="hist-buscar-nombre">Nombre</label>
+      <!-- Campos extra para Calendar -->
+      <section class="dashboard-card calendar-section no-imprimir">
+        <div class="card-header">
+          <h2><i class="material-icons left">event</i>Datos para Calendar</h2>
+          <div class="card-actions">
+            <button class="btn-icon-small tooltipped" data-tooltip="Autocompletar con fecha actual">
+              <i class="material-icons">today</i>
+            </button>
+            <button class="btn-icon-small tooltipped" data-tooltip="Limpiar campos">
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="input-field-modern">
+                <input type="date" id="calendar-fecha" />
+                <label for="calendar-fecha" class="active">Fecha de la Cita</label>
+                <i class="material-icons prefix">event</i>
+              </div>
+              <div class="input-field-modern input-small">
+                <input type="time" id="calendar-hora" />
+                <label for="calendar-hora" class="active">Hora</label>
+                <i class="material-icons prefix">schedule</i>
+              </div>
+              <div class="input-field-modern input-small">
+                <input type="number" id="calendar-duracion" min="15" step="15" value="60" />
+                <label for="calendar-duracion" class="active">Duración (min)</label>
+                <i class="material-icons prefix">timer</i>
+              </div>
+              <div class="input-field-modern">
+                <input type="text" id="calendar-proveedor" />
+                <label for="calendar-proveedor">Proveedor</label>
+                <i class="material-icons prefix">local_shipping</i>
+              </div>
+              <div class="input-field-modern input-small">
+                <input type="number" id="calendar-porte" step="0.01" />
+                <label for="calendar-porte">Porte (€)</label>
+                <i class="material-icons prefix">euro</i>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-field-modern full-width">
+                <input type="text" id="calendar-nota" />
+                <label for="calendar-nota">Nota Adicional</label>
+                <i class="material-icons prefix">note</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historial -->
+      <section id="historial-view" class="historial-section-modern no-imprimir" style="display:none;">
+        <div class="historial-container">
+          <!-- Header -->
+          <div class="historial-header">
+            <div class="header-content">
+              <h1 class="historial-title">
+                <i class="material-icons left">history</i>
+                Historial de Presupuestos
+              </h1>
+              <p class="historial-subtitle">Busca y gestiona presupuestos anteriores</p>
+            </div>
+            <div class="header-actions">
+              <button type="button" id="btnVolverPresupuestos" class="btn-back-modern">
+                <i class="material-icons left">arrow_back</i>Volver
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros de búsqueda -->
+          <div class="search-panel">
+            <div class="search-header">
+              <h3><i class="material-icons left">search</i>Filtros de Búsqueda</h3>
+              <button type="button" class="btn-toggle-filters" id="toggleFilters">
+                <i class="material-icons">expand_more</i>
+              </button>
+            </div>
+            <div class="search-content" id="searchContent">
+              <div class="search-grid">
+                <div class="search-row">
+                  <div class="input-field-search">
+                    <input type="text" id="hist-buscar-nombre" />
+                    <label for="hist-buscar-nombre">Nombre del Cliente</label>
+                    <i class="material-icons prefix">person</i>
+                  </div>
+                  <div class="input-field-search">
+                    <input type="text" id="hist-buscar-telefono" />
+                    <label for="hist-buscar-telefono">Teléfono</label>
+                    <i class="material-icons prefix">phone</i>
+                  </div>
+                  <div class="input-field-search">
+                    <input type="text" id="hist-buscar-medida" />
+                    <label for="hist-buscar-medida">Medida</label>
+                    <i class="material-icons prefix">straighten</i>
+                  </div>
+                  <div class="input-field-search">
+                    <input type="text" id="hist-buscar-numero" />
+                    <label for="hist-buscar-numero">Nº Presupuesto</label>
+                    <i class="material-icons prefix">receipt</i>
+                  </div>
+                </div>
+              </div>
+              <div class="search-actions">
+                <button type="button" id="hist-buscar-btn" class="btn-search-modern primary">
+                  <i class="material-icons left">search</i>Buscar
+                </button>
+                <button type="button" id="hist-limpiar-btn" class="btn-search-modern secondary">
+                  <i class="material-icons left">clear</i>Limpiar
+                </button>
+                <button type="button" id="hist-exportar-btn" class="btn-search-modern tertiary">
+                  <i class="material-icons left">file_download</i>Exportar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas rápidas -->
+          <div class="stats-panel">
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <i class="material-icons">receipt_long</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="stat-total">0</div>
+                <div class="stat-label">Total Presupuestos</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <i class="material-icons">euro</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="stat-monto">€0</div>
+                <div class="stat-label">Monto Total</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange">
+                <i class="material-icons">today</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="stat-mes">0</div>
+                <div class="stat-label">Este Mes</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon purple">
+                <i class="material-icons">person</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="stat-clientes">0</div>
+                <div class="stat-label">Clientes Únicos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de resultados -->
+          <div class="results-panel">
+            <div class="results-header">
+              <div class="results-info">
+                <span id="results-count">Mostrando 0 resultados</span>
+              </div>
+              <div class="results-actions">
+                <div class="view-toggle">
+                  <button class="view-btn active" data-view="cards">
+                    <i class="material-icons">view_module</i>
+                  </button>
+                  <button class="view-btn" data-view="list">
+                    <i class="material-icons">view_list</i>
+                  </button>
+                </div>
+                <div class="sort-options">
+                  <select id="sort-historial" class="browser-default">
+                    <option value="fecha-desc">Más recientes</option>
+                    <option value="fecha-asc">Más antiguos</option>
+                    <option value="nombre-asc">Nombre A-Z</option>
+                    <option value="total-desc">Mayor importe</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading state -->
+            <div id="historial-loading" class="loading-state" style="display: none;">
+              <div class="loading-spinner"></div>
+              <p>Cargando historial...</p>
+            </div>
+
+            <!-- Lista de presupuestos -->
+            <div id="lista-historial-container" class="historial-lista-moderna">
+              <ul id="lista-historial" class="historial-items"></ul>
+            </div>
+
+            <!-- Paginación -->
+            <div id="paginacion-container" class="pagination-modern"></div>
+          </div>
+
+          <!-- Panel de sugerencias -->
+          <div class="suggestions-panel">
+            <div class="suggestions-header">
+              <h3><i class="material-icons left">lightbulb</i>Sugerencias Inteligentes</h3>
+              <button type="button" class="btn-toggle-suggestions" id="toggleSuggestions">
+                <i class="material-icons">expand_more</i>
+              </button>
+            </div>
+            <div class="suggestions-content" id="suggestionsContent" style="display: none;">
+              <div class="suggestions-config">
+                <div class="input-field-search small">
+                  <input type="number" id="sug-limit" min="1" value="200" />
+                  <label for="sug-limit" class="active">Analizar últimos registros</label>
+                  <i class="material-icons prefix">analytics</i>
+                </div>
+                <button type="button" id="btnCargarSugerencias" class="btn-suggestions-modern">
+                  <i class="material-icons left">refresh</i>Generar Sugerencias
+                </button>
+              </div>
+
+              <div class="suggestions-grid">
+                <div class="suggestion-group">
+                  <h4><i class="material-icons left">straighten</i>Medidas Frecuentes</h4>
+                  <div id="sug-medidas" class="suggestions-chips"></div>
+                </div>
+                <div class="suggestion-group">
+                  <h4><i class="material-icons left">label</i>Marcas Populares</h4>
+                  <div id="sug-marcas" class="suggestions-chips"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pedidos -->
+      <section id="pedidos-view" class="no-imprimir app-section pedidos-section" style="display:none;">
+        <div class="card">
+          <div class="card-content">
+            <h2><i class="material-icons left">shopping_cart</i>Pedidos</h2>
+
+            <div class="pedidos-filters">
+              <div class="row" style="margin-bottom:0;">
+                <div class="input-field col s2">
+                  <i class="material-icons prefix">search</i>
+                  <input type="text" id="ped-filtro-texto" />
+                  <label for="ped-filtro-texto">Buscar</label>
+                </div>
+                <div class="input-field col s2">
+                  <i class="material-icons prefix">local_shipping</i>
+                  <input type="text" id="ped-filtro-proveedor" />
+                  <label for="ped-filtro-proveedor">Proveedor</label>
+                </div>
+                <div class="input-field col s2">
+                  <i class="material-icons prefix">filter_list</i>
+                  <select id="ped-filtro-estado">
+                    <option value="">Todos</option>
+                    <option value="pending">Pendientes</option>
+                    <option value="ordered">Pedidos</option>
+                    <option value="received">Recibidos</option>
+                  </select>
+                  <label>Estado</label>
+                </div>
+                <div class="input-field col s2">
+                  <i class="material-icons prefix">date_range</i>
+                  <input type="date" id="ped-filtro-desde" />
+                  <label for="ped-filtro-desde" class="active">Desde</label>
+                </div>
+                <div class="input-field col s2">
+                  <i class="material-icons prefix">date_range</i>
+                  <input type="date" id="ped-filtro-hasta" />
+                  <label for="ped-filtro-hasta" class="active">Hasta</label>
+                </div>
+                <div class="input-field col s2" style="margin-top:25px;">
+                  <button id="ped-btn-filtrar" class="btn waves-effect blue">
+                    <i class="material-icons left">filter_alt</i>Filtrar
+                  </button>
+                  <button id="ped-btn-limpiar" class="btn waves-effect grey" style="margin-top:6px;">
+                    <i class="material-icons left">clear</i>Limpiar
+                  </button>
+                </div>
+              </div>
+
+              <div class="row" style="margin-bottom:0;">
+                <div class="col s12 right-align">
+                  <button id="ped-btn-nuevo" class="btn green waves-effect">
+                    <i class="material-icons left">add</i>Nuevo
+                  </button>
+                  <button id="ped-btn-volver" class="btn grey waves-effect">
+                    <i class="material-icons left">arrow_back</i>Volver
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <ul id="pedidos-lista" class="collection pedidos-lista" style="margin-top:16px;"></ul>
+            <div id="pedidos-paginacion" class="pagination center-align" style="margin-top: 20px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estado/conexión al final -->
+      <section id="top-actions" class="no-imprimir" style="margin-top: 12px;">
+        <div class="actions-bar card z-depth-1">
+          <div class="card-content actions-content" style="display:flex; align-items:center; gap:12px;">
+            <span><span id="connDot" class="status-dot" title="Estado de conexión"></span><span id="connText">Comprobando conexión…</span></span>
+            <button type="button" id="btnCopyHostURL" class="btn-flat btn-ghost"><i class="material-icons left">link</i>Copiar enlace</button>
+          </div>
+        </div>
+      </section>
     </div>
-    <div class="input-field col s4">
-      <input type="text" id="hist-buscar-telefono" />
-      <label for="hist-buscar-telefono">Teléfono</label>
-    </div>
-    <div class="input-field col s4">
-      <input type="text" id="hist-buscar-numero" />
-      <label for="hist-buscar-numero">Nº Presupuesto</label>
-    </div>
-  </div>
-  <div class="row" style="margin-top: -10px;">
-    <div class="col s12 right-align">
-      <button type="button" id="hist-buscar-btn" class="btn waves-effect waves-light blue">Buscar</button>
-      <button type="button" id="hist-limpiar-btn" class="btn waves-effect waves-light grey">Limpiar</button>
-    </div>
-  </div>
-  <ul id="lista-historial" class="collection"></ul>
-  <div id="paginacion-container"></div>
-  <div class="card" style="margin-top:16px;">
-    <div class="card-content">
-      <span class="card-title">Sugerencias (medidas y marcas)</span>
-      <div class="row" style="margin-bottom:0;">
-        <div class="input-field col s3">
-          <input type="number" id="sug-limit" min="1" value="200">
-          <label for="sug-limit" class="active">Analizar últimos (N) registros</label>
-        </div>
-        <div class="col s3" style="margin-top:24px;">
-          <button type="button" id="btnCargarSugerencias" class="btn waves-effect waves-light">Cargar sugerencias</button>
-        </div>
-      </div>
-      <div class="row" style="margin-bottom:0;">
-        <div class="col s6">
-          <h6>Medidas frecuentes</h6>
-          <div id="sug-medidas" class="chips-container"></div>
-        </div>
-        <div class="col s6">
-          <h6>Marcas frecuentes</h6>
-          <div id="sug-marcas" class="chips-container"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-    </section>
 
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
+    <!-- Captura HTML a imagen / PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  </div>
-
-    
-
-  <!-- Materialize JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
-  <!-- Captura HTML a imagen / PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+      <!-- Main JS -->
   <script type="module" src="js/main.js"></script>
-</body>
+  <script type="module" src="js/modal.js"></script>
+
+  <!-- Debug Auto-add -->
+  <script src="debug_autoadd.js"></script>
+
+  <!-- Loader Overlay -->
+  <div id="loader-overlay" class="loader-overlay">
+    <div class="loader-content">
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+      <p id="loader-text">Procesando...</p>
+    </div>
+  </div>
+
+    <footer class="page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">Neumáticos Palmones</h5>
+            <p class="grey-text text-lighten-4">
+              Tu taller de confianza para el mantenimiento y reparación de neumáticos.
+            </p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 class="white-text">Enlaces útiles</h5>
+            <ul>
+              <li><a class="grey-text text-lighten-3" href="#!">Inicio</a></li>
+              <li><a class="grey-text text-lighten-3" href="#!">Servicios</a></li>
+              <li><a class="grey-text text-lighten-3" href="#!">Contacto</a></li>
+              <li><a class="grey-text text-lighten-3" href="#!">Privacidad</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          © 2024
+          <a class="grey-text text-lighten-4 right" href="#!">v1.5.0</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Modal de Confirmación Genérico Modernizado -->
+    <div id="confirm-modal" class="modal-modern">
+      <div class="modal-overlay" id="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h4 id="confirm-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">help_outline</i>
+            Confirmar Acción
+          </h4>
+          <button class="modal-close-btn" id="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-content-wrapper">
+            <div class="modal-icon-large" id="modal-icon-large">
+              <i class="material-icons">help_outline</i>
+            </div>
+            <div class="modal-text">
+              <p id="confirm-modal-content" class="modal-message">¿Estás seguro de realizar esta acción?</p>
+              <p id="confirm-modal-subtitle" class="modal-subtitle" style="display: none;">Esta acción no se puede deshacer.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern secondary" id="confirm-modal-cancel">
+            <i class="material-icons left">close</i>
+            Cancelar
+          </button>
+          <button class="btn-modal-modern primary" id="confirm-modal-accept">
+            <i class="material-icons left">check</i>
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Información/Éxito -->
+    <div id="info-modal" class="modal-modern">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h4 id="info-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">info</i>
+            Información
+          </h4>
+          <button class="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-content-wrapper">
+            <div class="modal-icon-large success" id="info-modal-icon">
+              <i class="material-icons">check_circle</i>
+            </div>
+            <div class="modal-text">
+              <p id="info-modal-content" class="modal-message">Operación completada exitosamente.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern primary modal-close">
+            <i class="material-icons left">done</i>
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div id="error-modal" class="modal-modern">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header error">
+          <h4 id="error-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">error</i>
+            Error
+          </h4>
+          <button class="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-content-wrapper">
+            <div class="modal-icon-large error">
+              <i class="material-icons">error</i>
+            </div>
+            <div class="modal-text">
+              <p id="error-modal-content" class="modal-message">Ha ocurrido un error inesperado.</p>
+              <p id="error-modal-details" class="modal-details" style="display: none;"></p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern secondary modal-close">
+            <i class="material-icons left">close</i>
+            Cerrar
+          </button>
+          <button class="btn-modal-modern primary" id="error-modal-retry" style="display: none;">
+            <i class="material-icons left">refresh</i>
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Formulario -->
+    <div id="form-modal" class="modal-modern modal-large">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h4 id="form-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">edit</i>
+            Editar Información
+          </h4>
+          <button class="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="form-modal-form" class="modal-form">
+            <div id="form-modal-content" class="form-content">
+              <!-- Contenido dinámico del formulario -->
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern secondary modal-close">
+            <i class="material-icons left">close</i>
+            Cancelar
+          </button>
+          <button class="btn-modal-modern primary" id="form-modal-submit">
+            <i class="material-icons left">save</i>
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

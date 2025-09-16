@@ -1,304 +1,226 @@
-import json
 import os
+import re
 import uuid
+import logging
+import sys
 from datetime import date, datetime
+from io import BytesIO
 
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, send_from_directory, abort, send_file
+try:
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+except Exception:  # pragma: no cover - entorno sin dependencia
+    # Fallback no-op si flask-limiter no está disponible
+    class Limiter:  # type: ignore
+        def __init__(self, *_, **__):
+            pass
+
+        def init_app(self, *_):
+            pass
+
+        def limit(self, *_, **__):
+            def deco(f):
+                return f
+
+            return deco
+
+    def get_remote_address():  # type: ignore
+        return None
+from flask import Flask, abort, jsonify, request, send_file, send_from_directory, has_app_context
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from sqlalchemy.dialects.postgresql import JSONB
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import UniqueConstraint, or_
-import re
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+
+    REPORTLAB_AVAILABLE = True
+except Exception:  # pragma: no cover - entorno sin dependencia
+    REPORTLAB_AVAILABLE = False
+
 
 # --- Utilidad para limpiar la vista antes de guardar ---
 def _clean_vista_for_db(vista_data):
-    if not vista_data or not isinstance(vista_data, dict) or 'grupos' not in vista_data:
+    if not vista_data or not isinstance(vista_data, dict) or "grupos" not in vista_data:
         return vista_data
 
     vista_copy = vista_data.copy()
-    for grupo in vista_copy.get('grupos', []):
+    for grupo in vista_copy.get("grupos", []):
         cleaned_neumaticos = []
-        for neumatico in grupo.get('neumaticos', []):
+        for neumatico in grupo.get("neumaticos", []):
             # Ya no hay inventario, solo dejar el ítem tal cual
             cleaned_neumaticos.append(neumatico)
-        grupo['neumaticos'] = cleaned_neumaticos
+        grupo["neumaticos"] = cleaned_neumaticos
     return vista_copy
+
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
 
+# Configuración de logging básica (puede ajustarse por entorno)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
+logger = logging.getLogger("app")
+
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or os.environ.get("FLASK_SECRET") or os.urandom(24)
+if not os.environ.get("SECRET_KEY") and not os.environ.get("FLASK_SECRET"):
+    logger.warning("SECRET_KEY no definido en entorno; generando uno temporal (no usar en producción)")
 CORS(app)  # Habilita CORS para toda la aplicación
 
-DB_USER = os.environ.get('POSTGRES_USER')
-DB_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-DB_HOST = os.environ.get('POSTGRES_HOST')
-DB_PORT = os.environ.get('POSTGRES_PORT')
-DB_NAME = os.environ.get('POSTGRES_DB')
+# Limiter (v3): si REDIS_URL está definida, usarla como backend de almacenamiento
+_redis_url = os.environ.get("REDIS_URL")
+limiter = Limiter(
+    key_func=get_remote_address,
+    # Eliminar límites globales para evitar 429 en recursos estáticos.
+    # Aplicaremos límites solo de forma explícita con decoradores.
+    default_limits=[],
+    storage_uri=_redis_url if _redis_url else None,
+)
+limiter.init_app(app)
 
-# Configuración de SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-# --- Modelos ---
-class Cliente(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(150), nullable=False)
-    telefono = db.Column(db.String(20), nullable=True)
-    nif = db.Column(db.String(20), nullable=True)
-    presupuestos = db.relationship('Presupuesto', backref='cliente', lazy=True)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'nombre': self.nombre,
-            'telefono': self.telefono,
-            'nif': self.nif
-        }
-
-class Presupuesto(db.Model):
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    numero = db.Column(db.String(50), unique=True, nullable=False)
-    fecha = db.Column(db.Date, nullable=False, default=date.today)
-    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
-    vista_cliente = db.Column(JSONB)
-    vista_interna = db.Column(JSONB)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'numero': self.numero,
-            'fecha': self.fecha.isoformat(),
-            'cliente': self.cliente.to_dict() if self.cliente else None,
-            'vista_cliente': self.vista_cliente,
-            'vista_interna': self.vista_interna
-        }
-
-# Nuevo: precios por medida y marca
-class Precio(db.Model):
-    __tablename__ = 'precios'
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    medida = db.Column(db.String(100), nullable=False, index=True)
-    marca = db.Column(db.String(150), nullable=False, index=True)
-    neto = db.Column(db.Float, nullable=False)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    __table_args__ = (
-        UniqueConstraint('medida', 'marca', name='uq_medida_marca'),
+# Filtro global: excluir rutas estáticas y salud del rate limiting aunque hubiera defaults futuros
+@limiter.request_filter
+def _exempt_static_and_health():  # pragma: no cover - lógica sencilla
+    try:
+        p = request.path
+    except Exception:
+        return False
+    # Paths a excluir siempre
+    if p in ("/", "/health"):
+        return True
+    return (
+        p.startswith("/js/")
+        or p.startswith("/static/")
+        or p.endswith(".css")
+        or p.endswith(".js")
+        or p.endswith(".map")
+        or p.startswith("/favicon")
     )
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'medida': self.medida,
-            'marca': self.marca,
-            'neto': self.neto,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-        }
+DB_USER = os.environ.get("POSTGRES_USER")
+DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+DB_HOST = os.environ.get("POSTGRES_HOST")
+DB_PORT = os.environ.get("POSTGRES_PORT")
+DB_NAME = os.environ.get("POSTGRES_DB")
 
-# --- Presupuesto Routes ---
-@app.route('/presupuestos', methods=['GET'])
-def get_presupuestos():
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    nombre = request.args.get('nombre', type=str)
-    telefono = request.args.get('telefono', type=str)
-    numero = request.args.get('numero', type=str)
+# Configuración de SQLAlchemy con override por DATABASE_URL
+db_url = os.environ.get("DATABASE_URL")
+if not db_url:
+    db_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-    q = Presupuesto.query.join(Cliente)
-    if numero:
-        like_num = f"%{numero}%"
-        q = q.filter(Presupuesto.numero.ilike(like_num))
-    if nombre:
-        like_nom = f"%{nombre}%"
-        q = q.filter(Cliente.nombre.ilike(like_nom))
-    if telefono:
-        like_tel = f"%{telefono}%"
-        q = q.filter(Cliente.telefono.ilike(like_tel))
+# Asegurar que la URL usa el driver psycopg (para psycopg v3)
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
-    q = q.order_by(Presupuesto.numero.desc())
-    presupuestos_page = q.paginate(page=page, per_page=per_page, error_out=False)
-    
-    return jsonify({
-        'presupuestos': [p.to_dict() for p in presupuestos_page.items],
-        'total': presupuestos_page.total,
-        'pages': presupuestos_page.pages,
-        'current_page': presupuestos_page.page,
-        'has_next': presupuestos_page.has_next,
-        'has_prev': presupuestos_page.has_prev
-    })
-
-def generar_siguiente_numero_presupuesto():
-    today = date.today()
-    current_year = today.year
-    
-    # Busca el último número de presupuesto para el año actual que sigue el formato YYYY-NNN
-    ultimo_numero_str = db.session.query(db.func.max(Presupuesto.numero)).filter(
-        Presupuesto.numero.like(f'{current_year}-%')
-    ).scalar()
-
-    nuevo_numero_secuencial = 1
-    if ultimo_numero_str:
-        try:
-            ultimo_numero_secuencial = int(ultimo_numero_str.split('-')[-1])
-            nuevo_numero_secuencial = ultimo_numero_secuencial + 1
-        except (ValueError, IndexError):
-            pass
-
-    return f"{current_year}-{str(nuevo_numero_secuencial).zfill(3)}"
-
-@app.route('/presupuestos', methods=['POST'])
-def create_presupuesto():
-    data = request.json
-    if not data:
-        abort(400, description="Invalid JSON")
-
-    cliente_data = data.get('cliente', {})
-    
-    # Find or create client
-    cliente = None
-    if cliente_data.get('nif') and cliente_data['nif'].strip():
-        cliente = Cliente.query.filter_by(nif=cliente_data['nif']).first()
-    
-    if not cliente and cliente_data.get('nombre'):
-         cliente = Cliente.query.filter_by(nombre=cliente_data['nombre']).first()
-
-    if not cliente:
-        cliente = Cliente(
-            nombre=cliente_data.get('nombre', 'Sin Nombre'),
-            telefono=cliente_data.get('telefono'),
-            nif=cliente_data.get('nif')
-        )
-        db.session.add(cliente)
-        db.session.flush()
-
-    # Clean and normalize the vista data before saving
-    vista_cliente_data = _clean_vista_for_db(data.get('vista_cliente', {}))
-    vista_interna_data = _clean_vista_for_db(data.get('vista_interna', {}))
-
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+try:
+    from extensions import db, migrate  # usar instancias globales
+except ModuleNotFoundError:  # pragma: no cover - fallback para entorno de test
+    sys.path.append(os.path.dirname(__file__))
+    from extensions import db, migrate
+try:
+    from models import Cliente, Presupuesto, Precio
+except ModuleNotFoundError:
+    sys.path.append(os.path.dirname(__file__))
+    from models import Cliente, Presupuesto, Precio
+try:
+    from api.presupuestos_api import bp_presupuestos  # Blueprint fase 2
+    from api.precios_api import bp_precios
+    from api.stats_api import bp_stats
     try:
-        fecha_str = data.get('fecha')
-        if not fecha_str:
-            abort(400, description="Fecha del presupuesto es requerida.")
-        fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        from api.pedidos_api import bp_pedidos
+    except Exception:
+        bp_pedidos = None
+except ModuleNotFoundError:
+    sys.path.append(os.path.dirname(__file__))
+    from api.presupuestos_api import bp_presupuestos
+    from api.precios_api import bp_precios
+    from api.stats_api import bp_stats
+    try:
+        from api.pedidos_api import bp_pedidos
+    except Exception:
+        bp_pedidos = None
 
-        # Intentar varias veces por si hay colisión de número (uso simultáneo)
-        intentos = 5
-        for _ in range(intentos):
-            try:
-                new_presupuesto = Presupuesto(
-                    id=str(uuid.uuid4()),
-                    numero=generar_siguiente_numero_presupuesto(),
-                    fecha=fecha_obj,
-                    cliente_id=cliente.id,
-                    vista_cliente=vista_cliente_data,
-                    vista_interna=vista_interna_data
-                )
-                db.session.add(new_presupuesto)
-                db.session.commit()
-                return jsonify(new_presupuesto.to_dict()), 201
-            except IntegrityError:
-                db.session.rollback()
-                # Reintentar generando otro número
-                continue
-        abort(409, description="No se pudo generar un número de presupuesto único tras varios intentos. Intenta de nuevo.")
+db.init_app(app)
+migrate.init_app(app, db)
 
-    except ValueError as e:
-        db.session.rollback()
-        abort(400, description=f"Error en el formato de la fecha: {e}. Asegúrate de que sea YYYY-MM-DD.")
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        db.session.rollback()
-        abort(500, description=f"Error interno al crear el presupuesto: {e}")
 
-@app.route('/presupuestos/<string:presupuesto_id>', methods=['GET'])
-def get_presupuesto(presupuesto_id):
-    presupuesto = Presupuesto.query.get_or_404(presupuesto_id)
-    return jsonify(presupuesto.to_dict())
+# --- Modelos ---
+"""Modelos movidos a models.py. Se mantienen importados para compatibilidad."""
 
-@app.route('/presupuestos/<string:presupuesto_id>', methods=['PUT'])
-def update_presupuesto(presupuesto_id):
-    presupuesto = Presupuesto.query.get_or_404(presupuesto_id)
-    data = request.json
-    if not data:
-        abort(400, description="Invalid JSON")
 
-    # Clean and normalize the vista data before saving
-    presupuesto.vista_cliente = _clean_vista_for_db(data.get('vista_cliente', presupuesto.vista_cliente))
-    presupuesto.vista_interna = _clean_vista_for_db(data.get('vista_interna', presupuesto.vista_interna))
-
-    # Update other fields
-    presupuesto.fecha = datetime.strptime(data.get('fecha'), '%Y-%m-%d').date() if data.get('fecha') else presupuesto.fecha
-    
-    cliente_data = data.get('cliente')
-    if cliente_data and presupuesto.cliente:
-        presupuesto.cliente.nombre = cliente_data.get('nombre', presupuesto.cliente.nombre)
-        presupuesto.cliente.telefono = cliente_data.get('telefono', presupuesto.cliente.telefono)
-        presupuesto.cliente.nif = cliente_data.get('nif', presupuesto.cliente.nif)
-
-    db.session.commit()
-    return jsonify(presupuesto.to_dict())
-
-@app.route('/presupuestos/<string:presupuesto_id>', methods=['DELETE'])
-def delete_presupuesto(presupuesto_id):
-    presupuesto = Presupuesto.query.get_or_404(presupuesto_id)
-    db.session.delete(presupuesto)
-    db.session.commit()
-    return '', 204  # No Content
-
+app.register_blueprint(bp_stats)
 
 
 # Serve static files (like index.html, CSS, JS)
-@app.route('/')
+@limiter.exempt
+@app.route("/")
 def serve_index():
-    return send_file('index.html')
-@app.route('/<path:path>')
+    return send_file("index.html")
+
+
+@limiter.exempt
+@app.route("/<path:path>")
 def serve_static(path):
     # Prevent directory traversal
-    if ".." in path or path.startswith('/'):
+    if ".." in path or path.startswith("/"):
         abort(404)
-    return send_from_directory('.', path)
+    return send_from_directory(".", path)
 
 
 # Manejador global de errores 500 para devolver JSON
 @app.errorhandler(500)
 def handle_internal_error(error):
-    description = getattr(error, 'description', str(error))
-    response = jsonify({
-        'description': f'Error interno del servidor: {description}'
-    })
+    description = getattr(error, "description", str(error))
+    response = jsonify({"description": f"Error interno del servidor: {description}"})
     response.status_code = 500
     return response
 
+
 @app.errorhandler(404)
 def handle_not_found(error):
-    response = jsonify({
-        'description': 'Recurso no encontrado'
-    })
+    response = jsonify({"description": "Recurso no encontrado"})
     response.status_code = 404
     return response
 
+
 @app.errorhandler(400)
 def handle_bad_request(error):
-    description = getattr(error, 'description', str(error))
-    response = jsonify({
-        'description': f'Solicitud incorrecta: {description}'
-    })
+    description = getattr(error, "description", str(error))
+    response = jsonify({"description": f"Solicitud incorrecta: {description}"})
     response.status_code = 400
     return response
 
-@app.get('/health')
+
+@app.errorhandler(429)
+def handle_rate_limit(error):  # pragma: no cover - handler simple
+    # Aclarar al cliente qué ruta fue limitada
+    response = jsonify(
+        {
+            "description": "Rate limit excedido",
+            "path": request.path,
+            "limit": getattr(error, "limit", None),
+        }
+    )
+    response.status_code = 429
+    return response
+
+
+@app.get("/health")
 def health():
-    return jsonify({'status': 'ok'}), 200
+    return jsonify({"status": "ok"}), 200
+
 
 # --- Sugerencias (medidas y marcas) ---
-@app.get('/sugerencias')
+@app.get("/sugerencias")
+@limiter.limit("10/minute")
 def sugerencias():
     """
     Devuelve sugerencias basadas en el historial guardado:
@@ -307,13 +229,24 @@ def sugerencias():
     - combos: contador por (medida -> marca -> count)
     """
     try:
-        limit = request.args.get('limit', type=int)  # opcional: limitar N presupuestos recientes
+        limit = request.args.get("limit", default=200, type=int)
+        # Seguridad: tope máximo para no cargar en exceso
+        if limit is not None:
+            try:
+                limit = int(limit)
+                if limit <= 0:
+                    limit = 200
+                if limit > 1000:
+                    limit = 1000
+            except Exception:
+                limit = 200
         q = Presupuesto.query.order_by(Presupuesto.fecha.desc())
         if limit and limit > 0:
             q = q.limit(limit)
         rows = q.all()
 
         from collections import Counter, defaultdict
+
         medidas_counter = Counter()
         marcas_counter = Counter()
         combos = defaultdict(lambda: Counter())
@@ -321,14 +254,14 @@ def sugerencias():
         def process_vista(v):
             if not v or not isinstance(v, dict):
                 return
-            grupos = v.get('grupos') or []
+            grupos = v.get("grupos") or []
             for g in grupos:
-                medida = g.get('medida')
+                medida = g.get("medida")
                 if medida:
                     medidas_counter[medida] += 1
-                neumaticos = g.get('neumaticos') or []
+                neumaticos = g.get("neumaticos") or []
                 for n in neumaticos:
-                    marca = n.get('nombre') or n.get('marca')
+                    marca = n.get("nombre") or n.get("marca")
                     if marca:
                         marcas_counter[marca] += 1
                         if medida:
@@ -341,19 +274,21 @@ def sugerencias():
         def top_list(counter: Counter, max_items=30):
             return [k for k, _ in counter.most_common(max_items)]
 
-        combos_out = {
-            m: [k for k, _ in c.most_common(20)] for m, c in combos.items()
-        }
+        combos_out = {m: [k for k, _ in c.most_common(20)] for m, c in combos.items()}
 
-        return jsonify({
-            'medidas': top_list(medidas_counter, 50),
-            'marcas': top_list(marcas_counter, 50),
-            'combos': combos_out
-        })
+        return jsonify(
+            {
+                "medidas": top_list(medidas_counter, 50),
+                "marcas": top_list(marcas_counter, 50),
+                "combos": combos_out,
+            }
+        )
     except Exception as e:
         import traceback
+
         traceback.print_exc()
         abort(500, description=f"No se pudieron calcular sugerencias: {e}")
+
 
 # --- Precios por medida y marca ---
 def _parse_medida_bases(text: str):
@@ -363,60 +298,62 @@ def _parse_medida_bases(text: str):
     """
     if not text:
         return []
-    s = text.strip().upper().replace('\t', ' ')
-    s = re.sub(r"\s+", " ", s)
-    # Buscar W/PR/R o W/PR/RI con o sin R entre PR y RI
-    m = re.search(r"(\d{3})[\s/]+(\d{2})[\s/]*R?(\d{2})", s)
-    if not m:
-        return []
-    w, pr, ri = m.group(1), m.group(2), m.group(3)
-    base_no_r = f"{w}/{pr}/{ri}"
-    base_r = f"{w}/{pr}R{ri}"
-    return [base_no_r, base_r]
+    s = (text or "").upper()
+    # Reemplazar separadores no alfanuméricos (excepto R) por espacios para tokenizar
+    s = re.sub(r"[^0-9R]+", " ", s)
+    tokens = [t for t in s.split() if t]
+    # Buscar patrón: 3 dígitos, 2 dígitos, (opcional R), 2 dígitos consecutivos
+    for i in range(len(tokens)):
+        try:
+            w = tokens[i]
+            pr = tokens[i + 1]
+            # Caso con R separada
+            if i + 3 < len(tokens) and tokens[i + 2] == 'R':
+                ri = tokens[i + 3]
+                if len(w) == 3 and len(pr) == 2 and len(ri) == 2 and w.isdigit() and pr.isdigit() and ri.isdigit():
+                    return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
+            # Caso sin R separada (puede venir en forma compacta luego, pero aquí solo números)
+            if i + 2 < len(tokens):
+                ri = tokens[i + 2]
+                if len(w) == 3 and len(pr) == 2 and len(ri) == 2 and w.isdigit() and pr.isdigit() and ri.isdigit():
+                    return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
+        except IndexError:
+            pass
+    # Segundo intento: detectar formato compacto con R: ### ## R## o ### ##R## sin espacios (ej: 205/55R16 ya capturado antes)
+    compact = re.sub(r"\s+", "", text.upper())
+    m = re.search(r"(\d{3})[\/](\d{2})R(\d{2})", compact)
+    if m:
+        w, pr, ri = m.group(1), m.group(2), m.group(3)
+        return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
+    m2 = re.search(r"(\d{3})(\d{2})R(\d{2})", compact)
+    if m2:
+        w, pr, ri = m2.group(1), m2.group(2), m2.group(3)
+        return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
+    return []
 
-@app.get('/precios')
-def get_precios_por_medida():
-    medida = request.args.get('medida', type=str)
-    if not medida:
-        abort(400, description='Falta la medida')
-    bases = _parse_medida_bases(medida)
-    if not bases:
-        # Si no se pudo parsear, devolvemos lista vacía para no confundir
-        return jsonify([])
-    # Buscar cualquier precio cuya medida empiece por alguna base (así incluimos códigos)
-    conds = [Precio.medida.ilike(f"{b}%") for b in bases]
-    q = Precio.query.filter(or_(*conds)).order_by(Precio.updated_at.desc())
-    rows = q.all()
-    return jsonify([r.to_dict() for r in rows])
+# Marcador para tests: línea que comienza con '@' para delimitar extracción en test_utils_backend
+def _noop_marker(f):  # pragma: no cover - utilidad de test
+    return f
 
-@app.post('/precios')
-def upsert_precio():
-    data = request.json or {}
-    medida = (data.get('medida') or '').strip()
-    marca = (data.get('marca') or '').strip()
-    neto = data.get('neto')
-    if not medida or not marca:
-        abort(400, description='Medida y marca son obligatorias')
-    try:
-        neto_val = float(neto)
-        if neto_val < 0:
-            raise ValueError('Neto negativo')
-    except Exception:
-        abort(400, description='Neto inválido')
+@_noop_marker
+def _after_parse_marker():  # pragma: no cover
+    return None
 
-    # Upsert por (medida, marca)
-    row = Precio.query.filter_by(medida=medida, marca=marca).first()
-    if row:
-        row.neto = neto_val
-        row.updated_at = datetime.utcnow()
-    else:
-        row = Precio(medida=medida, marca=marca, neto=neto_val)
-        db.session.add(row)
-    db.session.commit()
-    return jsonify(row.to_dict())
 
-if __name__ == '__main__':
+app.register_blueprint(bp_precios)
+
+
+# --- PDF del presupuesto ---
+ # Registro de blueprint de presupuestos (CRUD + PDF)
+app.register_blueprint(bp_presupuestos)
+
+# Registrar blueprint pedidos si disponible
+if 'bp_pedidos' in globals() and bp_pedidos is not None:
+    app.register_blueprint(bp_pedidos, url_prefix='/api')
+
+
+if __name__ == "__main__":
     # Crear tablas que no existan aún (útil para nuevas tablas como precios)
     with app.app_context():
         db.create_all()
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host="0.0.0.0")

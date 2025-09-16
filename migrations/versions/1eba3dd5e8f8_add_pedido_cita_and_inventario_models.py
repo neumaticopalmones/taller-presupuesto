@@ -1,7 +1,7 @@
 """Add Pedido, Cita, and Inventario models
 
 Revision ID: 1eba3dd5e8f8
-Revises: 
+Revises:
 Create Date: 2025-08-22 18:08:04.133306
 
 """
