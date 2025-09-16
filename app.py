@@ -112,11 +112,20 @@ DB_NAME = os.environ.get("POSTGRES_DB")
 # Configuración de SQLAlchemy con override por DATABASE_URL
 db_url = os.environ.get("DATABASE_URL")
 if not db_url:
-    db_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # Solo construir URL si todas las variables están presentes
+    if all([DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME]):
+        db_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    else:
+        # Fallback para desarrollo local
+        db_url = "postgresql://postgres:password@localhost:5432/presupuestos"
 
 # Asegurar que la URL usa el driver psycopg (para psycopg v3)
 if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+# Debug logging para Railway
+print(f"[DEBUG] Using database URL: {db_url[:50]}...")  # Solo primeros 50 chars por seguridad
+print(f"[DEBUG] DATABASE_URL env var exists: {bool(os.environ.get('DATABASE_URL'))}")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
