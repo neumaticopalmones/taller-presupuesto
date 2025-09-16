@@ -1,12 +1,10 @@
+import logging
 import os
 import re
-import uuid
-import logging
 import sys
-from datetime import date, datetime
-from io import BytesIO
 
 from dotenv import load_dotenv
+
 try:
     from flask_limiter import Limiter
     from flask_limiter.util import get_remote_address
@@ -27,15 +25,12 @@ except Exception:  # pragma: no cover - entorno sin dependencia
 
     def get_remote_address():  # type: ignore
         return None
-from flask import Flask, abort, jsonify, request, send_file, send_from_directory, has_app_context
+
+
+from flask import Flask, abort, jsonify, request, send_file, send_from_directory
 from flask_cors import CORS
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_
-from sqlalchemy.exc import IntegrityError
+
 try:
-    from reportlab.lib.pagesizes import A4
-    from reportlab.pdfgen import canvas
 
     REPORTLAB_AVAILABLE = True
 except Exception:  # pragma: no cover - entorno sin dependencia
@@ -68,9 +63,13 @@ logging.basicConfig(
 logger = logging.getLogger("app")
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or os.environ.get("FLASK_SECRET") or os.urandom(24)
+app.config["SECRET_KEY"] = (
+    os.environ.get("SECRET_KEY") or os.environ.get("FLASK_SECRET") or os.urandom(24)
+)
 if not os.environ.get("SECRET_KEY") and not os.environ.get("FLASK_SECRET"):
-    logger.warning("SECRET_KEY no definido en entorno; generando uno temporal (no usar en producción)")
+    logger.warning(
+        "SECRET_KEY no definido en entorno; " "generando uno temporal (no usar en producción)"
+    )
 CORS(app)  # Habilita CORS para toda la aplicación
 
 # Limiter (v3): si REDIS_URL está definida, usarla como backend de almacenamiento
@@ -83,6 +82,7 @@ limiter = Limiter(
     storage_uri=_redis_url if _redis_url else None,
 )
 limiter.init_app(app)
+
 
 # Filtro global: excluir rutas estáticas y salud del rate limiting aunque hubiera defaults futuros
 @limiter.request_filter
@@ -103,14 +103,21 @@ def _exempt_static_and_health():  # pragma: no cover - lógica sencilla
         or p.startswith("/favicon")
     )
 
-DB_USER = os.environ.get("POSTGRES_USER")
-DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
-DB_HOST = os.environ.get("POSTGRES_HOST")
-DB_PORT = os.environ.get("POSTGRES_PORT")
-DB_NAME = os.environ.get("POSTGRES_DB")
+
+# Función auxiliar para obtener variables de entorno excluyendo valores 'None'
+def get_env_var(var_name):
+    value = os.environ.get(var_name)
+    return value if value and value.lower() != "none" else None
+
+
+DB_USER = get_env_var("POSTGRES_USER")
+DB_PASSWORD = get_env_var("POSTGRES_PASSWORD")
+DB_HOST = get_env_var("POSTGRES_HOST")
+DB_PORT = get_env_var("POSTGRES_PORT")
+DB_NAME = get_env_var("POSTGRES_DB")
 
 # Configuración de SQLAlchemy con override por DATABASE_URL
-db_url = os.environ.get("DATABASE_URL")
+db_url = get_env_var("DATABASE_URL")
 if not db_url:
     # Solo construir URL si todas las variables están presentes
     if all([DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME]):
@@ -124,8 +131,13 @@ if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
 # Debug logging para Railway
+print(f"[DEBUG] DB_USER: {DB_USER}")
+print(f"[DEBUG] DB_PASSWORD: {'***' if DB_PASSWORD else None}")
+print(f"[DEBUG] DB_HOST: {DB_HOST}")
+print(f"[DEBUG] DB_PORT: {DB_PORT}")
+print(f"[DEBUG] DB_NAME: {DB_NAME}")
 print(f"[DEBUG] Using database URL: {db_url[:50]}...")  # Solo primeros 50 chars por seguridad
-print(f"[DEBUG] DATABASE_URL env var exists: {bool(os.environ.get('DATABASE_URL'))}")
+print(f"[DEBUG] DATABASE_URL env var exists: {bool(get_env_var('DATABASE_URL'))}")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -135,23 +147,25 @@ except ModuleNotFoundError:  # pragma: no cover - fallback para entorno de test
     sys.path.append(os.path.dirname(__file__))
     from extensions import db, migrate
 try:
-    from models import Cliente, Presupuesto, Precio
+    from models import Presupuesto
 except ModuleNotFoundError:
     sys.path.append(os.path.dirname(__file__))
-    from models import Cliente, Presupuesto, Precio
+    from models import Presupuesto
 try:
-    from api.presupuestos_api import bp_presupuestos  # Blueprint fase 2
     from api.precios_api import bp_precios
+    from api.presupuestos_api import bp_presupuestos  # Blueprint fase 2
     from api.stats_api import bp_stats
+
     try:
         from api.pedidos_api import bp_pedidos
     except Exception:
         bp_pedidos = None
 except ModuleNotFoundError:
     sys.path.append(os.path.dirname(__file__))
-    from api.presupuestos_api import bp_presupuestos
     from api.precios_api import bp_precios
+    from api.presupuestos_api import bp_presupuestos
     from api.stats_api import bp_stats
+
     try:
         from api.pedidos_api import bp_pedidos
     except Exception:
@@ -317,18 +331,35 @@ def _parse_medida_bases(text: str):
             w = tokens[i]
             pr = tokens[i + 1]
             # Caso con R separada
-            if i + 3 < len(tokens) and tokens[i + 2] == 'R':
+            if i + 3 < len(tokens) and tokens[i + 2] == "R":
                 ri = tokens[i + 3]
-                if len(w) == 3 and len(pr) == 2 and len(ri) == 2 and w.isdigit() and pr.isdigit() and ri.isdigit():
+                valid_parts = (
+                    len(w) == 3
+                    and len(pr) == 2
+                    and len(ri) == 2
+                    and w.isdigit()
+                    and pr.isdigit()
+                    and ri.isdigit()
+                )
+                if valid_parts:
                     return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
             # Caso sin R separada (puede venir en forma compacta luego, pero aquí solo números)
             if i + 2 < len(tokens):
                 ri = tokens[i + 2]
-                if len(w) == 3 and len(pr) == 2 and len(ri) == 2 and w.isdigit() and pr.isdigit() and ri.isdigit():
+                valid_parts = (
+                    len(w) == 3
+                    and len(pr) == 2
+                    and len(ri) == 2
+                    and w.isdigit()
+                    and pr.isdigit()
+                    and ri.isdigit()
+                )
+                if valid_parts:
                     return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
         except IndexError:
             pass
-    # Segundo intento: detectar formato compacto con R: ### ## R## o ### ##R## sin espacios (ej: 205/55R16 ya capturado antes)
+    # Segundo intento: detectar formato compacto con R
+    # ### ## R## o ### ##R## sin espacios (ej: 205/55R16 ya capturado antes)
     compact = re.sub(r"\s+", "", text.upper())
     m = re.search(r"(\d{3})[\/](\d{2})R(\d{2})", compact)
     if m:
@@ -340,9 +371,11 @@ def _parse_medida_bases(text: str):
         return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
     return []
 
+
 # Marcador para tests: línea que comienza con '@' para delimitar extracción en test_utils_backend
 def _noop_marker(f):  # pragma: no cover - utilidad de test
     return f
+
 
 @_noop_marker
 def _after_parse_marker():  # pragma: no cover
@@ -353,12 +386,12 @@ app.register_blueprint(bp_precios)
 
 
 # --- PDF del presupuesto ---
- # Registro de blueprint de presupuestos (CRUD + PDF)
+# Registro de blueprint de presupuestos (CRUD + PDF)
 app.register_blueprint(bp_presupuestos)
 
 # Registrar blueprint pedidos si disponible
-if 'bp_pedidos' in globals() and bp_pedidos is not None:
-    app.register_blueprint(bp_pedidos, url_prefix='/api')
+if "bp_pedidos" in globals() and bp_pedidos is not None:
+    app.register_blueprint(bp_pedidos, url_prefix="/api")
 
 
 if __name__ == "__main__":
