@@ -218,22 +218,6 @@ def health_check():
         return jsonify({"status": "unhealthy", "database": "disconnected", "error": str(e)}), 503
 
 
-# Función para inicializar la base de datos
-def init_db():
-    """Crear tablas si no existen."""
-    try:
-        with app.app_context():
-            db.create_all()
-            logger.info("Database tables created/verified successfully")
-    except Exception as e:
-        logger.error(f"Error creating database tables: {e}")
-
-
-# Llamar la inicialización si estamos en producción
-if os.environ.get("FLASK_ENV") == "production":
-    init_db()
-
-
 # --- Modelos ---
 """Modelos movidos a models.py. Se mantienen importados para compatibilidad."""
 
