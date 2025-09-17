@@ -1,0 +1,37 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "runtime": "python",
+      "name": "taller-presupuesto-web",
+      "buildCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+      "startCommand": "chmod +x start.sh && ./start.sh",
+      "plan": "free",
+      "region": "frankfurt",
+      "envVars": [
+        {
+          "key": "PYTHON_VERSION",
+          "value": "3.11.0"
+        },
+        {
+          "key": "FLASK_ENV",
+          "value": "production"
+        },
+        {
+          "key": "WEB_CONCURRENCY",
+          "value": "4"
+        }
+      ],
+      "healthCheckPath": "/health"
+    }
+  ],
+  "databases": [
+    {
+      "name": "taller-presupuesto-db",
+      "databaseName": "taller_presupuesto",
+      "user": "admin",
+      "plan": "free",
+      "region": "frankfurt"
+    }
+  ]
+}
