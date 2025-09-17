@@ -206,6 +206,34 @@ db.init_app(app)
 migrate.init_app(app, db)
 
 
+# Endpoint de salud para verificar el estado de la aplicación
+@app.route("/healthz")
+def health_check():
+    """Endpoint de verificación de salud."""
+    try:
+        # Verificar conexión a la base de datos
+        db.session.execute("SELECT 1")
+        return jsonify({"status": "healthy", "database": "connected", "version": "1.0.0"}), 200
+    except Exception as e:
+        return jsonify({"status": "unhealthy", "database": "disconnected", "error": str(e)}), 503
+
+
+# Función para inicializar la base de datos
+def init_db():
+    """Crear tablas si no existen."""
+    try:
+        with app.app_context():
+            db.create_all()
+            logger.info("Database tables created/verified successfully")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {e}")
+
+
+# Llamar la inicialización si estamos en producción
+if os.environ.get("FLASK_ENV") == "production":
+    init_db()
+
+
 # --- Modelos ---
 """Modelos movidos a models.py. Se mantienen importados para compatibilidad."""
 
