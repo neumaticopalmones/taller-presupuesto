@@ -212,7 +212,9 @@ def health_check():
     """Endpoint de verificación de salud."""
     try:
         # Verificar conexión a la base de datos
-        db.session.execute("SELECT 1")
+        from sqlalchemy import text
+
+        db.session.execute(text("SELECT 1"))
         return jsonify({"status": "healthy", "database": "connected", "version": "1.0.0"}), 200
     except Exception as e:
         return jsonify({"status": "unhealthy", "database": "disconnected", "error": str(e)}), 503
