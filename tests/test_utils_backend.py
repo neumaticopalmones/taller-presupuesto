@@ -1,6 +1,6 @@
+import pathlib
 import re
 from datetime import date
-import pathlib
 
 APP_FILE = pathlib.Path(__file__).parent.parent / "app.py"
 _CODE = APP_FILE.read_text(encoding="utf-8")
@@ -20,6 +20,7 @@ def _extract_function(code: str, func_name: str):
     func_code = "\n".join(collected)
     local_ns = {}
     import re as _re  # asegurar disponibilidad dentro del código ejecutado
+
     exec(func_code, {"re": _re}, local_ns)
     return local_ns[func_name]
 

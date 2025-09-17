@@ -125,26 +125,51 @@ DB_PORT = clean_env(os.environ.get("POSTGRES_PORT"))
 DB_NAME = clean_env(os.environ.get("POSTGRES_DB"))
 DATABASE_URL = clean_env(os.environ.get("DATABASE_URL"))
 
-# Logs de depuración para ver exactamente qué llega
-print("DEBUG → Variables de entorno:")
-print("POSTGRES_USER:", DB_USER)
-print("POSTGRES_PASSWORD:", DB_PASSWORD)
-print("POSTGRES_HOST:", DB_HOST)
-print("POSTGRES_PORT:", DB_PORT)
-print("POSTGRES_DB:", DB_NAME)
-print("DATABASE_URL:", DATABASE_URL)
+# Logs de depuración para desarrollo - en producción usar logger
+if os.environ.get("FLASK_ENV") == "development":
+    print("DEBUG → Variables de entorno:")
+    print("POSTGRES_USER:", DB_USER)
+    print("POSTGRES_PASSWORD:", "***" if DB_PASSWORD else None)
+    print("POSTGRES_HOST:", DB_HOST)
+    print("POSTGRES_PORT:", DB_PORT)
+    print("POSTGRES_DB:", DB_NAME)
+    print("DATABASE_URL:", "***" if DATABASE_URL else None)
 
 # Construcción robusta de la URL de la base de datos
+database_uri = None
 if DATABASE_URL:
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+    database_uri = DATABASE_URL
+    logger.info("Using DATABASE_URL for database connection")
 elif all([DB_USER, DB_PASSWORD, DB_HOST, DB_NAME]):
     port = DB_PORT if DB_PORT else "5432"
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{port}/{DB_NAME}"
-    )
+    database_uri = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{port}/{DB_NAME}"
+    logger.info(f"Constructed database URI from individual variables: {DB_HOST}:{port}/{DB_NAME}")
 else:
-    print("⚠️ No se encontró configuración válida de BD, usando SQLite local.")
+    database_uri = "sqlite:///local.db"
+    logger.warning("No se encontró configuración válida de BD, usando SQLite local.")
+
+# Validar que la URI es válida antes de asignarla
+try:
+    from sqlalchemy import create_engine
+
+    # Test de conexión rápido
+    test_engine = create_engine(database_uri, echo=False)
+    test_engine.dispose()
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+    logger.info("Database URI validation successful")
+except Exception as e:
+    logger.error(f"Database URI validation failed: {e}")
+    logger.info("Falling back to SQLite")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///local.db"
+
+# Print final URI for debugging (mask credentials)
+final_uri = app.config["SQLALCHEMY_DATABASE_URI"]
+if "://" in final_uri and "@" in final_uri:
+    # Mask credentials in log
+    masked_uri = re.sub(r"://([^:]+):([^@]+)@", r"://\1:***@", final_uri)
+    logger.info(f"Final database URI: {masked_uri}")
+else:
+    logger.info(f"Final database URI: {final_uri}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 try:

@@ -1,13 +1,16 @@
-from flask import Blueprint, request, jsonify, abort
-from datetime import datetime
 import re
+from datetime import datetime
+
+from flask import Blueprint, abort, jsonify, request
+from sqlalchemy import or_
+
 from extensions import db
 from models import Precio
-from sqlalchemy import or_
 
 bp_precios = Blueprint("precios", __name__)
 
 # Reutilizamos mismo parser para bases de medida que existía en app
+
 
 def _parse_medida_bases(text: str):
     if not text:
@@ -19,13 +22,27 @@ def _parse_medida_bases(text: str):
         try:
             w = tokens[i]
             pr = tokens[i + 1]
-            if i + 3 < len(tokens) and tokens[i + 2] == 'R':
+            if i + 3 < len(tokens) and tokens[i + 2] == "R":
                 ri = tokens[i + 3]
-                if len(w) == 3 and len(pr) == 2 and len(ri) == 2 and w.isdigit() and pr.isdigit() and ri.isdigit():
+                if (
+                    len(w) == 3
+                    and len(pr) == 2
+                    and len(ri) == 2
+                    and w.isdigit()
+                    and pr.isdigit()
+                    and ri.isdigit()
+                ):
                     return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
             if i + 2 < len(tokens):
                 ri = tokens[i + 2]
-                if len(w) == 3 and len(pr) == 2 and len(ri) == 2 and w.isdigit() and pr.isdigit() and ri.isdigit():
+                if (
+                    len(w) == 3
+                    and len(pr) == 2
+                    and len(ri) == 2
+                    and w.isdigit()
+                    and pr.isdigit()
+                    and ri.isdigit()
+                ):
                     return [f"{w}/{pr}/{ri}", f"{w}/{pr}R{ri}"]
         except IndexError:
             pass

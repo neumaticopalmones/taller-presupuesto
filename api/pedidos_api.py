@@ -1,13 +1,16 @@
-from flask import Blueprint, request, jsonify, abort
 from datetime import datetime
-from sqlalchemy import or_, and_
+
+from flask import Blueprint, abort, jsonify, request
+from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
+
 from extensions import db
 from models import Pedido, Presupuesto
-from sqlalchemy.orm import joinedload
 
 bp_pedidos = Blueprint("pedidos", __name__)
 
 # --- Helpers ---
+
 
 def _apply_filters(q):
     estado = request.args.get("estado")  # pending|ordered|received
@@ -28,7 +31,9 @@ def _apply_filters(q):
 
     if qtext:
         like = f"%{qtext}%"
-        q = q.filter(or_(Pedido.medida.ilike(like), Pedido.marca.ilike(like), Pedido.descripcion.ilike(like)))
+        q = q.filter(
+            or_(Pedido.medida.ilike(like), Pedido.marca.ilike(like), Pedido.descripcion.ilike(like))
+        )
 
     if desde:
         try:
@@ -43,6 +48,7 @@ def _apply_filters(q):
         except Exception:
             pass
     return q
+
 
 # --- CRUD ---
 @bp_pedidos.post("/pedidos")
@@ -118,14 +124,16 @@ def listar_pedidos():
             d["cliente_nombre"] = None
             d["cliente_telefono"] = None
         items.append(d)
-    return jsonify({
-        "pedidos": items,
-        "total": pag.total,
-        "pages": pag.pages,
-        "current_page": pag.page,
-        "has_next": pag.has_next,
-        "has_prev": pag.has_prev,
-    })
+    return jsonify(
+        {
+            "pedidos": items,
+            "total": pag.total,
+            "pages": pag.pages,
+            "current_page": pag.page,
+            "has_next": pag.has_next,
+            "has_prev": pag.has_prev,
+        }
+    )
 
 
 @bp_pedidos.get("/pedidos/<string:pedido_id>")
@@ -169,13 +177,14 @@ def editar_pedido(pedido_id):
                     abort(404, description=f"El presupuesto con id {val} no existe.")
 
             # --- Asignación ---
-            setattr(p, campo, val or None) # Convierte strings vacíos a None
+            setattr(p, campo, val or None)  # Convierte strings vacíos a None
             cambios = True
 
     if cambios:
         db.session.commit()
 
     return jsonify(p.to_dict_custom())
+
 
 # --- Toggles ---
 @bp_pedidos.post("/pedidos/<string:pedido_id>/toggle_confirmado")

@@ -1,17 +1,19 @@
-from flask import Blueprint, request, jsonify, abort, send_file
-from datetime import date, datetime
-import uuid
-from io import BytesIO
 import logging
+import uuid
+from datetime import date, datetime
+from io import BytesIO
 
-from extensions import db
-from models import Presupuesto, Cliente
+from flask import Blueprint, abort, jsonify, request, send_file
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
+
+from extensions import db
+from models import Cliente, Presupuesto
 
 try:  # PDF opcional
     from reportlab.lib.pagesizes import A4
     from reportlab.pdfgen import canvas
+
     REPORTLAB_AVAILABLE = True
 except Exception:  # pragma: no cover
     REPORTLAB_AVAILABLE = False
@@ -21,6 +23,7 @@ logger = logging.getLogger(__name__)
 bp_presupuestos = Blueprint("presupuestos", __name__)
 
 # Helpers locales (se reutilizan desde app mediante import si hiciera falta)
+
 
 def _clean_vista_for_db(vista_data):
     if not vista_data or not isinstance(vista_data, dict) or "grupos" not in vista_data:
@@ -89,6 +92,7 @@ def get_presupuestos():
             all_rows = q.order_by(Presupuesto.numero.desc()).all()
             filtrados = []
             for p in all_rows:
+
                 def contiene_medida(v):
                     if not v or not isinstance(v, dict):
                         return False
@@ -97,6 +101,7 @@ def get_presupuestos():
                         if medida_like in m:
                             return True
                     return False
+
                 if contiene_medida(p.vista_cliente) or contiene_medida(p.vista_interna):
                     filtrados.append(p)
             total = len(filtrados)
@@ -169,10 +174,14 @@ def create_presupuesto():
                     bind = db.session.get_bind()
                 except Exception:
                     bind = None
-                es_postgres = bool(getattr(getattr(bind, "dialect", None), "name", None) == "postgresql")
+                es_postgres = bool(
+                    getattr(getattr(bind, "dialect", None), "name", None) == "postgresql"
+                )
                 if es_postgres:
                     try:
-                        db.session.execute(db.text("SELECT pg_advisory_xact_lock(:k)"), {"k": lock_key})
+                        db.session.execute(
+                            db.text("SELECT pg_advisory_xact_lock(:k)"), {"k": lock_key}
+                        )
                     except Exception as lk_err:
                         logger.warning(f"[create_presupuesto] No lock advisory: {lk_err}")
                 ultimo_numero = (
@@ -201,7 +210,9 @@ def create_presupuesto():
                 return jsonify(new_presupuesto.to_dict()), 201
             except IntegrityError as ie:
                 db.session.rollback()
-                logger.warning(f"[create_presupuesto] Colisión IntegrityError {numero_generado}: {ie}")
+                logger.warning(
+                    f"[create_presupuesto] Colisión IntegrityError {numero_generado}: {ie}"
+                )
                 continue
         abort(409, description="No se pudo generar un número único. Reintenta.")
     except ValueError as e:
@@ -209,9 +220,11 @@ def create_presupuesto():
         abort(400, description=f"Error fecha: {e} (YYYY-MM-DD)")
     except Exception as e:
         from werkzeug.exceptions import HTTPException
+
         if isinstance(e, HTTPException):
             raise
         import traceback
+
         traceback.print_exc()
         db.session.rollback()
         abort(500, description=f"Error interno al crear: {e}")
@@ -281,7 +294,7 @@ def presupuesto_pdf(presupuesto_id):
     y -= 24
     vista = p.vista_cliente or {}
     grupos = (vista.get("grupos") or [])[:20]
-    total_general = (vista.get("totalGeneral") or 0)
+    total_general = vista.get("totalGeneral") or 0
     c.setFont("Helvetica-Bold", 11)
     c.drawString(40, y, "Detalle")
     y -= 16
