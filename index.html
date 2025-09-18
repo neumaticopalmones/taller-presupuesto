@@ -84,9 +84,9 @@
     </div>
 
     <!-- Container principal compacto -->
-    <div class="main-container">
+    <div class="main-container dashboard-grid">
       <!-- Sección cliente y formulario más compacta -->
-      <div class="left-content">
+      <div class="left-content" id="presupuestos-view">
         <!-- Datos cliente súper compactos -->
         <div class="cliente-section">
           <div class="section-title">
@@ -138,7 +138,7 @@
         </div>
 
         <!-- Añadir productos súper compacto -->
-        <div class="add-product-section">
+        <div class="add-product-section" id="productos-view">
           <div class="section-title">
             <i class="material-icons">add_shopping_cart</i>
             Añadir Productos
@@ -242,7 +242,7 @@
       <!-- Panel derecho -->
       <div class="right-panel">
         <!-- Presupuesto final -->
-        <div class="presupuesto-final">
+        <div class="presupuesto-final" id="presupuesto-final-view">
           <div class="presupuesto-header">
             <div>
               <div>NEUMÁTICOS PALMONES</div>
@@ -260,7 +260,7 @@
         </div>
 
         <!-- Acciones rápidas -->
-        <div class="actions-compact">
+        <div class="actions-compact" id="acciones-finales-view">
           <div class="action-grid">
             <button class="action-btn-small primary" id="btnGuardarComoNuevo" style="display: none">
               <i class="material-icons">content_copy</i>
@@ -429,7 +429,6 @@
 
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/modal.js"></script>
-    <script src="debug_autoadd.js"></script>
 
     <!-- Loader Overlay -->
     <div id="loader-overlay" class="loader-overlay">
