@@ -3,13 +3,21 @@ set -e
 
 echo "🚀 Iniciando aplicación en Render..."
 
-# Verificar variables de entorno críticas
-if [ -z "$DATABASE_URL" ]; then
-    echo "❌ ERROR: DATABASE_URL no está definida"
+# Verificar variables de entorno críticas - más flexible
+if [ -z "$DATABASE_URL" ] && [ -z "$POSTGRES_HOST" ]; then
+    echo "❌ ERROR: Ni DATABASE_URL ni POSTGRES_HOST están definidas"
+    echo "💡 Se requiere DATABASE_URL o las variables individuales (POSTGRES_HOST, POSTGRES_USER, etc.)"
     exit 1
 fi
 
-echo "✅ Variables de entorno verificadas"
+if [ -n "$DATABASE_URL" ]; then
+    echo "✅ Usando DATABASE_URL para conexión a la base de datos"
+else
+    echo "✅ Usando variables individuales para conexión a la base de datos"
+    echo "   POSTGRES_HOST: ${POSTGRES_HOST}"
+    echo "   POSTGRES_DB: ${POSTGRES_DB}"
+    echo "   POSTGRES_USER: ${POSTGRES_USER}"
+fi
 
 # Usar nuestro script inteligente para manejar migraciones
 echo "🔧 Ejecutando script inteligente de migraciones..."
