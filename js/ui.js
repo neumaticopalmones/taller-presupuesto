@@ -64,18 +64,23 @@ export const DOMElements = {
 // --- View Management ---
 
 export function showView(viewId) {
-  // Cerrar todos los modales primero
+  // Ocultar todas las secciones y modales
+  const dashboardGrid = document.querySelector(".dashboard-grid");
   const allModals = document.querySelectorAll(".modal-overlay");
+
+  // Ocultar dashboard y modales
+  if (dashboardGrid) {
+    dashboardGrid.style.display = "none";
+  }
   allModals.forEach((modal) => {
     modal.style.display = "none";
   });
 
-  // Manejar las diferentes vistas
+  // Mostrar la vista solicitada
   if (viewId === "presupuestos-view") {
-    // Vista principal - mostrar dashboard
-    const mainContainer = document.querySelector(".main-container");
-    if (mainContainer) {
-      mainContainer.style.display = "grid";
+    // Vista principal - mostrar dashboard grid
+    if (dashboardGrid) {
+      dashboardGrid.style.display = "grid";
     }
   } else if (viewId === "historial-view") {
     // Mostrar modal de historial
@@ -91,7 +96,7 @@ export function showView(viewId) {
     }
   }
 
-  // Los botones de cerrar modal
+  // Configurar botones de cerrar modales
   setupModalCloseButtons();
 }
 
@@ -100,12 +105,16 @@ function setupModalCloseButtons() {
   const closeButtons = document.querySelectorAll(".modal-close");
   closeButtons.forEach((button) => {
     button.onclick = () => {
-      const modalId = button.getAttribute("data-modal");
-      if (modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.style.display = "none";
-        }
+      // Cerrar modal y volver a vista principal
+      const allModals = document.querySelectorAll(".modal-overlay");
+      allModals.forEach((modal) => {
+        modal.style.display = "none";
+      });
+
+      // Mostrar vista principal
+      const dashboardGrid = document.querySelector(".dashboard-grid");
+      if (dashboardGrid) {
+        dashboardGrid.style.display = "grid";
       }
     };
   });
@@ -115,7 +124,12 @@ function setupModalCloseButtons() {
   modals.forEach((modal) => {
     modal.onclick = (e) => {
       if (e.target === modal) {
+        // Cerrar modal y volver a vista principal
         modal.style.display = "none";
+        const dashboardGrid = document.querySelector(".dashboard-grid");
+        if (dashboardGrid) {
+          dashboardGrid.style.display = "grid";
+        }
       }
     };
   });
