@@ -64,45 +64,61 @@ export const DOMElements = {
 // --- View Management ---
 
 export function showView(viewId) {
-  // Hide all main sections
-  const allSections = [
-    "presupuestos-view",
-    "productos-view",
-    "presupuesto-final-view",
-    "acciones-finales-view",
-    "historial-view",
-    "pedidos-view",
-  ];
-
-  allSections.forEach((sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.style.display = "none";
-    }
+  // Cerrar todos los modales primero
+  const allModals = document.querySelectorAll(".modal-overlay");
+  allModals.forEach((modal) => {
+    modal.style.display = "none";
   });
 
-  // Hide dashboard grid if exists
-  const dashboardGrid = document.querySelector(".dashboard-grid");
-  if (dashboardGrid) {
-    dashboardGrid.style.display = "none";
+  // Manejar las diferentes vistas
+  if (viewId === "presupuestos-view") {
+    // Vista principal - mostrar dashboard
+    const mainContainer = document.querySelector(".main-container");
+    if (mainContainer) {
+      mainContainer.style.display = "grid";
+    }
+  } else if (viewId === "historial-view") {
+    // Mostrar modal de historial
+    const historialModal = document.getElementById("historial-modal");
+    if (historialModal) {
+      historialModal.style.display = "flex";
+    }
+  } else if (viewId === "pedidos-view") {
+    // Mostrar modal de pedidos
+    const pedidosModal = document.getElementById("pedidos-modal");
+    if (pedidosModal) {
+      pedidosModal.style.display = "flex";
+    }
   }
 
-  if (viewId === "presupuestos-view") {
-    // Show all dashboard sections
-    document.getElementById("presupuestos-view").style.display = "block";
-    document.getElementById("productos-view").style.display = "block";
-    document.getElementById("presupuesto-final-view").style.display = "block";
-    document.getElementById("acciones-finales-view").style.display = "block";
-    if (dashboardGrid) {
-      dashboardGrid.style.display = "grid";
-    }
-  } else {
-    // Show specific section
-    const selectedSection = document.getElementById(viewId);
-    if (selectedSection) {
-      selectedSection.style.display = "block";
-    }
-  }
+  // Los botones de cerrar modal
+  setupModalCloseButtons();
+}
+
+function setupModalCloseButtons() {
+  // Configurar botones de cerrar modales
+  const closeButtons = document.querySelectorAll(".modal-close");
+  closeButtons.forEach((button) => {
+    button.onclick = () => {
+      const modalId = button.getAttribute("data-modal");
+      if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.style.display = "none";
+        }
+      }
+    };
+  });
+
+  // Cerrar modal al hacer clic en el overlay
+  const modals = document.querySelectorAll(".modal-overlay");
+  modals.forEach((modal) => {
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+  });
 }
 
 // --- Form & UI Reset ---
