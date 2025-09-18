@@ -263,6 +263,13 @@ export function renderPresupuestoFinal(presupuesto) {
 
   const nombreCli = sanitizeHTML(DOMElements.presupuestoNombreCliente?.value || "N/A");
   const telCli = sanitizeHTML(DOMElements.presupuestoTelefonoCliente?.value || "N/A");
+
+  // Verificación defensiva para evitar TypeError
+  if (!DOMElements.presupuestoMeta) {
+    console.error("❌ Elemento presupuesto-meta no encontrado en el DOM");
+    return;
+  }
+
   DOMElements.presupuestoMeta.innerHTML = `
         <div class="meta-line">
             <span><strong>Cliente:</strong> ${nombreCli} &nbsp;&nbsp; <strong>Tel:</strong> ${telCli}</span>
