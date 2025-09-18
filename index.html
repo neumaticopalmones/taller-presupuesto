@@ -22,791 +22,436 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <nav class="navbar-modern">
-      <div class="nav-wrapper">
-        <a href="#" class="brand-logo modern-logo">
-          <i class="material-icons left">build</i>
-          Presupuestos Taller
-        </a>
-        <span id="loaded-presupuesto-badge" class="badge new blue modern-badge" style="display: none; margin-left: 10px;" data-badge-caption=""></span>
-
-        <!-- Acciones principales -->
-        <ul id="nav-mobile" class="right nav-actions-list">
-          <!-- Grupo: Gestión de Pedidos -->
-          <li class="nav-group">
-            <a href="#!" id="btnVerPedidos" class="btn-modern purple waves-effect waves-light tooltipped" data-tooltip="Ver y gestionar pedidos">
-              <i class="material-icons left">shopping_cart</i>Pedidos
-            </a>
-          </li>
-
-          <!-- Grupo: Presupuestos -->
-          <li class="nav-group">
-            <a href="#!" id="btnNuevoPresupuesto" class="btn-modern waves-effect waves-light tooltipped" data-tooltip="Crear nuevo presupuesto">
-              <i class="material-icons left">add</i>Nuevo
-            </a>
-          </li>
-          <li class="nav-group">
-            <a href="#!" id="btnGuardarPresupuesto" class="btn-modern green waves-effect waves-light tooltipped" data-tooltip="Guardar presupuesto actual">
-              <i class="material-icons left">save</i>Guardar
-            </a>
-          </li>
-          <li class="nav-group">
-            <a href="#!" id="btnCancelarEdicionTop" class="btn-modern orange waves-effect waves-light tooltipped" style="display: none;" data-tooltip="Cancelar edición">
-              <i class="material-icons left">cancel</i>Cancelar
-            </a>
-          </li>
-          <li class="nav-group">
-            <a href="#!" id="btnVerHistorial" class="btn-modern blue waves-effect waves-light tooltipped" data-tooltip="Ver historial de presupuestos">
-              <i class="material-icons left">history</i>Historial
-            </a>
-          </li>
-
-          <!-- Dropdown Exportar -->
-          <li class="nav-dropdown">
-            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-export">
-              <i class="material-icons left">file_download</i>Exportar<i class="material-icons right">arrow_drop_down</i>
-            </a>
-          </li>
-          <ul id="dropdown-export" class="dropdown-content modern-dropdown">
-            <li><a href="#!" id="btnImprimirPresupuesto"><i class="material-icons left">print</i>Imprimir</a></li>
-            <li><a href="#!" id="btnDescargarPDF"><i class="material-icons left">picture_as_pdf</i>Descargar PDF</a></li>
-            <li><a href="#!" id="btnCapturaWhatsApp"><i class="material-icons left">photo_camera</i>Captura para WhatsApp</a></li>
-          </ul>
-
-          <!-- Dropdown Compartir -->
-          <li class="nav-dropdown">
-            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-share">
-              <i class="material-icons left">share</i>Compartir<i class="material-icons right">arrow_drop_down</i>
-            </a>
-          </li>
-          <ul id="dropdown-share" class="dropdown-content modern-dropdown">
-            <li><a href="#!" id="btnCompartirWhatsApp"><i class="material-icons left">message</i>Texto a WhatsApp</a></li>
-            <li><a href="#!" id="btnCopiarCalendar"><i class="material-icons left">event</i>Copiar para Calendar</a></li>
-            <li><a href="#!" id="btnAbrirCalendar"><i class="material-icons left">open_in_new</i>Abrir en Calendar</a></li>
-          </ul>
-
-          <!-- Dropdown Acciones -->
-          <li class="nav-dropdown">
-            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-actions">
-              <i class="material-icons left">more_vert</i>Acciones<i class="material-icons right">arrow_drop_down</i>
-            </a>
-          </li>
-          <ul id="dropdown-actions" class="dropdown-content modern-dropdown">
-            <li><a href="#!" id="btnVaciarGrupos"><i class="material-icons left">clear_all</i>Vaciar Presupuesto</a></li>
-            <li><a href="#!" id="btnVaciarTemporales"><i class="material-icons left">delete_sweep</i>Vaciar Temporales</a></li>
-            <li class="divider"></li>
-            <li><a href="#!" id="btnGuardarComoNuevo" style="display: none;"><i class="material-icons left">content_copy</i>Guardar como Nuevo</a></li>
-          </ul>
-
-          <!-- Dropdown Vista -->
-          <li class="nav-dropdown">
-            <a class="dropdown-trigger btn-modern" href="#!" data-target="dropdown-view">
-              <i class="material-icons left">visibility</i>Vista<i class="material-icons right">arrow_drop_down</i>
-            </a>
-          </li>
-          <ul id="dropdown-view" class="dropdown-content modern-dropdown">
-            <li class="switch-item">
-              <div class="switch">
-                <label>
-                  <i class="material-icons tiny">view_comfortable</i> Normal
-                  <input type="checkbox" id="toggleCompactoTop">
-                  <span class="lever"></span>
-                  Compacto <i class="material-icons tiny">view_compact</i>
-                </label>
-              </div>
-            </li>
-            <li class="switch-item">
-              <div class="switch">
-                <label>
-                  <i class="material-icons tiny">view_stream</i> Normal
-                  <input type="checkbox" id="toggleExtraCompactoTop">
-                  <span class="lever"></span>
-                  Extra Compacto <i class="material-icons tiny">view_list</i>
-                </label>
-              </div>
-            </li>
-          </ul>
-
-          <!-- Herramientas -->
-          <li class="nav-divider"></li>
-          <li class="nav-tool">
-            <a href="#!" id="btnCargarSugerencias" class="btn-flat-modern waves-effect tooltipped" data-tooltip="Cargar sugerencias de medidas y marcas">
-              <i class="material-icons">lightbulb_outline</i>
-            </a>
-          </li>
-          <li class="nav-tool">
-            <a href="#!" id="btnCopyHostURL" class="btn-flat-modern waves-effect tooltipped" data-tooltip="Copiar URL para otros dispositivos">
-              <i class="material-icons">link</i>
-            </a>
-          </li>
-        </ul>
-
-        <!-- Mobile menu -->
-        <ul class="sidenav" id="mobile-demo">
-          <li><a href="#presupuestos-view"><i class="material-icons left">assignment</i>Presupuestos</a></li>
-          <li><a href="#historial-view"><i class="material-icons left">history</i>Historial</a></li>
-        </ul>
+    <!-- Toolbar compacto -->
+    <div class="compact-toolbar">
+      <div class="toolbar-brand">
+        <i class="material-icons">build</i>
+        Neumáticos Palmones
       </div>
-    </nav>
+      <span
+        id="loaded-presupuesto-badge"
+        class="toolbar-badge"
+        style="display: none"
+        data-badge-caption=""
+      ></span>
 
-    <div class="container dashboard-container">
-      <!-- Business Header modernizado -->
-      <header class="business-header-modern">
-        <div class="business-card">
-          <div class="business-info">
-            <h1 class="business-title">
-              <i class="material-icons left">business</i>
-              NEUMÁTICOS PALMONES
-            </h1>
-            <div class="business-details">
-              <div class="detail-item">
-                <i class="material-icons tiny">location_on</i>
-                <span>C/GALEON 25. POLÍGONO 1 PALMONES, 11379 Los Barrios</span>
-              </div>
-              <div class="detail-item">
-                <i class="material-icons tiny">email</i>
-                <span>neumaticospalmones@hotmail.com</span>
-              </div>
-              <div class="detail-item">
-                <i class="material-icons tiny">phone</i>
-                <span>659 718 809</span>
-              </div>
-            </div>
-          </div>
-          <div class="business-logo">
-            <i class="material-icons">tire_repair</i>
-          </div>
-        </div>
-      </header>
+      <!-- Grupo: Presupuestos -->
+      <button id="btnNuevoPresupuesto" class="toolbar-btn primary">
+        <i class="material-icons">add</i>Nuevo
+      </button>
+      <button id="btnGuardarPresupuesto" class="toolbar-btn success">
+        <i class="material-icons">save</i>Guardar
+      </button>
+      <button id="btnCancelarEdicionTop" class="toolbar-btn orange" style="display: none">
+        <i class="material-icons">cancel</i>Cancelar
+      </button>
 
-      <!-- Dashboard Grid -->
-      <div class="dashboard-grid">
-        <!-- Datos cliente + meta -->
-        <section id="presupuestos-view" class="dashboard-card cliente-section no-imprimir">
-          <div class="card-header">
-            <h2><i class="material-icons left">person</i>Datos del Cliente</h2>
-            <div class="card-actions">
-              <button class="btn-icon-small tooltipped" data-tooltip="Limpiar formulario">
-                <i class="material-icons">clear</i>
-              </button>
-              <button class="btn-icon-small tooltipped" data-tooltip="Autocompletar desde historial">
-                <i class="material-icons">history</i>
-              </button>
-            </div>
-          </div>
-          <div class="card-content">
-            <form id="cliente-form" onsubmit="return false;">
-              <div class="form-errors" style="display: none"></div>
-              <div class="form-grid">
-                <div class="form-row">
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-nombreCliente" class="validate" />
-                    <label for="presupuesto-nombreCliente">Nombre y Apellidos</label>
-                    <i class="material-icons prefix">person</i>
-                  </div>
-                  <div class="input-field-modern">
-                    <input type="tel" id="presupuesto-telefonoCliente" class="validate" />
-                    <label for="presupuesto-telefonoCliente">Teléfono</label>
-                    <i class="material-icons prefix">phone</i>
-                  </div>
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-nifCliente" class="validate" />
-                    <label for="presupuesto-nifCliente">NIF/CIF</label>
-                    <i class="material-icons prefix">badge</i>
-                  </div>
-                </div>
+      <!-- Grupo: Navegación -->
+      <button id="btnVerHistorial" class="toolbar-btn blue">
+        <i class="material-icons">history</i>Historial
+      </button>
+      <button id="btnVerPedidos" class="toolbar-btn purple">
+        <i class="material-icons">shopping_cart</i>Pedidos
+      </button>
 
-                <div class="form-row">
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-numeroPresupuesto" class="validate" />
-                    <label for="presupuesto-numeroPresupuesto">Nº de Presupuesto</label>
-                    <i class="material-icons prefix">receipt_long</i>
-                  </div>
-                  <div class="input-field-modern">
-                    <input type="date" id="presupuesto-fechaPresupuesto" class="validate" />
-                    <label for="presupuesto-fechaPresupuesto" class="active">Fecha</label>
-                    <i class="material-icons prefix">event</i>
-                  </div>
-                </div>
+      <!-- Grupo: Exportar -->
+      <button id="btnImprimirPresupuesto" class="toolbar-btn">
+        <i class="material-icons">print</i>PDF
+      </button>
+      <button id="btnCompartirWhatsApp" class="toolbar-btn">
+        <i class="material-icons">message</i>WhatsApp
+      </button>
 
-                <div class="form-row">
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-distribuidor" class="validate" />
-                    <label for="presupuesto-distribuidor">Distribuidor</label>
-                    <i class="material-icons prefix">store</i>
-                  </div>
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-descripcion" class="validate" />
-                    <label for="presupuesto-descripcion">Descripción (para Calendar)</label>
-                    <i class="material-icons prefix">description</i>
-                  </div>
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-observaciones" class="validate" />
-                    <label for="presupuesto-observaciones">Observaciones (*** en título si rellenas)</label>
-                    <i class="material-icons prefix">note</i>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </section>
+      <!-- Grupo: Acciones -->
+      <button id="btnVaciarGrupos" class="toolbar-btn">
+        <i class="material-icons">clear_all</i>Vaciar
+      </button>
+      <button id="btnCargarSugerencias" class="toolbar-btn">
+        <i class="material-icons">lightbulb_outline</i>Sugerencias
+      </button>
 
-        <!-- Añadir grupo -->
-        <section id="productos-view" class="dashboard-card productos-section no-imprimir">
-          <div class="card-header">
-            <h2><i class="material-icons left">add_shopping_cart</i>Añadir Productos</h2>
-            <div class="card-actions">
-              <button class="btn-icon-small tooltipped" data-tooltip="Limpiar formulario">
-                <i class="material-icons">clear</i>
-              </button>
-              <button class="btn-icon-small tooltipped" data-tooltip="Cargar plantilla">
-                <i class="material-icons">template</i>
-              </button>
-            </div>
-          </div>
-          <div class="card-content">
-            <form id="producto-form" onsubmit="return false;">
-              <div class="form-errors" style="display: none"></div>
+      <!-- Grupo: Vista -->
+      <button class="toolbar-btn"><i class="material-icons">visibility</i>Vista</button>
 
-              <!-- Grupo de Productos -->
-              <div class="product-group">
-                <h3 class="group-title">
-                  <i class="material-icons left">tire_repair</i>Grupo de Neumáticos
-                </h3>
-                <div class="form-grid">
-                  <div class="form-row">
-                    <div class="input-field-modern">
-                      <input type="text" id="presupuesto-medida" />
-                      <label for="presupuesto-medida">Medida</label>
-                      <i class="material-icons prefix">straighten</i>
-                    </div>
-                    <div class="input-field-modern input-small">
-                      <input type="number" id="presupuesto-cantidad" min="1" value="2" />
-                      <label for="presupuesto-cantidad">Cantidad</label>
-                      <i class="material-icons prefix">confirmation_number</i>
-                    </div>
-                    <div class="input-field-modern input-small">
-                      <input type="number" id="presupuesto-ganancia" step="0.01" value="0" />
-                      <label for="presupuesto-ganancia">Ganancia (€)</label>
-                      <i class="material-icons prefix">trending_up</i>
-                    </div>
-                    <div class="input-field-modern input-small">
-                      <input type="number" id="presupuesto-ecotasa" step="0.01" value="0" />
-                      <label for="presupuesto-ecotasa">Ecotasa (€)</label>
-                      <i class="material-icons prefix">eco</i>
-                    </div>
-                    <div class="input-field-modern input-small">
-                      <input type="number" id="presupuesto-iva" step="0.01" value="21" />
-                      <label for="presupuesto-iva">IVA (%)</label>
-                      <i class="material-icons prefix">percent</i>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="suggestions-area">
-                  <div class="chips-container-modern" id="precios-filtros-codigo"></div>
-                  <div class="chips-container-modern" id="precios-por-medida"></div>
-                </div>
-
-                <div class="brands-section">
-                  <h4 class="subsection-title">
-                    <i class="material-icons left">branding_watermark</i>Marcas y Precios
-                  </h4>
-                  <div class="form-row">
-                    <div class="input-field-modern">
-                      <input type="text" id="presupuesto-marca-temp" />
-                      <label for="presupuesto-marca-temp">Marca</label>
-                      <i class="material-icons prefix">label</i>
-                    </div>
-                    <div class="input-field-modern">
-                      <input type="number" id="presupuesto-neto-temp" step="0.01" />
-                      <label for="presupuesto-neto-temp">Precio Neto (€)</label>
-                      <i class="material-icons prefix">euro</i>
-                    </div>
-                    <div class="input-actions">
-                      <button type="button" id="btnAgregarMarca" class="btn-action-modern green">
-                        <i class="material-icons left">add</i>Añadir Marca
-                      </button>
-                    </div>
-                  </div>
-                  <ul id="lista-marcas-temp" class="brands-list-modern"></ul>
-                </div>
-              </div>
-
-              <!-- Trabajos Adicionales -->
-              <div class="work-group">
-                <h3 class="group-title">
-                  <i class="material-icons left">build</i>Trabajos Adicionales
-                </h3>
-                <div class="form-row">
-                  <div class="input-field-modern">
-                    <input type="text" id="presupuesto-otro-concepto" />
-                    <label for="presupuesto-otro-concepto">Concepto</label>
-                    <i class="material-icons prefix">work</i>
-                  </div>
-                  <div class="input-field-modern">
-                    <input type="number" id="presupuesto-otro-precio" step="0.01" />
-                    <label for="presupuesto-otro-precio">Precio Final (€)</label>
-                    <i class="material-icons prefix">euro</i>
-                  </div>
-                  <div class="input-actions">
-                    <button type="button" id="btnAgregarOtroTrabajo" class="btn-action-modern blue">
-                      <i class="material-icons left">add</i>Añadir Trabajo
-                    </button>
-                  </div>
-                </div>
-                <ul id="lista-otros-trabajos-temp" class="work-list-modern"></ul>
-              </div>
-
-              <!-- Botón principal -->
-              <div class="main-action">
-                <button type="button" id="btnAgregarGrupo" class="btn-main-action">
-                  <i class="material-icons left">playlist_add</i>
-                  <span>Agregar Grupo al Presupuesto</span>
-                  <div class="btn-highlight"></div>
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- Presupuesto final -->
-        <section id="presupuesto-final-view" class="dashboard-card presupuesto-section">
-          <div class="card-header">
-            <h2><i class="material-icons left">receipt</i>Presupuesto Final</h2>
-            <div class="card-actions">
-              <button class="btn-icon-small tooltipped" data-tooltip="Vista previa">
-                <i class="material-icons">preview</i>
-              </button>
-              <button class="btn-icon-small tooltipped" data-tooltip="Configurar formato">
-                <i class="material-icons">settings</i>
-              </button>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="presupuesto-meta" id="presupuesto-meta"></div>
-            <div id="presupuesto-final-render" class="presupuesto-render"></div>
-          </div>
-        </section>
-
-        <!-- Controles y acciones -->
-        <section id="acciones-finales-view" class="dashboard-card acciones-finales no-imprimir">
-          <div class="card-header">
-            <h2><i class="material-icons left">tune</i>Controles</h2>
-          </div>
-          <div class="card-content">
-            <div class="controls-grid">
-              <div class="view-controls">
-                <h4>Vista</h4>
-                <div class="switch-group">
-                  <label class="switch-modern">
-                    <input type="checkbox" id="toggleCompacto" />
-                    <span class="switch-slider"></span>
-                    <span class="switch-label">
-                      <i class="material-icons left">view_compact</i>
-                      Modo compacto
-                    </span>
-                  </label>
-                  <label class="switch-modern">
-                    <input type="checkbox" id="toggleExtraCompacto" />
-                    <span class="switch-slider"></span>
-                    <span class="switch-label">
-                      <i class="material-icons left">view_list</i>
-                      Extra-compacto
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="action-controls">
-                <h4>Acciones</h4>
-                <div class="action-buttons">
-                  <button type="button" id="btnCancelarEdicion" class="btn-secondary-modern" style="display: none">
-                    <i class="material-icons left">undo</i>Cancelar Edición
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div> <!-- End dashboard-grid -->
-          </div>
-        </div>
-      </section>
-
-      <!-- Campos extra para Calendar -->
-      <section class="dashboard-card calendar-section no-imprimir">
-        <div class="card-header">
-          <h2><i class="material-icons left">event</i>Datos para Calendar</h2>
-          <div class="card-actions">
-            <button class="btn-icon-small tooltipped" data-tooltip="Autocompletar con fecha actual">
-              <i class="material-icons">today</i>
-            </button>
-            <button class="btn-icon-small tooltipped" data-tooltip="Limpiar campos">
-              <i class="material-icons">clear</i>
-            </button>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="form-grid">
-            <div class="form-row">
-              <div class="input-field-modern">
-                <input type="date" id="calendar-fecha" />
-                <label for="calendar-fecha" class="active">Fecha de la Cita</label>
-                <i class="material-icons prefix">event</i>
-              </div>
-              <div class="input-field-modern input-small">
-                <input type="time" id="calendar-hora" />
-                <label for="calendar-hora" class="active">Hora</label>
-                <i class="material-icons prefix">schedule</i>
-              </div>
-              <div class="input-field-modern input-small">
-                <input type="number" id="calendar-duracion" min="15" step="15" value="60" />
-                <label for="calendar-duracion" class="active">Duración (min)</label>
-                <i class="material-icons prefix">timer</i>
-              </div>
-              <div class="input-field-modern">
-                <input type="text" id="calendar-proveedor" />
-                <label for="calendar-proveedor">Proveedor</label>
-                <i class="material-icons prefix">local_shipping</i>
-              </div>
-              <div class="input-field-modern input-small">
-                <input type="number" id="calendar-porte" step="0.01" />
-                <label for="calendar-porte">Porte (€)</label>
-                <i class="material-icons prefix">euro</i>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="input-field-modern full-width">
-                <input type="text" id="calendar-nota" />
-                <label for="calendar-nota">Nota Adicional</label>
-                <i class="material-icons prefix">note</i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Historial -->
-      <section id="historial-view" class="historial-section-modern no-imprimir" style="display:none;">
-        <div class="historial-container">
-          <!-- Header -->
-          <div class="historial-header">
-            <div class="header-content">
-              <h1 class="historial-title">
-                <i class="material-icons left">history</i>
-                Historial de Presupuestos
-              </h1>
-              <p class="historial-subtitle">Busca y gestiona presupuestos anteriores</p>
-            </div>
-            <div class="header-actions">
-              <button type="button" id="btnVolverPresupuestos" class="btn-back-modern">
-                <i class="material-icons left">arrow_back</i>Volver
-              </button>
-            </div>
-          </div>
-
-          <!-- Filtros de búsqueda -->
-          <div class="search-panel">
-            <div class="search-header">
-              <h3><i class="material-icons left">search</i>Filtros de Búsqueda</h3>
-              <button type="button" class="btn-toggle-filters" id="toggleFilters">
-                <i class="material-icons">expand_more</i>
-              </button>
-            </div>
-            <div class="search-content" id="searchContent">
-              <div class="search-grid">
-                <div class="search-row">
-                  <div class="input-field-search">
-                    <input type="text" id="hist-buscar-nombre" />
-                    <label for="hist-buscar-nombre">Nombre del Cliente</label>
-                    <i class="material-icons prefix">person</i>
-                  </div>
-                  <div class="input-field-search">
-                    <input type="text" id="hist-buscar-telefono" />
-                    <label for="hist-buscar-telefono">Teléfono</label>
-                    <i class="material-icons prefix">phone</i>
-                  </div>
-                  <div class="input-field-search">
-                    <input type="text" id="hist-buscar-medida" />
-                    <label for="hist-buscar-medida">Medida</label>
-                    <i class="material-icons prefix">straighten</i>
-                  </div>
-                  <div class="input-field-search">
-                    <input type="text" id="hist-buscar-numero" />
-                    <label for="hist-buscar-numero">Nº Presupuesto</label>
-                    <i class="material-icons prefix">receipt</i>
-                  </div>
-                </div>
-              </div>
-              <div class="search-actions">
-                <button type="button" id="hist-buscar-btn" class="btn-search-modern primary">
-                  <i class="material-icons left">search</i>Buscar
-                </button>
-                <button type="button" id="hist-limpiar-btn" class="btn-search-modern secondary">
-                  <i class="material-icons left">clear</i>Limpiar
-                </button>
-                <button type="button" id="hist-exportar-btn" class="btn-search-modern tertiary">
-                  <i class="material-icons left">file_download</i>Exportar
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Estadísticas rápidas -->
-          <div class="stats-panel">
-            <div class="stat-card">
-              <div class="stat-icon blue">
-                <i class="material-icons">receipt_long</i>
-              </div>
-              <div class="stat-content">
-                <div class="stat-number" id="stat-total">0</div>
-                <div class="stat-label">Total Presupuestos</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon green">
-                <i class="material-icons">euro</i>
-              </div>
-              <div class="stat-content">
-                <div class="stat-number" id="stat-monto">€0</div>
-                <div class="stat-label">Monto Total</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon orange">
-                <i class="material-icons">today</i>
-              </div>
-              <div class="stat-content">
-                <div class="stat-number" id="stat-mes">0</div>
-                <div class="stat-label">Este Mes</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon purple">
-                <i class="material-icons">person</i>
-              </div>
-              <div class="stat-content">
-                <div class="stat-number" id="stat-clientes">0</div>
-                <div class="stat-label">Clientes Únicos</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lista de resultados -->
-          <div class="results-panel">
-            <div class="results-header">
-              <div class="results-info">
-                <span id="results-count">Mostrando 0 resultados</span>
-              </div>
-              <div class="results-actions">
-                <div class="view-toggle">
-                  <button class="view-btn active" data-view="cards">
-                    <i class="material-icons">view_module</i>
-                  </button>
-                  <button class="view-btn" data-view="list">
-                    <i class="material-icons">view_list</i>
-                  </button>
-                </div>
-                <div class="sort-options">
-                  <select id="sort-historial" class="browser-default">
-                    <option value="fecha-desc">Más recientes</option>
-                    <option value="fecha-asc">Más antiguos</option>
-                    <option value="nombre-asc">Nombre A-Z</option>
-                    <option value="total-desc">Mayor importe</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Loading state -->
-            <div id="historial-loading" class="loading-state" style="display: none;">
-              <div class="loading-spinner"></div>
-              <p>Cargando historial...</p>
-            </div>
-
-            <!-- Lista de presupuestos -->
-            <div id="lista-historial-container" class="historial-lista-moderna">
-              <ul id="lista-historial" class="historial-items"></ul>
-            </div>
-
-            <!-- Paginación -->
-            <div id="paginacion-container" class="pagination-modern"></div>
-          </div>
-
-          <!-- Panel de sugerencias -->
-          <div class="suggestions-panel">
-            <div class="suggestions-header">
-              <h3><i class="material-icons left">lightbulb</i>Sugerencias Inteligentes</h3>
-              <button type="button" class="btn-toggle-suggestions" id="toggleSuggestions">
-                <i class="material-icons">expand_more</i>
-              </button>
-            </div>
-            <div class="suggestions-content" id="suggestionsContent" style="display: none;">
-              <div class="suggestions-config">
-                <div class="input-field-search small">
-                  <input type="number" id="sug-limit" min="1" value="200" />
-                  <label for="sug-limit" class="active">Analizar últimos registros</label>
-                  <i class="material-icons prefix">analytics</i>
-                </div>
-                <button type="button" id="btnCargarSugerencias" class="btn-suggestions-modern">
-                  <i class="material-icons left">refresh</i>Generar Sugerencias
-                </button>
-              </div>
-
-              <div class="suggestions-grid">
-                <div class="suggestion-group">
-                  <h4><i class="material-icons left">straighten</i>Medidas Frecuentes</h4>
-                  <div id="sug-medidas" class="suggestions-chips"></div>
-                </div>
-                <div class="suggestion-group">
-                  <h4><i class="material-icons left">label</i>Marcas Populares</h4>
-                  <div id="sug-marcas" class="suggestions-chips"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Pedidos -->
-      <section id="pedidos-view" class="no-imprimir app-section pedidos-section" style="display:none;">
-        <div class="card">
-          <div class="card-content">
-            <h2><i class="material-icons left">shopping_cart</i>Pedidos</h2>
-
-            <div class="pedidos-filters">
-              <div class="row" style="margin-bottom:0;">
-                <div class="input-field col s2">
-                  <i class="material-icons prefix">search</i>
-                  <input type="text" id="ped-filtro-texto" />
-                  <label for="ped-filtro-texto">Buscar</label>
-                </div>
-                <div class="input-field col s2">
-                  <i class="material-icons prefix">local_shipping</i>
-                  <input type="text" id="ped-filtro-proveedor" />
-                  <label for="ped-filtro-proveedor">Proveedor</label>
-                </div>
-                <div class="input-field col s2">
-                  <i class="material-icons prefix">filter_list</i>
-                  <select id="ped-filtro-estado">
-                    <option value="">Todos</option>
-                    <option value="pending">Pendientes</option>
-                    <option value="ordered">Pedidos</option>
-                    <option value="received">Recibidos</option>
-                  </select>
-                  <label>Estado</label>
-                </div>
-                <div class="input-field col s2">
-                  <i class="material-icons prefix">date_range</i>
-                  <input type="date" id="ped-filtro-desde" />
-                  <label for="ped-filtro-desde" class="active">Desde</label>
-                </div>
-                <div class="input-field col s2">
-                  <i class="material-icons prefix">date_range</i>
-                  <input type="date" id="ped-filtro-hasta" />
-                  <label for="ped-filtro-hasta" class="active">Hasta</label>
-                </div>
-                <div class="input-field col s2" style="margin-top:25px;">
-                  <button id="ped-btn-filtrar" class="btn waves-effect blue">
-                    <i class="material-icons left">filter_alt</i>Filtrar
-                  </button>
-                  <button id="ped-btn-limpiar" class="btn waves-effect grey" style="margin-top:6px;">
-                    <i class="material-icons left">clear</i>Limpiar
-                  </button>
-                </div>
-              </div>
-
-              <div class="row" style="margin-bottom:0;">
-                <div class="col s12 right-align">
-                  <button id="ped-btn-nuevo" class="btn green waves-effect">
-                    <i class="material-icons left">add</i>Nuevo
-                  </button>
-                  <button id="ped-btn-volver" class="btn grey waves-effect">
-                    <i class="material-icons left">arrow_back</i>Volver
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <ul id="pedidos-lista" class="collection pedidos-lista" style="margin-top:16px;"></ul>
-            <div id="pedidos-paginacion" class="pagination center-align" style="margin-top: 20px;"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Estado/conexión al final -->
-      <section id="top-actions" class="no-imprimir" style="margin-top: 12px;">
-        <div class="actions-bar card z-depth-1">
-          <div class="card-content actions-content" style="display:flex; align-items:center; gap:12px;">
-            <span><span id="connDot" class="status-dot" title="Estado de conexión"></span><span id="connText">Comprobando conexión…</span></span>
-            <button type="button" id="btnCopyHostURL" class="btn-flat btn-ghost"><i class="material-icons left">link</i>Copiar enlace</button>
-          </div>
-        </div>
-      </section>
+      <!-- Herramientas -->
+      <div style="margin-left: auto; display: flex; gap: 6px">
+        <span id="connDot" class="status-dot" title="Estado de conexión"></span>
+        <span id="connText" style="font-size: 10px; color: #666">Conectado</span>
+        <button id="btnCopyHostURL" class="toolbar-btn">
+          <i class="material-icons">link</i>
+        </button>
+      </div>
     </div>
 
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Container principal compacto -->
+    <div class="main-container">
+      <!-- Sección cliente y formulario más compacta -->
+      <div class="left-content">
+        <!-- Datos cliente súper compactos -->
+        <div class="cliente-section">
+          <div class="section-title">
+            <i class="material-icons">person</i>
+            Datos del Cliente
+          </div>
+          <form id="cliente-form" onsubmit="return false;">
+            <div class="form-row">
+              <div class="input-column">
+                <div class="input-compact">
+                  <label for="presupuesto-nombreCliente">Nombre y Apellidos</label>
+                  <input type="text" id="presupuesto-nombreCliente" class="validate" />
+                </div>
+                <div class="input-compact">
+                  <label for="presupuesto-numeroPresupuesto">Nº Presupuesto</label>
+                  <input type="text" id="presupuesto-numeroPresupuesto" class="validate" />
+                </div>
+                <div class="input-compact">
+                  <label for="presupuesto-distribuidor">Distribuidor</label>
+                  <input type="text" id="presupuesto-distribuidor" class="validate" />
+                </div>
+              </div>
+              <div class="input-column">
+                <div class="input-compact">
+                  <label for="presupuesto-telefonoCliente">Teléfono</label>
+                  <input type="tel" id="presupuesto-telefonoCliente" class="validate" />
+                </div>
+                <div class="input-compact">
+                  <label for="presupuesto-fechaPresupuesto">Fecha</label>
+                  <input type="date" id="presupuesto-fechaPresupuesto" class="validate" />
+                </div>
+                <div class="input-compact">
+                  <label for="presupuesto-descripcion">Descripción (Calendar)</label>
+                  <input type="text" id="presupuesto-descripcion" class="validate" />
+                </div>
+              </div>
+              <div class="input-column">
+                <div class="input-compact">
+                  <label for="presupuesto-nifCliente">NIF/CIF</label>
+                  <input type="text" id="presupuesto-nifCliente" class="validate" />
+                </div>
+                <div class="input-compact">
+                  <label for="presupuesto-observaciones">Observaciones</label>
+                  <input type="text" id="presupuesto-observaciones" class="validate" />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
 
-    <!-- Captura HTML a imagen / PDF -->
+        <!-- Añadir productos súper compacto -->
+        <div class="add-product-section">
+          <div class="section-title">
+            <i class="material-icons">add_shopping_cart</i>
+            Añadir Productos
+          </div>
+          <form id="producto-form" onsubmit="return false;">
+            <div class="product-form-row">
+              <div class="input-compact">
+                <label for="presupuesto-medida">Medida</label>
+                <input type="text" id="presupuesto-medida" />
+              </div>
+              <div class="input-compact">
+                <label for="presupuesto-cantidad">Cant.</label>
+                <input type="number" id="presupuesto-cantidad" min="1" value="2" />
+              </div>
+              <div class="input-compact">
+                <label for="presupuesto-marca-temp">Marca</label>
+                <input type="text" id="presupuesto-marca-temp" />
+              </div>
+              <div class="input-compact">
+                <label for="presupuesto-neto-temp">Precio Neto</label>
+                <input type="number" id="presupuesto-neto-temp" step="0.01" />
+              </div>
+              <div class="input-compact">
+                <label for="presupuesto-ganancia">Ganancia</label>
+                <input type="number" id="presupuesto-ganancia" step="0.01" value="0" />
+              </div>
+              <div class="input-compact">
+                <label for="presupuesto-iva">IVA %</label>
+                <input type="number" id="presupuesto-iva" step="0.01" value="21" />
+              </div>
+              <button type="button" id="btnAgregarMarca" class="btn-add">
+                <i class="material-icons">add</i>
+                Añadir
+              </button>
+            </div>
+
+            <!-- Sugerencias compactas -->
+            <div class="suggestions-section">
+              <div class="suggestions-title">Sugerencias por Medida</div>
+              <div class="chips-container" id="precios-por-medida"></div>
+              <div class="suggestions-title">Códigos Filtrados</div>
+              <div class="chips-container" id="precios-filtros-codigo"></div>
+            </div>
+
+            <!-- Marcas temporales compactas -->
+            <div class="brands-temp-section">
+              <div id="lista-marcas-temp"></div>
+              <div id="lista-otros-trabajos-temp"></div>
+
+              <!-- Botones de acción principales -->
+              <div style="margin-top: 8px; display: flex; gap: 6px">
+                <button
+                  type="button"
+                  id="btnAgregarOtroTrabajo"
+                  class="btn-add"
+                  style="background: #8b5cf6"
+                >
+                  <i class="material-icons">build</i>
+                  Otro Trabajo
+                </button>
+                <button
+                  type="button"
+                  id="btnAgregarGrupo"
+                  class="btn-add"
+                  style="background: #2563eb; flex: 1"
+                >
+                  <i class="material-icons">playlist_add</i>
+                  Agregar Grupo
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabla de productos -->
+        <div class="products-table">
+          <div class="table-header">
+            <i class="material-icons">list</i>
+            Lista de Productos
+          </div>
+          <div class="table-content">
+            <table>
+              <thead>
+                <tr>
+                  <th>Medida</th>
+                  <th>Cant.</th>
+                  <th>Marca</th>
+                  <th>Precio Unit.</th>
+                  <th>Total</th>
+                  <th>Acc.</th>
+                </tr>
+              </thead>
+              <tbody id="items-list">
+                <!-- Productos dinámicos -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel derecho -->
+      <div class="right-panel">
+        <!-- Presupuesto final -->
+        <div class="presupuesto-final">
+          <div class="presupuesto-header">
+            <div>
+              <div>NEUMÁTICOS PALMONES</div>
+              <div class="presupuesto-meta">C/GALEON 25 - Tel: 659 718 809</div>
+            </div>
+            <div style="text-align: right">
+              <div>PRESUPUESTO</div>
+              <div class="presupuesto-meta" id="presupuesto-numero-display">Nº: ---</div>
+            </div>
+          </div>
+          <div class="presupuesto-content" id="presupuesto-final-content">
+            <!-- Contenido dinámico del presupuesto -->
+            <div id="presupuesto-final-render"></div>
+          </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="actions-compact">
+          <div class="action-grid">
+            <button class="action-btn-small primary" id="btnGuardarComoNuevo" style="display: none">
+              <i class="material-icons">content_copy</i>
+              Guardar como Nuevo
+            </button>
+            <button class="action-btn-small" id="btnVaciarTemporales">
+              <i class="material-icons">delete_sweep</i>
+              Vaciar Temp.
+            </button>
+            <button class="action-btn-small" id="btnDescargarPDF">
+              <i class="material-icons">picture_as_pdf</i>
+              PDF
+            </button>
+            <button class="action-btn-small" id="btnCapturaWhatsApp">
+              <i class="material-icons">photo_camera</i>
+              Captura
+            </button>
+            <button class="action-btn-small" id="btnCopiarCalendar">
+              <i class="material-icons">event</i>
+              Copiar Cal.
+            </button>
+            <button class="action-btn-small" id="btnAbrirCalendar">
+              <i class="material-icons">open_in_new</i>
+              Abrir Cal.
+            </button>
+            <button class="action-btn-small" id="btnCancelarEdicion" style="display: none">
+              <i class="material-icons">undo</i>
+              Cancelar Ed.
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modales del sistema -->
+
+    <!-- Modal Historial -->
+    <div id="historial-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content-historial">
+        <div class="modal-header-historial">
+          <h3>
+            <i class="material-icons">history</i>
+            Historial de Presupuestos
+          </h3>
+          <button class="modal-close" data-modal="historial-modal">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+
+        <!-- Panel de búsqueda -->
+        <div class="search-panel-historial">
+          <div class="search-inputs">
+            <input type="text" id="hist-buscar-nombre" placeholder="Nombre cliente..." />
+            <input type="text" id="hist-buscar-telefono" placeholder="Teléfono..." />
+            <input type="text" id="hist-buscar-medida" placeholder="Medida..." />
+            <input type="text" id="hist-buscar-numero" placeholder="Nº presupuesto..." />
+            <button id="hist-buscar-btn" class="btn-search">
+              <i class="material-icons">search</i>Buscar
+            </button>
+            <button id="hist-limpiar-btn" class="btn-clear">
+              <i class="material-icons">clear</i>Limpiar
+            </button>
+          </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-panel-historial">
+          <div class="stat-item">
+            <div class="stat-number" id="stat-total">156</div>
+            <div class="stat-label">Total Presupuestos</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="stat-monto">€12,450</div>
+            <div class="stat-label">Monto Total</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="stat-mes">23</div>
+            <div class="stat-label">Este Mes</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="stat-clientes">89</div>
+            <div class="stat-label">Clientes Únicos</div>
+          </div>
+        </div>
+
+        <!-- Lista de presupuestos -->
+        <div class="presupuestos-list-historial">
+          <div class="list-header">
+            <span>Mostrando resultados de búsqueda</span>
+            <div class="list-actions">
+              <button class="btn-export">
+                <i class="material-icons">file_download</i>Exportar
+              </button>
+            </div>
+          </div>
+          <div class="list-content" id="lista-historial">
+            <!-- Lista dinámica de presupuestos -->
+          </div>
+        </div>
+
+        <!-- Navegación -->
+        <div class="modal-navigation">
+          <div id="paginacion-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Pedidos -->
+    <div id="pedidos-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content-pedidos">
+        <div class="modal-header-pedidos">
+          <h3>
+            <i class="material-icons">shopping_cart</i>
+            Gestión de Pedidos
+          </h3>
+          <button class="modal-close" data-modal="pedidos-modal">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+
+        <!-- Filtros de pedidos -->
+        <div class="filters-panel-pedidos">
+          <div class="filters-row">
+            <input type="text" id="ped-filtro-texto" placeholder="Buscar..." />
+            <input type="text" id="ped-filtro-proveedor" placeholder="Proveedor..." />
+            <select id="ped-filtro-estado">
+              <option value="">Todos los estados</option>
+              <option value="pending">Pendientes</option>
+              <option value="ordered">Pedidos</option>
+              <option value="received">Recibidos</option>
+            </select>
+            <input type="date" id="ped-filtro-desde" />
+            <input type="date" id="ped-filtro-hasta" />
+            <button id="ped-btn-filtrar" class="btn-filter">
+              <i class="material-icons">filter_alt</i>Filtrar
+            </button>
+          </div>
+          <div class="actions-row">
+            <button id="ped-btn-nuevo" class="btn-new-pedido">
+              <i class="material-icons">add</i>Nuevo Pedido
+            </button>
+            <button id="ped-btn-limpiar" class="btn-clear">
+              <i class="material-icons">clear</i>Limpiar
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de pedidos -->
+        <div class="pedidos-list">
+          <div class="list-content" id="pedidos-lista">
+            <!-- Lista dinámica de pedidos -->
+          </div>
+        </div>
+
+        <!-- Paginación de pedidos -->
+        <div class="modal-navigation">
+          <div id="pedidos-paginacion"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-      <!-- Main JS -->
-  <script type="module" src="js/main.js"></script>
-  <script type="module" src="js/modal.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/modal.js"></script>
+    <script src="debug_autoadd.js"></script>
 
-  <!-- Debug Auto-add -->
-  <script src="debug_autoadd.js"></script>
-
-  <!-- Loader Overlay -->
-  <div id="loader-overlay" class="loader-overlay">
-    <div class="loader-content">
-      <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-blue-only">
-          <div class="circle-clipper left">
-            <div class="circle"></div>
-          </div><div class="gap-patch">
-            <div class="circle"></div>
-          </div><div class="circle-clipper right">
-            <div class="circle"></div>
+    <!-- Loader Overlay -->
+    <div id="loader-overlay" class="loader-overlay">
+      <div class="loader-content">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
           </div>
         </div>
+        <p id="loader-text">Procesando...</p>
       </div>
-      <p id="loader-text">Procesando...</p>
     </div>
-  </div>
 
-    <footer class="page-footer">
-      <div class="container">
-        <div class="row">
-          <div class="col l6 s12">
-            <h5 class="white-text">Neumáticos Palmones</h5>
-            <p class="grey-text text-lighten-4">
-              Tu taller de confianza para el mantenimiento y reparación de neumáticos.
-            </p>
-          </div>
-          <div class="col l4 offset-l2 s12">
-            <h5 class="white-text">Enlaces útiles</h5>
-            <ul>
-              <li><a class="grey-text text-lighten-3" href="#!">Inicio</a></li>
-              <li><a class="grey-text text-lighten-3" href="#!">Servicios</a></li>
-              <li><a class="grey-text text-lighten-3" href="#!">Contacto</a></li>
-              <li><a class="grey-text text-lighten-3" href="#!">Privacidad</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="footer-copyright">
-        <div class="container">
-          © 2024
-          <a class="grey-text text-lighten-4 right" href="#!">v1.5.0</a>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Modal de Confirmación Genérico Modernizado -->
+    <!-- Modal de Confirmación Genérico -->
     <div id="confirm-modal" class="modal-modern">
       <div class="modal-overlay" id="modal-overlay"></div>
       <div class="modal-container">
@@ -825,8 +470,12 @@
               <i class="material-icons">help_outline</i>
             </div>
             <div class="modal-text">
-              <p id="confirm-modal-content" class="modal-message">¿Estás seguro de realizar esta acción?</p>
-              <p id="confirm-modal-subtitle" class="modal-subtitle" style="display: none;">Esta acción no se puede deshacer.</p>
+              <p id="confirm-modal-content" class="modal-message">
+                ¿Estás seguro de realizar esta acción?
+              </p>
+              <p id="confirm-modal-subtitle" class="modal-subtitle" style="display: none">
+                Esta acción no se puede deshacer.
+              </p>
             </div>
           </div>
         </div>
@@ -862,7 +511,9 @@
               <i class="material-icons">check_circle</i>
             </div>
             <div class="modal-text">
-              <p id="info-modal-content" class="modal-message">Operación completada exitosamente.</p>
+              <p id="info-modal-content" class="modal-message">
+                Operación completada exitosamente.
+              </p>
             </div>
           </div>
         </div>
@@ -895,7 +546,7 @@
             </div>
             <div class="modal-text">
               <p id="error-modal-content" class="modal-message">Ha ocurrido un error inesperado.</p>
-              <p id="error-modal-details" class="modal-details" style="display: none;"></p>
+              <p id="error-modal-details" class="modal-details" style="display: none"></p>
             </div>
           </div>
         </div>
@@ -904,7 +555,7 @@
             <i class="material-icons left">close</i>
             Cerrar
           </button>
-          <button class="btn-modal-modern primary" id="error-modal-retry" style="display: none;">
+          <button class="btn-modal-modern primary" id="error-modal-retry" style="display: none">
             <i class="material-icons left">refresh</i>
             Reintentar
           </button>
