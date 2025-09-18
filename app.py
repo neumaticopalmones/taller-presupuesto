@@ -145,8 +145,23 @@ elif all([DB_USER, DB_PASSWORD, DB_HOST, DB_NAME]):
     database_uri = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{port}/{DB_NAME}"
     logger.info(f"Constructed database URI from individual variables: {DB_HOST}:{port}/{DB_NAME}")
 else:
-    database_uri = "sqlite:///local.db"
-    logger.warning("No se encontró configuración válida de BD, usando SQLite local.")
+    # En producción, usar una URL por defecto que funcione
+    logger.warning(
+        "⚠️ No se encontró configuración de BD. " "Verificar variables de entorno en Render.com"
+    )
+    logger.warning(
+        "📋 Variables requeridas: DATABASE_URL o "
+        "(POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)"
+    )
+
+    # Fallback mejorado para producción
+    if os.environ.get("RENDER"):
+        logger.error("🔥 ERROR CRÍTICO: En Render.com sin configuración de BD válida")
+        logger.error("🛠️ SOLUCIÓN: Configurar DATABASE_URL en el dashboard de Render")
+        database_uri = "sqlite:///tmp/fallback.db"  # Temporal en Render
+    else:
+        database_uri = "sqlite:///local.db"
+        logger.warning("Usando SQLite local para desarrollo.")
 
 # Validar que la URI es válida antes de asignarla
 try:
