@@ -861,13 +861,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleAddMarca() {
     console.log("🟢 [MANUAL-ADD] Iniciando añadir marca manual...");
 
-    const medida = document.getElementById("presupuesto-medida").value;
-    const cantidad = document.getElementById("presupuesto-cantidad").value;
-    const ganancia = document.getElementById("presupuesto-ganancia").value;
-    const ecotasa = document.getElementById("presupuesto-ecotasa").value;
-    const iva = document.getElementById("presupuesto-iva").value;
-    const marca = document.getElementById("presupuesto-marca-temp").value;
-    const neto = document.getElementById("presupuesto-neto-temp").value;
+    const medida = document.getElementById("presupuesto-medida")?.value ?? "";
+    const cantidad = document.getElementById("presupuesto-cantidad")?.value ?? "";
+    const ganancia = document.getElementById("presupuesto-ganancia")?.value ?? "";
+    // En el diseño compacto puede no existir ecotasa: por defecto 0
+    const ecotasa = document.getElementById("presupuesto-ecotasa")?.value ?? "0";
+    const iva = document.getElementById("presupuesto-iva")?.value ?? "0";
+    const marca = document.getElementById("presupuesto-marca-temp")?.value ?? "";
+    const neto = document.getElementById("presupuesto-neto-temp")?.value ?? "";
 
     console.log("🔍 [MANUAL-ADD] Valores capturados:");
     console.log("  Medida:", medida || "(vacío)");
@@ -941,8 +942,10 @@ document.addEventListener("DOMContentLoaded", () => {
       /* silencioso */
     }
     UI.renderTemporaryItems(State.getCurrentPresupuesto());
-    document.getElementById("presupuesto-marca-temp").value = "";
-    document.getElementById("presupuesto-neto-temp").value = "";
+    const marcaInp2 = document.getElementById("presupuesto-marca-temp");
+    const netoInp2 = document.getElementById("presupuesto-neto-temp");
+    if (marcaInp2) marcaInp2.value = "";
+    if (netoInp2) netoInp2.value = "";
     M.updateTextFields();
     // Volver a enfocar Marca para facilitar múltiples entradas
     const marcaRef = document.getElementById("presupuesto-marca-temp");
@@ -950,8 +953,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleAddTrabajo() {
-    const concepto = document.getElementById("presupuesto-otro-concepto").value;
-    const precioFinal = document.getElementById("presupuesto-otro-precio").value;
+    const conceptoEl = document.getElementById("presupuesto-otro-concepto");
+    const precioEl = document.getElementById("presupuesto-otro-precio");
+    let concepto = conceptoEl?.value?.trim() ?? "";
+    let precioFinal = precioEl?.value?.trim() ?? "";
+
+    // Si los inputs no existen en el diseño compacto, pedir datos por prompt
+    if (!conceptoEl || !precioEl) {
+      if (!concepto) concepto = window.prompt("Concepto del trabajo:") || "";
+      if (!precioFinal) precioFinal = window.prompt("Precio final (€):") || "";
+    }
     const errores = [];
     if (!isNotEmpty(concepto)) errores.push("El concepto es obligatorio.");
     if (!isValidNumber(precioFinal, { min: 0, allowNegative: false }))
@@ -971,8 +982,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     State.addTempTrabajo(trabajo);
     UI.renderTemporaryItems(State.getCurrentPresupuesto());
-    document.getElementById("presupuesto-otro-concepto").value = "";
-    document.getElementById("presupuesto-otro-precio").value = "";
+    if (conceptoEl) conceptoEl.value = "";
+    if (precioEl) precioEl.value = "";
     M.updateTextFields();
   }
 
@@ -1101,12 +1112,17 @@ document.addEventListener("DOMContentLoaded", () => {
                   setTimeout(() => {
                     console.log("🔥 [AUTO-ADD] INICIANDO AUTO-ADD PARA MARCA:", marca);
 
-                    const medida = document.getElementById("presupuesto-medida").value.trim();
-                    const cantidad = document.getElementById("presupuesto-cantidad").value.trim();
-                    const ganancia = document.getElementById("presupuesto-ganancia").value.trim();
-                    const ecotasa = document.getElementById("presupuesto-ecotasa").value.trim();
-                    const iva = document.getElementById("presupuesto-iva").value.trim();
-                    const neto = document.getElementById("presupuesto-neto-temp").value.trim();
+                    const medida =
+                      document.getElementById("presupuesto-medida")?.value?.trim() ?? "";
+                    const cantidad =
+                      document.getElementById("presupuesto-cantidad")?.value?.trim() ?? "";
+                    const ganancia =
+                      document.getElementById("presupuesto-ganancia")?.value?.trim() ?? "";
+                    const ecotasa =
+                      document.getElementById("presupuesto-ecotasa")?.value?.trim() ?? "0"; // puede no existir en diseño compacto
+                    const iva = document.getElementById("presupuesto-iva")?.value?.trim() ?? "0";
+                    const neto =
+                      document.getElementById("presupuesto-neto-temp")?.value?.trim() ?? "";
 
                     // Debug SUPER detallado
                     console.log("🔍 [AUTO-ADD] VALORES CAPTURADOS:");
