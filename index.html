@@ -70,8 +70,23 @@
         <i class="material-icons">lightbulb_outline</i>Sugerencias
       </button>
 
-      <!-- Grupo: Vista -->
-      <button class="toolbar-btn"><i class="material-icons">visibility</i>Vista</button>
+      <!-- Grupo: Vista (paridad con app antigua) -->
+      <label
+        class="toolbar-toggle"
+        title="Vista compacta"
+        style="display: flex; align-items: center; gap: 4px; margin-left: 8px"
+      >
+        <input type="checkbox" id="toggleCompactoTop" />
+        <span>Compacto</span>
+      </label>
+      <label
+        class="toolbar-toggle"
+        title="Vista extra compacta"
+        style="display: flex; align-items: center; gap: 4px; margin-left: 6px"
+      >
+        <input type="checkbox" id="toggleExtraCompactoTop" />
+        <span>Extra</span>
+      </label>
 
       <!-- Herramientas -->
       <div style="margin-left: auto; display: flex; gap: 6px">
@@ -297,6 +312,37 @@
             </button>
           </div>
         </div>
+
+        <!-- Calendar rápido (paridad con app antigua) -->
+        <div
+          class="calendar-quick"
+          style="
+            margin-top: 10px;
+            padding: 8px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+          "
+        >
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+            <div class="input-field" style="margin: 0; min-width: 140px; flex: 1 1 140px">
+              <input type="date" id="calendar-fecha" />
+              <label class="active" for="calendar-fecha">Fecha cita</label>
+            </div>
+            <div class="input-field" style="margin: 0; min-width: 120px; flex: 1 1 120px">
+              <input type="time" id="calendar-hora" />
+              <label class="active" for="calendar-hora">Hora</label>
+            </div>
+            <div class="input-field" style="margin: 0; min-width: 120px; flex: 1 1 120px">
+              <input type="number" id="calendar-duracion" value="60" min="5" step="5" />
+              <label class="active" for="calendar-duracion">Duración (min)</label>
+            </div>
+            <div class="input-field" style="margin: 0; min-width: 200px; flex: 2 1 200px">
+              <input type="text" id="calendar-proveedor" />
+              <label class="active" for="calendar-proveedor">Distribuidor (opcional)</label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -310,6 +356,14 @@
             <i class="material-icons">history</i>
             Historial de Presupuestos
           </h3>
+          <button
+            id="btnVolverPresupuestos"
+            class="modal-back"
+            title="Volver a Presupuestos"
+            style="margin-right: 8px"
+          >
+            <i class="material-icons">arrow_back</i>
+          </button>
           <button class="modal-close" data-modal="historial-modal">
             <i class="material-icons">close</i>
           </button>
@@ -381,6 +435,14 @@
             <i class="material-icons">shopping_cart</i>
             Gestión de Pedidos
           </h3>
+          <button
+            id="ped-btn-volver"
+            class="modal-back"
+            title="Volver a Presupuestos"
+            style="margin-right: 8px"
+          >
+            <i class="material-icons">arrow_back</i>
+          </button>
           <button class="modal-close" data-modal="pedidos-modal">
             <i class="material-icons">close</i>
           </button>
