@@ -90,8 +90,10 @@ body {
   max-width: 1400px;
   margin: 0 auto;
   padding: 8px;
-  height: calc(100vh - 48px);
-  overflow: hidden;
+  /* Permitir que el contenido crezca y haga scroll vertical */
+  min-height: calc(100vh - 48px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Sección cliente súper compacta */
@@ -241,6 +243,8 @@ body {
   border-radius: 3px;
   padding: 4px;
   margin-top: 4px;
+  max-height: 30vh;
+  overflow-y: auto;
 }
 
 .brand-temp-item {
@@ -277,7 +281,9 @@ body {
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 8px;
-  height: calc(100vh - 150px);
+  /* Evitar fijar altura para no cortar contenido; dejar que crezca */
+  min-height: calc(100vh - 150px);
+  overflow: visible;
 }
 
 /* Tabla súper compacta */
@@ -285,7 +291,8 @@ body {
   background: white;
   border: 1px solid #e1e5e9;
   border-radius: 6px;
-  overflow: hidden;
+  /* permitir que el contenido interno gestione su propio scroll */
+  overflow: visible;
 }
 
 .table-header {
@@ -301,7 +308,8 @@ body {
 }
 
 .table-content {
-  height: calc(100% - 32px);
+  /* no depender del 100% de un contenedor con altura fija */
+  max-height: 50vh;
   overflow-y: auto;
 }
 
@@ -370,7 +378,8 @@ tr:hover {
   border: 1px solid #e1e5e9;
   border-radius: 6px;
   flex: 1;
-  overflow: hidden;
+  /* permitir scroll interno si es necesario */
+  overflow: visible;
 }
 
 .presupuesto-header {
@@ -393,7 +402,8 @@ tr:hover {
 
 .presupuesto-content {
   padding: 6px;
-  height: calc(100% - 36px);
+  /* altura adaptable con límite razonable para scroll */
+  max-height: 55vh;
   overflow-y: auto;
 }
 

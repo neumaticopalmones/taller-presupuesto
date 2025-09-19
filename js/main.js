@@ -252,6 +252,17 @@ document.addEventListener("DOMContentLoaded", () => {
     else alert(msg);
   }
 
+  // Helper para leer inputs de forma segura (evita crashes si no existen en el DOM)
+  function gv(id, fallback = "") {
+    try {
+      const v = document.getElementById(id)?.value;
+      if (v === null || v === undefined) return fallback;
+      return typeof v === "string" ? v.trim() : v;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
   function renderChips(container, items, onClick) {
     if (!container) return;
     container.innerHTML = "";
@@ -291,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // 🔥 NUEVO: Buscar precio automáticamente para esta marca y medida
-        const medidaActual = document.getElementById("presupuesto-medida").value.trim();
+        const medidaActual = gv("presupuesto-medida");
         if (medidaActual) {
           try {
             console.log(
@@ -341,9 +352,9 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           console.log("🔥 [AUTO-ADD] Procesando auto-añadir para marca:", val);
 
-          const medida = document.getElementById("presupuesto-medida").value.trim();
-          const cantidad = document.getElementById("presupuesto-cantidad").value.trim();
-          const neto = document.getElementById("presupuesto-neto-temp").value.trim();
+          const medida = gv("presupuesto-medida");
+          const cantidad = gv("presupuesto-cantidad");
+          const neto = gv("presupuesto-neto-temp");
 
           // Verificar que todos los campos requeridos están completos (SIMPLIFICADO - solo 4 campos esenciales)
           const validaciones = {
@@ -395,9 +406,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Auto-añadir si todos los campos están completos
         setTimeout(() => {
-          const cantidad = document.getElementById("presupuesto-cantidad").value.trim();
-          const marca = document.getElementById("presupuesto-marca-temp").value.trim();
-          const neto = document.getElementById("presupuesto-neto-temp").value.trim();
+          const cantidad = gv("presupuesto-cantidad");
+          const marca = gv("presupuesto-marca-temp");
+          const neto = gv("presupuesto-neto-temp");
 
           // Verificar que todos los campos requeridos están completos (SIMPLIFICADO - solo 4 campos esenciales)
           const validaciones = {
@@ -1541,12 +1552,12 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>`;
     showConfirmModal("Nuevo Pedido", html, async () => {
       const payload = {
-        medida: document.getElementById("ped-nuevo-medida").value.trim(),
-        marca: document.getElementById("ped-nuevo-marca").value.trim(),
-        unidades: document.getElementById("ped-nuevo-unidades").value || 1,
-        proveedor: document.getElementById("ped-nuevo-proveedor").value.trim(),
-        descripcion: document.getElementById("ped-nuevo-descripcion").value.trim(),
-        notas: document.getElementById("ped-nuevo-notas").value.trim(),
+        medida: gv("ped-nuevo-medida"),
+        marca: gv("ped-nuevo-marca"),
+        unidades: gv("ped-nuevo-unidades", 1) || 1,
+        proveedor: gv("ped-nuevo-proveedor"),
+        descripcion: gv("ped-nuevo-descripcion"),
+        notas: gv("ped-nuevo-notas"),
       };
       // Si hay un presupuesto cargado en memoria lo vinculamos automáticamente
       try {
@@ -1597,12 +1608,12 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>`;
     showConfirmModal("Editar Pedido", html, async () => {
       const payload = {
-        medida: document.getElementById("ped-edit-medida").value.trim(),
-        marca: document.getElementById("ped-edit-marca").value.trim(),
-        unidades: document.getElementById("ped-edit-unidades").value || 1,
-        proveedor: document.getElementById("ped-edit-proveedor").value.trim(),
-        descripcion: document.getElementById("ped-edit-descripcion").value.trim(),
-        notas: document.getElementById("ped-edit-notas").value.trim(),
+        medida: gv("ped-edit-medida"),
+        marca: gv("ped-edit-marca"),
+        unidades: gv("ped-edit-unidades", 1) || 1,
+        proveedor: gv("ped-edit-proveedor"),
+        descripcion: gv("ped-edit-descripcion"),
+        notas: gv("ped-edit-notas"),
       };
       try {
         await API.editarPedido(p.id, payload);
@@ -1647,7 +1658,15 @@ document.addEventListener("DOMContentLoaded", () => {
         await API.toggleRecibido(id);
         handleFetchPedidos();
       } catch (e2) {
-        M.toast({ html: `Error: ${e2.message || e2}`, classes: "red" });
+        const msg = String(e2?.message || e2 || "");
+        if (msg.includes("HTTP 409") || msg.toLowerCase().includes("conflict")) {
+          M.toast({
+            html: "Primero confirma el pedido antes de marcarlo como recibido (estado requerido).",
+            classes: "orange",
+          });
+        } else {
+          M.toast({ html: `Error: ${msg}`, classes: "red" });
+        }
       }
     } else if (pedAction.classList.contains("ped-editar")) {
       try {
@@ -1683,11 +1702,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("ped-btn-nuevo")?.addEventListener("click", abrirDialogoNuevoPedido);
   document.getElementById("ped-btn-filtrar")?.addEventListener("click", () => {
     pedidosFiltros = {
-      q: document.getElementById("ped-filtro-texto").value.trim(),
-      proveedor: document.getElementById("ped-filtro-proveedor").value.trim(),
-      estado: document.getElementById("ped-filtro-estado").value,
-      desde: document.getElementById("ped-filtro-desde").value,
-      hasta: document.getElementById("ped-filtro-hasta").value,
+      q: gv("ped-filtro-texto"),
+      proveedor: gv("ped-filtro-proveedor"),
+      estado: gv("ped-filtro-estado"),
+      desde: gv("ped-filtro-desde"),
+      hasta: gv("ped-filtro-hasta"),
     };
     pedidosPaginacion.page = 1;
     handleFetchPedidos();
