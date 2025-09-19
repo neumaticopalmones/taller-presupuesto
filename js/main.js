@@ -54,6 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnVolver) {
     btnVolver.addEventListener("click", () => handleShowView("presupuestos-view"));
   }
+  const btnVolverBottom = document.getElementById("btnVolverPresupuestosBottom");
+  if (btnVolverBottom) {
+    btnVolverBottom.addEventListener("click", () => handleShowView("presupuestos-view"));
+  }
   // Buttons
   document.getElementById("btnAgregarMarca")?.addEventListener("click", handleAddMarca);
   document.getElementById("btnAgregarOtroTrabajo")?.addEventListener("click", handleAddTrabajo);
@@ -1698,6 +1702,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ?.addEventListener("click", () => handleShowView("pedidos-view"));
   document
     .getElementById("ped-btn-volver")
+    ?.addEventListener("click", () => handleShowView("presupuestos-view"));
+  document
+    .getElementById("ped-btn-volver-bottom")
     ?.addEventListener("click", () => handleShowView("presupuestos-view"));
   document.getElementById("ped-btn-nuevo")?.addEventListener("click", abrirDialogoNuevoPedido);
   document.getElementById("ped-btn-filtrar")?.addEventListener("click", () => {
