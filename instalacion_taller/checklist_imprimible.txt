@@ -1,0 +1,64 @@
+===============================================
+CHECKLIST IMPRIMIBLE - PC TALLER
+===============================================
+
+FASE 1: DESCARGAS (5 min)
+□ Visual Studio Code → https://code.visualstudio.com/
+□ Python 3.11+ → https://python.org/downloads/ [✓ Add to PATH]
+□ Git → https://git-scm.com/downloads
+□ Node.js → https://nodejs.org/
+
+FASE 2: CONFIGURAR GIT (5 min)
+□ Abrir PowerShell
+□ git config --global user.name "TuNombre"
+□ git config --global user.email "tu@email.com"
+□ Verificar: git config --list
+
+FASE 3: CLONAR PROYECTO (5 min)
+□ cd Desktop
+□ git clone https://github.com/neumaticopalmones/taller-presupuesto.git
+□ cd taller-presupuesto
+□ Verificar: ls
+
+FASE 4: ENTORNO PYTHON (5 min)
+□ python -m venv venv
+□ venv\Scripts\Activate.ps1
+□ pip install -r requirements.txt
+□ Verificar: python --version
+
+FASE 5: VS CODE (10 min)
+□ Abrir VS Code
+□ Ejecutar: install_vscode_extensions.bat
+□ Login GitHub Copilot
+□ Abrir carpeta: taller-presupuesto
+□ Seleccionar Python interpreter
+
+VERIFICACION FINAL:
+□ python --version → OK
+□ git --version → OK
+□ VS Code abre proyecto → OK
+□ Copilot responde → OK
+□ python app.py → OK
+□ localhost:5000 → OK
+
+COMANDOS DIARIOS:
+AL LLEGAR:
+    cd Desktop/taller-presupuesto
+    git pull origin main
+    venv\Scripts\Activate.ps1
+    python app.py
+
+AL IRSE:
+    git add .
+    git commit -m "Cambios taller"
+    git push origin main
+
+PROBLEMAS FRECUENTES:
+❌ Python no funciona → Reinstalar con PATH
+❌ Git no funciona → Reiniciar terminal
+❌ VS Code no ve Python → Select Interpreter
+❌ Copilot no activa → GitHub Sign In
+
+===============================================
+RESULTADO: Casa ⟷ Taller sincronizado
+===============================================

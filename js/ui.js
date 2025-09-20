@@ -267,16 +267,16 @@ export function renderPresupuestoFinal(presupuesto) {
     <h4 class="right-align" style="margin-top: 20px;">TOTAL GENERAL: ${eur0(totalGeneral)}</h4>
     `;
 
-  // Botón extra para vaciar temporales
+  // Botón extra para vaciar temporales (evitar duplicar id si ya existe en panel derecho)
   html += `
-        <div class="right-align no-imprimir" style="margin-top: 10px; display:flex; gap:12px; justify-content:flex-end; align-items:center;">
-            <label style="display:flex; align-items:center; gap:6px;">
-                <input type="checkbox" id="toggleInterno" checked />
-                <span>Mostrar info interna</span>
-            </label>
-            <a href="#!" id="btnVaciarTemporales" class="btn-flat red-text">Vaciar temporales</a>
-        </div>
-    `;
+    <div class="right-align no-imprimir" style="margin-top: 10px; display:flex; gap:12px; justify-content:flex-end; align-items:center;">
+      <label style="display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="toggleInterno" checked />
+        <span>Mostrar info interna</span>
+      </label>
+      ${document.getElementById("btnVaciarTemporales") ? "" : '<a href="#!" id="btnVaciarTemporales" class="btn-flat red-text">Vaciar temporales</a>'}
+    </div>
+  `;
 
   DOMElements.presupuestoFinalRender.innerHTML = html;
 

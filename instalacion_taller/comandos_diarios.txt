@@ -1,0 +1,113 @@
+===============================================
+COMANDOS DE USO DIARIO - TALLER
+===============================================
+
+🌅 AL LLEGAR AL TALLER:
+cd Desktop/taller-presupuesto
+git pull origin main
+venv\Scripts\Activate.ps1
+python app.py
+
+🌅 AL IRSE DEL TALLER:
+git add .
+git commit -m "Cambios taller $(Get-Date -Format 'dd/MM')"
+git push origin main
+
+🔧 COMANDOS DESARROLLO:
+# Activar entorno
+venv\Scripts\Activate.ps1
+
+# Ejecutar aplicación
+python app.py
+
+# Ver en navegador
+http://localhost:5000
+
+# Parar aplicación
+Ctrl+C
+
+🔍 COMANDOS GIT ÚTILES:
+# Ver estado
+git status
+
+# Ver cambios
+git diff
+
+# Ver historial
+git log --oneline -5
+
+# Crear rama nueva
+git checkout -b nueva-funcionalidad
+
+# Cambiar rama
+git checkout main
+
+📊 COMANDOS PYTHON:
+# Verificar versión
+python --version
+
+# Instalar paquete
+pip install nombre-paquete
+
+# Ver paquetes instalados
+pip list
+
+# Actualizar requirements
+pip freeze > requirements.txt
+
+🔧 COMANDOS VS CODE:
+# Abrir desde terminal
+code .
+
+# Seleccionar intérprete Python
+Ctrl+Shift+P → Python: Select Interpreter
+
+# Formatear código
+Shift+Alt+F
+
+# Buscar en archivos
+Ctrl+Shift+F
+
+🚨 COMANDOS EMERGENCIA:
+# Si algo no funciona, resetear entorno
+rmdir /s venv
+python -m venv venv
+venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# Si git tiene conflictos
+git pull origin main
+# Resolver conflictos manualmente
+git add .
+git commit -m "Resuelto conflicto"
+git push origin main
+
+# Si aplicación no arranca
+git pull origin main
+venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python app.py
+
+===============================================
+FLUJO TÍPICO DIA COMPLETO:
+===============================================
+
+1. LLEGAR (2 min):
+   cd Desktop/taller-presupuesto
+   git pull origin main
+   venv\Scripts\Activate.ps1
+
+2. DESARROLLAR (todo el día):
+   python app.py
+   # Trabajar en VS Code
+   # Hacer cambios
+   # Probar en localhost:5000
+
+3. IRSE (1 min):
+   git add .
+   git commit -m "Cambios taller DD/MM"
+   git push origin main
+
+===============================================
+¡Desarrollo fluido casa ⟷ taller! 🏠🔧
+===============================================
