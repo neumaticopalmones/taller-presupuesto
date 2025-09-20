@@ -611,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Extra-compacto toggle
   const toggleExtraCompacto = document.getElementById("toggleExtraCompacto");
   const toggleExtraCompactoTop = document.getElementById("toggleExtraCompactoTop");
-  if (toggleExtraCompacto) {
+  if (toggleExtraCompacto || toggleExtraCompactoTop) {
     // init from localStorage
     try {
       const saved = localStorage.getItem("ui.extraCompacto");
@@ -630,7 +630,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (toggleExtraCompactoTop && toggleExtraCompactoTop.checked !== on)
         toggleExtraCompactoTop.checked = on;
     };
-    toggleExtraCompacto.addEventListener("change", (e) => applyExtra(!!e.target.checked));
+    if (toggleExtraCompacto)
+      toggleExtraCompacto.addEventListener("change", (e) => applyExtra(!!e.target.checked));
     if (toggleExtraCompactoTop)
       toggleExtraCompactoTop.addEventListener("change", (e) => applyExtra(!!e.target.checked));
   }

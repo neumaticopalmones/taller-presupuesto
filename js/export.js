@@ -207,7 +207,10 @@ export function abrirEnCalendar() {
 }
 
 async function construirNodoA4(opts = {}) {
-  const tabla = document.querySelector(".presupuesto-section .budget-table-container");
+  // Seleccionar el contenedor real del presupuesto renderizado en la derecha
+  const tabla =
+    document.querySelector("#presupuesto-final-view .budget-table-container") ||
+    document.querySelector("#presupuesto-final-render .budget-table-container");
   if (!tabla) {
     const toastId = "toast-error-" + Date.now();
     const copyBtn = `<button class='btn-flat toast-action' onclick='navigator.clipboard.writeText(document.getElementById("${toastId}").innerText);'>Copiar</button>`;
@@ -226,7 +229,8 @@ async function construirNodoA4(opts = {}) {
   if (document.body.classList.contains("compacto")) a4.classList.add("compacto");
   if (opts.compactWA) a4.classList.add("compacto", "compacto-wa");
 
-  const headerElement = document.querySelector(".business-header-modern") || document.querySelector("header");
+  // Clonar cabecera visual del presupuesto si existe (bloque superior de la derecha)
+  const headerElement = document.querySelector("#presupuesto-final-view .presupuesto-header");
   const headerClone = headerElement ? headerElement.cloneNode(true) : null;
 
   const meta = document.createElement("div");
@@ -276,7 +280,7 @@ async function construirNodoA4(opts = {}) {
   a4.appendChild(tablaClone);
 
   // Ocultar total general en el clon (para clientes)
-  const totalGeneralEl = document.querySelector(".presupuesto-section h4");
+  const totalGeneralEl = document.querySelector("#presupuesto-final-view h4");
   if (totalGeneralEl) {
     const hidden = totalGeneralEl.cloneNode(true);
     hidden.style.display = "none";
@@ -435,7 +439,9 @@ export async function capturaYWhatsApp() {
   let canvas = null;
   if (!a4) {
     // Fallback: capturar directamente la tabla si existe
-    const tabla = document.querySelector(".presupuesto-section .budget-table-container");
+    const tabla =
+      document.querySelector("#presupuesto-final-view .budget-table-container") ||
+      document.querySelector("#presupuesto-final-render .budget-table-container");
     if (tabla) {
       try {
         canvas = await capturarNodoComoCanvas(tabla, {
