@@ -15,36 +15,36 @@ body {
 .compact-toolbar {
   background: #ffffff;
   border-bottom: 1px solid #e1e5e9;
-  padding: 6px 10px;
+  padding: 0 2px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 40px;
+  gap: 7px;
+  height: 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .toolbar-brand {
   font-weight: 600;
-  color: #2563eb;
+  color: #074ee8;
   margin-right: 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 3px;
+  font-size: 11px;
 }
 
 .toolbar-btn {
   background: #e5e7eb;
   border: 1px solid #d1d5db;
-  padding: 3px 6px;
+  padding: 0 4px;
   border-radius: 3px;
-  font-size: 10px;
+  font-size: 9px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   transition: all 0.2s;
-  height: 28px;
+  height: 22px;
 }
 
 .toolbar-btn:hover {
@@ -83,6 +83,18 @@ body {
 
 .toolbar-btn .material-icons {
   font-size: 12px;
+}
+
+/* Botón de retroceso en headers de modales */
+.modal-back {
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
 }
 
 /* Container principal súper optimizado */
