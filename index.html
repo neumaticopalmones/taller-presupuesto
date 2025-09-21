@@ -12,6 +12,9 @@
     />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
+    <!-- Tailwind CSS para modernizar diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- Favicon inline para evitar 404 en /favicon.ico -->
     <link
       rel="icon"
@@ -22,317 +25,611 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Toolbar compacto -->
-    <div class="compact-toolbar">
-      <div class="toolbar-brand">Neumáticos Palmones</div>
-      <span
-        id="loaded-presupuesto-badge"
-        class="toolbar-badge"
-        style="display: none"
-        data-badge-caption=""
-      ></span>
+    <!-- Toolbar moderno estilo ERP -->
+    <div class="bg-white border-b border-gray-200 shadow-sm">
+      <div class="flex items-center justify-between px-4 py-2.5">
+        <!-- Marca y badge -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">N</span>
+            </div>
+            <h1 class="text-gray-900 font-semibold text-lg">Neumáticos Palmones</h1>
+          </div>
+          <span
+            id="loaded-presupuesto-badge"
+            class="hidden px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+            data-badge-caption=""
+          ></span>
+        </div>
 
-      <!-- Grupo: Presupuestos -->
-      <button id="btnNuevoPresupuesto" class="toolbar-btn primary">
-        <i class="material-icons">add</i>Nuevo
-      </button>
-      <button id="btnGuardarPresupuesto" class="toolbar-btn success">
-        <i class="material-icons">save</i>Guardar
-      </button>
-      <button id="btnCancelarEdicionTop" class="toolbar-btn orange" style="display: none">
-        <i class="material-icons">cancel</i>Cancelar
-      </button>
+        <!-- Grupos de botones -->
+        <div class="flex items-center space-x-6">
+          <!-- Grupo: Presupuestos -->
+          <div class="flex items-center space-x-1">
+            <button
+              id="btnNuevoPresupuesto"
+              class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">add</i>Nuevo
+            </button>
+            <button
+              id="btnGuardarPresupuesto"
+              class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">save</i>Guardar
+            </button>
+            <button
+              id="btnCancelarEdicionTop"
+              class="hidden inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">cancel</i>Cancelar
+            </button>
+          </div>
 
-      <!-- Grupo: Navegación -->
-      <button id="btnVerHistorial" class="toolbar-btn blue">
-        <i class="material-icons">history</i>Historial
-      </button>
-      <button id="btnVerPedidos" class="toolbar-btn purple">
-        <i class="material-icons">shopping_cart</i>Pedidos
-      </button>
+          <!-- Grupo: Navegación -->
+          <div class="flex items-center space-x-1">
+            <button
+              id="btnVerHistorial"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">history</i>Historial
+            </button>
+            <button
+              id="btnVerPedidos"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">shopping_cart</i>Pedidos
+            </button>
+          </div>
 
-      <!-- Grupo: Exportar -->
-      <button id="btnImprimirPresupuesto" class="toolbar-btn">
-        <i class="material-icons">print</i>PDF
-      </button>
-      <button id="btnCompartirWhatsApp" class="toolbar-btn">
-        <i class="material-icons">message</i>WhatsApp
-      </button>
+          <!-- Grupo: Exportar -->
+          <div class="flex items-center space-x-1">
+            <button
+              id="btnImprimirPresupuesto"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">print</i>PDF
+            </button>
+            <button
+              id="btnCompartirWhatsApp"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">message</i>WhatsApp
+            </button>
+          </div>
 
-      <!-- Grupo: Acciones -->
-      <button id="btnVaciarGrupos" class="toolbar-btn">
-        <i class="material-icons">clear_all</i>Vaciar
-      </button>
-      <button id="btnCargarSugerencias" class="toolbar-btn">
-        <i class="material-icons">lightbulb_outline</i>Sugerencias
-      </button>
+          <!-- Grupo: Acciones -->
+          <div class="flex items-center space-x-1">
+            <button
+              id="btnVaciarGrupos"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">clear_all</i>Vaciar
+            </button>
+            <button
+              id="btnCargarSugerencias"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <i class="material-icons text-sm mr-1">lightbulb_outline</i>Sugerencias
+            </button>
+          </div>
 
-      <!-- Grupo: Vista (solo Extra) -->
-      <label
-        class="toolbar-toggle"
-        title="Vista extra compacta"
-        style="display: flex; align-items: center; gap: 4px; margin-left: 6px"
-      >
-        <input type="checkbox" id="toggleExtraCompactoTop" />
-        <span>Extra</span>
-      </label>
+          <!-- Grupo: Vista y herramientas -->
+          <div class="flex items-center space-x-3">
+            <label
+              class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer"
+              title="Vista extra compacta"
+            >
+              <input
+                type="checkbox"
+                id="toggleExtraCompactoTop"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <span>Extra</span>
+            </label>
 
-      <!-- Herramientas -->
-      <div style="margin-left: auto; display: flex; gap: 6px">
-        <span id="connDot" class="status-dot" title="Estado de conexión"></span>
-        <span id="connText" style="font-size: 10px; color: #666">Conectado</span>
-        <button id="btnCopyHostURL" class="toolbar-btn">
-          <i class="material-icons">link</i>
-        </button>
+            <div class="flex items-center space-x-2 pl-3 border-l border-gray-200">
+              <div class="flex items-center space-x-1">
+                <span
+                  id="connDot"
+                  class="w-2 h-2 bg-green-500 rounded-full"
+                  title="Estado de conexión"
+                ></span>
+                <span id="connText" class="text-xs text-gray-500">Conectado</span>
+              </div>
+              <button
+                id="btnCopyHostURL"
+                class="inline-flex items-center p-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              >
+                <i class="material-icons text-sm">link</i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Container principal compacto -->
-    <div class="main-container dashboard-grid">
-      <!-- Sección cliente y formulario más compacta -->
-      <div class="left-content" id="presupuestos-view">
-        <!-- Datos cliente súper compactos -->
-        <div class="cliente-section">
-          <div class="section-title">
-            <i class="material-icons">person</i>
-            Datos del Cliente
-          </div>
-          <form id="cliente-form" onsubmit="return false;">
-            <div class="form-row">
-              <div class="input-column">
-                <div class="input-compact">
-                  <label for="presupuesto-nombreCliente">Nombre y Apellidos</label>
-                  <input type="text" id="presupuesto-nombreCliente" class="validate" />
-                </div>
-                <div class="input-compact">
-                  <label for="presupuesto-numeroPresupuesto">Nº Presupuesto</label>
-                  <input type="text" id="presupuesto-numeroPresupuesto" class="validate" />
-                </div>
-                <div class="input-compact">
-                  <label for="presupuesto-distribuidor">Distribuidor</label>
-                  <input type="text" id="presupuesto-distribuidor" class="validate" />
-                </div>
-              </div>
-              <div class="input-column">
-                <div class="input-compact">
-                  <label for="presupuesto-telefonoCliente">Teléfono</label>
-                  <input type="tel" id="presupuesto-telefonoCliente" class="validate" />
-                </div>
-                <div class="input-compact">
-                  <label for="presupuesto-fechaPresupuesto">Fecha</label>
-                  <input type="date" id="presupuesto-fechaPresupuesto" class="validate" />
-                </div>
-                <div class="input-compact">
-                  <label for="presupuesto-descripcion">Descripción (Calendar)</label>
-                  <input type="text" id="presupuesto-descripcion" class="validate" />
-                </div>
-              </div>
-              <div class="input-column">
-                <div class="input-compact">
-                  <label for="presupuesto-nifCliente">NIF/CIF</label>
-                  <input type="text" id="presupuesto-nifCliente" class="validate" />
-                </div>
-                <div class="input-compact">
-                  <label for="presupuesto-observaciones">Observaciones</label>
-                  <input type="text" id="presupuesto-observaciones" class="validate" />
-                </div>
-              </div>
+    <!-- Container principal moderno -->
+    <div class="bg-gray-50 min-h-screen">
+      <div class="max-w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Sección izquierda: Cliente y productos -->
+        <div class="lg:col-span-2 space-y-6" id="presupuestos-view">
+          <!-- Datos cliente modernos -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-blue-600 mr-2">person</i>
+                Datos del Cliente
+              </h2>
             </div>
-          </form>
+            <div class="p-6">
+              <form id="cliente-form" onsubmit="return false;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="space-y-4">
+                    <div>
+                      <label
+                        for="presupuesto-nombreCliente"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Nombre y Apellidos</label
+                      >
+                      <input
+                        type="text"
+                        id="presupuesto-nombreCliente"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="presupuesto-numeroPresupuesto"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Nº Presupuesto</label
+                      >
+                      <input
+                        type="text"
+                        id="presupuesto-numeroPresupuesto"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="presupuesto-distribuidor"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Distribuidor</label
+                      >
+                      <input
+                        type="text"
+                        id="presupuesto-distribuidor"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div class="space-y-4">
+                    <div>
+                      <label
+                        for="presupuesto-telefonoCliente"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Teléfono</label
+                      >
+                      <input
+                        type="tel"
+                        id="presupuesto-telefonoCliente"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="presupuesto-fechaPresupuesto"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Fecha</label
+                      >
+                      <input
+                        type="date"
+                        id="presupuesto-fechaPresupuesto"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="presupuesto-descripcion"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Descripción (Calendar)</label
+                      >
+                      <input
+                        type="text"
+                        id="presupuesto-descripcion"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div class="space-y-4">
+                    <div>
+                      <label
+                        for="presupuesto-nifCliente"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >NIF/CIF</label
+                      >
+                      <input
+                        type="text"
+                        id="presupuesto-nifCliente"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div class="md:col-span-1">
+                      <label
+                        for="presupuesto-observaciones"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Observaciones</label
+                      >
+                      <input
+                        type="text"
+                        id="presupuesto-observaciones"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Añadir productos moderno -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200" id="productos-view">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-green-600 mr-2">add_shopping_cart</i>
+                Añadir Productos
+              </h2>
+            </div>
+            <div class="p-6">
+              <form id="producto-form" onsubmit="return false;">
+                <div class="grid grid-cols-1 md:grid-cols-8 gap-3 mb-4">
+                  <div class="md:col-span-2">
+                    <label
+                      for="presupuesto-medida"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >Medida</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-medida"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-cantidad"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >Cant.</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-cantidad"
+                      min="1"
+                      value="2"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div class="md:col-span-2">
+                    <label
+                      for="presupuesto-marca-temp"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >Marca</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-marca-temp"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-neto-temp"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >Precio Neto</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-neto-temp"
+                      step="0.01"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-ganancia"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >Ganancia</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-ganancia"
+                      step="0.01"
+                      value="0"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-ecotasa"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >Ecotasa</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-ecotasa"
+                      step="0.01"
+                      value="0"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-iva"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >IVA %</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-iva"
+                      step="0.01"
+                      value="21"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div class="flex items-end">
+                    <button
+                      type="button"
+                      id="btnAgregarMarca"
+                      class="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    >
+                      <i class="material-icons text-sm mr-1">add</i>
+                      Añadir
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sugerencias modernas -->
+                <div class="space-y-4">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Sugerencias por Medida</h3>
+                    <div class="flex flex-wrap gap-2" id="precios-por-medida"></div>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Códigos Filtrados</h3>
+                    <div class="flex flex-wrap gap-2" id="precios-filtros-codigo"></div>
+                  </div>
+                </div>
+
+                <!-- Marcas temporales modernas -->
+                <div class="mt-6 space-y-4">
+                  <div id="lista-marcas-temp"></div>
+                  <div id="lista-otros-trabajos-temp"></div>
+
+                  <!-- Botones de acción principales -->
+                  <div class="flex gap-3">
+                    <button
+                      type="button"
+                      id="btnAgregarOtroTrabajo"
+                      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                    >
+                      <i class="material-icons text-sm mr-1">build</i>
+                      Otro Trabajo
+                    </button>
+                    <button
+                      type="button"
+                      id="btnAgregarGrupo"
+                      class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    >
+                      <i class="material-icons text-sm mr-1">playlist_add</i>
+                      Agregar Grupo
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Tabla de productos moderna -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-blue-600 mr-2">list</i>
+                Lista de Productos
+              </h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Medida
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Cant.
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Marca
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Precio Unit.
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Total
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Acc.
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="items-list" class="bg-white divide-y divide-gray-200">
+                  <!-- Productos dinámicos -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        <!-- Añadir productos súper compacto -->
-        <div class="add-product-section" id="productos-view">
-          <div class="section-title">
-            <i class="material-icons">add_shopping_cart</i>
-            Añadir Productos
+        <!-- Panel derecho moderno -->
+        <div class="lg:col-span-1 space-y-6">
+          <!-- Presupuesto final moderno -->
+          <div
+            class="bg-white rounded-lg shadow-sm border border-gray-200"
+            id="presupuesto-final-view"
+          >
+            <div class="px-6 py-4 border-b border-gray-200">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900">NEUMÁTICOS PALMONES</h3>
+                  <p class="text-sm text-gray-600">C/GALEON 25 - Tel: 659 718 809</p>
+                </div>
+                <div class="text-right">
+                  <h3 class="text-lg font-bold text-gray-900">PRESUPUESTO</h3>
+                  <p class="text-sm text-gray-600" id="presupuesto-numero-display">Nº: ---</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meta información del cliente -->
+            <div
+              id="presupuesto-meta"
+              class="px-6 py-2 text-sm text-gray-600 border-b border-gray-200"
+            ></div>
+
+            <div class="p-6" id="presupuesto-final-content">
+              <!-- Contenido dinámico del presupuesto -->
+              <div id="presupuesto-final-render"></div>
+            </div>
           </div>
-          <form id="producto-form" onsubmit="return false;">
-            <div class="product-form-row">
-              <div class="input-compact">
-                <label for="presupuesto-medida">Medida</label>
-                <input type="text" id="presupuesto-medida" />
-              </div>
-              <div class="input-compact">
-                <label for="presupuesto-cantidad">Cant.</label>
-                <input type="number" id="presupuesto-cantidad" min="1" value="2" />
-              </div>
-              <div class="input-compact">
-                <label for="presupuesto-marca-temp">Marca</label>
-                <input type="text" id="presupuesto-marca-temp" />
-              </div>
-              <div class="input-compact">
-                <label for="presupuesto-neto-temp">Precio Neto</label>
-                <input type="number" id="presupuesto-neto-temp" step="0.01" />
-              </div>
-              <div class="input-compact">
-                <label for="presupuesto-ganancia">Ganancia</label>
-                <input type="number" id="presupuesto-ganancia" step="0.01" value="0" />
-              </div>
-              <div class="input-compact">
-                <label for="presupuesto-ecotasa">Ecotasa</label>
-                <input type="number" id="presupuesto-ecotasa" step="0.01" value="0" />
-              </div>
-              <div class="input-compact">
-                <label for="presupuesto-iva">IVA %</label>
-                <input type="number" id="presupuesto-iva" step="0.01" value="21" />
-              </div>
-              <button type="button" id="btnAgregarMarca" class="btn-add">
-                <i class="material-icons">add</i>
-                Añadir
-              </button>
+
+          <!-- Acciones rápidas modernas -->
+          <div
+            class="bg-white rounded-lg shadow-sm border border-gray-200"
+            id="acciones-finales-view"
+          >
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Acciones Rápidas</h3>
             </div>
-
-            <!-- Sugerencias compactas -->
-            <div class="suggestions-section">
-              <div class="suggestions-title">Sugerencias por Medida</div>
-              <div class="chips-container" id="precios-por-medida"></div>
-              <div class="suggestions-title">Códigos Filtrados</div>
-              <div class="chips-container" id="precios-filtros-codigo"></div>
-            </div>
-
-            <!-- Marcas temporales compactas -->
-            <div class="brands-temp-section">
-              <div id="lista-marcas-temp"></div>
-              <div id="lista-otros-trabajos-temp"></div>
-
-              <!-- Botones de acción principales -->
-              <div style="margin-top: 8px; display: flex; gap: 6px">
+            <div class="p-4">
+              <div class="grid grid-cols-2 gap-2">
                 <button
-                  type="button"
-                  id="btnAgregarOtroTrabajo"
-                  class="btn-add"
-                  style="background: #8b5cf6"
+                  class="hidden w-full px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  id="btnGuardarComoNuevo"
                 >
-                  <i class="material-icons">build</i>
-                  Otro Trabajo
+                  <i class="material-icons text-sm mr-1">content_copy</i>
+                  Guardar como Nuevo
                 </button>
                 <button
-                  type="button"
-                  id="btnAgregarGrupo"
-                  class="btn-add"
-                  style="background: #2563eb; flex: 1"
+                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  id="btnVaciarTemporales"
                 >
-                  <i class="material-icons">playlist_add</i>
-                  Agregar Grupo
+                  <i class="material-icons text-sm mr-1">delete_sweep</i>
+                  Vaciar Temp.
+                </button>
+                <button
+                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  id="btnDescargarPDF"
+                >
+                  <i class="material-icons text-sm mr-1">picture_as_pdf</i>
+                  PDF
+                </button>
+                <button
+                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  id="btnCapturaWhatsApp"
+                >
+                  <i class="material-icons text-sm mr-1">photo_camera</i>
+                  Captura
+                </button>
+                <button
+                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  id="btnCopiarCalendar"
+                >
+                  <i class="material-icons text-sm mr-1">event</i>
+                  Copiar Cal.
+                </button>
+                <button
+                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  id="btnAbrirCalendar"
+                >
+                  <i class="material-icons text-sm mr-1">open_in_new</i>
+                  Abrir Cal.
+                </button>
+                <button
+                  class="hidden w-full px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors col-span-2"
+                  id="btnCancelarEdicion"
+                >
+                  <i class="material-icons text-sm mr-1">undo</i>
+                  Cancelar Edición
                 </button>
               </div>
             </div>
-          </form>
-        </div>
-
-        <!-- Tabla de productos -->
-        <div class="products-table">
-          <div class="table-header">
-            <i class="material-icons">list</i>
-            Lista de Productos
-          </div>
-          <div class="table-content">
-            <table>
-              <thead>
-                <tr>
-                  <th>Medida</th>
-                  <th>Cant.</th>
-                  <th>Marca</th>
-                  <th>Precio Unit.</th>
-                  <th>Total</th>
-                  <th>Acc.</th>
-                </tr>
-              </thead>
-              <tbody id="items-list">
-                <!-- Productos dinámicos -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel derecho -->
-      <div class="right-panel">
-        <!-- Presupuesto final -->
-        <div class="presupuesto-final" id="presupuesto-final-view">
-          <div class="presupuesto-header">
-            <div>
-              <div>NEUMÁTICOS PALMONES</div>
-              <div class="presupuesto-meta">C/GALEON 25 - Tel: 659 718 809</div>
-            </div>
-            <div style="text-align: right">
-              <div>PRESUPUESTO</div>
-              <div class="presupuesto-meta" id="presupuesto-numero-display">Nº: ---</div>
-            </div>
           </div>
 
-          <!-- Meta información del cliente -->
-          <div id="presupuesto-meta" class="presupuesto-meta-info"></div>
-          <!-- Fix: Elemento agregado para corregir TypeError -->
-
-          <div class="presupuesto-content" id="presupuesto-final-content">
-            <!-- Contenido dinámico del presupuesto -->
-            <div id="presupuesto-final-render"></div>
-          </div>
-        </div>
-
-        <!-- Acciones rápidas -->
-        <div class="actions-compact" id="acciones-finales-view">
-          <div class="action-grid">
-            <button class="action-btn-small primary" id="btnGuardarComoNuevo" style="display: none">
-              <i class="material-icons">content_copy</i>
-              Guardar como Nuevo
-            </button>
-            <button class="action-btn-small" id="btnVaciarTemporales">
-              <i class="material-icons">delete_sweep</i>
-              Vaciar Temp.
-            </button>
-            <button class="action-btn-small" id="btnDescargarPDF">
-              <i class="material-icons">picture_as_pdf</i>
-              PDF
-            </button>
-            <button class="action-btn-small" id="btnCapturaWhatsApp">
-              <i class="material-icons">photo_camera</i>
-              Captura
-            </button>
-            <button class="action-btn-small" id="btnCopiarCalendar">
-              <i class="material-icons">event</i>
-              Copiar Cal.
-            </button>
-            <button class="action-btn-small" id="btnAbrirCalendar">
-              <i class="material-icons">open_in_new</i>
-              Abrir Cal.
-            </button>
-            <button class="action-btn-small" id="btnCancelarEdicion" style="display: none">
-              <i class="material-icons">undo</i>
-              Cancelar Ed.
-            </button>
-          </div>
-        </div>
-
-        <!-- Calendar rápido (paridad con app antigua) -->
-        <div
-          class="calendar-quick"
-          style="
-            margin-top: 10px;
-            padding: 8px;
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-          "
-        >
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
-            <div class="input-field" style="margin: 0; min-width: 140px; flex: 1 1 140px">
-              <input type="date" id="calendar-fecha" />
-              <label class="active" for="calendar-fecha">Fecha cita</label>
+          <!-- Calendar rápido moderno -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Programar Cita</h3>
             </div>
-            <div class="input-field" style="margin: 0; min-width: 120px; flex: 1 1 120px">
-              <input type="time" id="calendar-hora" />
-              <label class="active" for="calendar-hora">Hora</label>
-            </div>
-            <div class="input-field" style="margin: 0; min-width: 120px; flex: 1 1 120px">
-              <input type="number" id="calendar-duracion" value="60" min="5" step="5" />
-              <label class="active" for="calendar-duracion">Duración (min)</label>
-            </div>
-            <div class="input-field" style="margin: 0; min-width: 200px; flex: 2 1 200px">
-              <input type="text" id="calendar-proveedor" />
-              <label class="active" for="calendar-proveedor">Distribuidor (opcional)</label>
+            <div class="p-4 space-y-4">
+              <div>
+                <label for="calendar-fecha" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Fecha cita</label
+                >
+                <input
+                  type="date"
+                  id="calendar-fecha"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="calendar-hora" class="block text-sm font-medium text-gray-700 mb-1"
+                    >Hora</label
+                  >
+                  <input
+                    type="time"
+                    id="calendar-hora"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="calendar-duracion"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Duración (min)</label
+                  >
+                  <input
+                    type="number"
+                    id="calendar-duracion"
+                    value="60"
+                    min="5"
+                    step="5"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <label for="calendar-proveedor" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Distribuidor (opcional)</label
+                >
+                <input
+                  type="text"
+                  id="calendar-proveedor"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
             </div>
           </div>
         </div>
