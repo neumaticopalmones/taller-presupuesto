@@ -25,122 +25,113 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Toolbar moderno estilo ERP -->
-    <div class="bg-white border-b border-gray-200 shadow-sm">
-      <div class="flex items-center justify-between px-4 py-2.5">
-        <!-- Marca y badge -->
-        <div class="flex items-center space-x-4">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span class="text-white font-bold text-sm">N</span>
+    <!-- Toolbar ultra-compacto estilo ERP -->
+    <div class="bg-white border-b border-gray-300 shadow-sm">
+      <div class="flex items-center justify-between px-2 py-1">
+        <!-- Marca y badge compactos -->
+        <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-1">
+            <div class="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
+              <span class="text-white font-bold text-xs">N</span>
             </div>
-            <h1 class="text-gray-900 font-semibold text-lg">Neumáticos Palmones</h1>
+            <h1 class="text-gray-900 font-semibold text-sm">Neumáticos Palmones</h1>
           </div>
           <span
             id="loaded-presupuesto-badge"
-            class="hidden px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+            class="hidden px-1 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded"
             data-badge-caption=""
           ></span>
         </div>
 
-        <!-- Grupos de botones -->
-        <div class="flex items-center space-x-6">
-          <!-- Grupo: Presupuestos -->
-          <div class="flex items-center space-x-1">
+        <!-- Grupos de botones ultra-compactos -->
+        <div class="flex items-center space-x-3">
+          <!-- Presupuestos -->
+          <div class="flex items-center gap-1">
             <button
               id="btnNuevoPresupuesto"
-              class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
             >
-              <i class="material-icons text-sm mr-1">add</i>Nuevo
+              <i class="material-icons text-sm">add</i>Nuevo
             </button>
             <button
               id="btnGuardarPresupuesto"
-              class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+              class="px-2 py-1 text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700"
             >
-              <i class="material-icons text-sm mr-1">save</i>Guardar
+              <i class="material-icons text-sm">save</i>Guardar
             </button>
             <button
               id="btnCancelarEdicionTop"
-              class="hidden inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+              class="hidden px-2 py-1 text-xs font-medium rounded text-white bg-orange-600 hover:bg-orange-700"
             >
-              <i class="material-icons text-sm mr-1">cancel</i>Cancelar
+              <i class="material-icons text-sm">cancel</i>Cancelar
             </button>
           </div>
 
-          <!-- Grupo: Navegación -->
-          <div class="flex items-center space-x-1">
+          <!-- Navegación -->
+          <div class="flex items-center gap-1">
             <button
               id="btnVerHistorial"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
             >
-              <i class="material-icons text-sm mr-1">history</i>Historial
+              <i class="material-icons text-sm">history</i>Historial
             </button>
             <button
               id="btnVerPedidos"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
             >
-              <i class="material-icons text-sm mr-1">shopping_cart</i>Pedidos
+              <i class="material-icons text-sm">shopping_cart</i>Pedidos
             </button>
           </div>
 
-          <!-- Grupo: Exportar -->
-          <div class="flex items-center space-x-1">
+          <!-- Exportar -->
+          <div class="flex items-center gap-1">
             <button
               id="btnImprimirPresupuesto"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
             >
-              <i class="material-icons text-sm mr-1">print</i>PDF
+              <i class="material-icons text-sm">print</i>PDF
             </button>
             <button
               id="btnCompartirWhatsApp"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
             >
-              <i class="material-icons text-sm mr-1">message</i>WhatsApp
+              <i class="material-icons text-sm">message</i>WhatsApp
             </button>
           </div>
 
-          <!-- Grupo: Acciones -->
-          <div class="flex items-center space-x-1">
+          <!-- Acciones -->
+          <div class="flex items-center gap-1">
             <button
               id="btnVaciarGrupos"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
             >
-              <i class="material-icons text-sm mr-1">clear_all</i>Vaciar
+              <i class="material-icons text-sm">clear_all</i>Vaciar
             </button>
             <button
               id="btnCargarSugerencias"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
             >
-              <i class="material-icons text-sm mr-1">lightbulb_outline</i>Sugerencias
+              <i class="material-icons text-sm">lightbulb_outline</i>Sugerencias
             </button>
           </div>
 
-          <!-- Grupo: Vista y herramientas -->
-          <div class="flex items-center space-x-3">
-            <label
-              class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer"
-              title="Vista extra compacta"
-            >
+          <!-- Vista y herramientas -->
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-1 text-xs text-gray-700 cursor-pointer">
               <input
                 type="checkbox"
                 id="toggleExtraCompactoTop"
-                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                class="h-3 w-3 text-blue-600 border-gray-300 rounded"
               />
               <span>Extra</span>
             </label>
 
-            <div class="flex items-center space-x-2 pl-3 border-l border-gray-200">
-              <div class="flex items-center space-x-1">
-                <span
-                  id="connDot"
-                  class="w-2 h-2 bg-green-500 rounded-full"
-                  title="Estado de conexión"
-                ></span>
-                <span id="connText" class="text-xs text-gray-500">Conectado</span>
-              </div>
+            <div class="flex items-center gap-1 pl-2 border-l border-gray-200">
+              <span id="connDot" class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+              <span id="connText" class="text-xs text-gray-500">OK</span>
               <button
                 id="btnCopyHostURL"
-                class="inline-flex items-center p-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                class="p-1 border border-gray-300 text-xs rounded text-gray-700 bg-white hover:bg-gray-50"
               >
                 <i class="material-icons text-sm">link</i>
               </button>
@@ -150,156 +141,139 @@
       </div>
     </div>
 
-    <!-- Container principal moderno -->
-    <div class="bg-gray-50 min-h-screen">
-      <div class="max-w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Container principal ultra-compacto -->
+    <div class="bg-gray-100 h-screen overflow-hidden">
+      <div class="h-full p-2 grid grid-cols-1 lg:grid-cols-3 gap-2">
         <!-- Sección izquierda: Cliente y productos -->
-        <div class="lg:col-span-2 space-y-6" id="presupuestos-view">
-          <!-- Datos cliente modernos -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                <i class="material-icons text-blue-600 mr-2">person</i>
-                Datos del Cliente
+        <div class="lg:col-span-2 flex flex-col gap-2 overflow-hidden" id="presupuestos-view">
+          <!-- Datos cliente ultra-compactos -->
+          <div class="bg-white rounded border border-gray-300 flex-shrink-0">
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50">
+              <h2 class="text-sm font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-sm text-blue-600 mr-1">person</i>
+                Cliente
               </h2>
             </div>
-            <div class="p-6">
+            <div class="p-2">
               <form id="cliente-form" onsubmit="return false;">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div class="space-y-4">
-                    <div>
-                      <label
-                        for="presupuesto-nombreCliente"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Nombre y Apellidos</label
-                      >
-                      <input
-                        type="text"
-                        id="presupuesto-nombreCliente"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="presupuesto-numeroPresupuesto"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Nº Presupuesto</label
-                      >
-                      <input
-                        type="text"
-                        id="presupuesto-numeroPresupuesto"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="presupuesto-distribuidor"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Distribuidor</label
-                      >
-                      <input
-                        type="text"
-                        id="presupuesto-distribuidor"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
+                <div class="grid grid-cols-6 gap-2 text-xs">
+                  <div>
+                    <label for="presupuesto-nombreCliente" class="block font-medium text-gray-700"
+                      >Nombre</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-nombreCliente"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
                   </div>
-                  <div class="space-y-4">
-                    <div>
-                      <label
-                        for="presupuesto-telefonoCliente"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Teléfono</label
-                      >
-                      <input
-                        type="tel"
-                        id="presupuesto-telefonoCliente"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="presupuesto-fechaPresupuesto"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Fecha</label
-                      >
-                      <input
-                        type="date"
-                        id="presupuesto-fechaPresupuesto"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="presupuesto-descripcion"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Descripción (Calendar)</label
-                      >
-                      <input
-                        type="text"
-                        id="presupuesto-descripcion"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
+                  <div>
+                    <label for="presupuesto-telefonoCliente" class="block font-medium text-gray-700"
+                      >Teléfono</label
+                    >
+                    <input
+                      type="tel"
+                      id="presupuesto-telefonoCliente"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
                   </div>
-                  <div class="space-y-4">
-                    <div>
-                      <label
-                        for="presupuesto-nifCliente"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >NIF/CIF</label
-                      >
-                      <input
-                        type="text"
-                        id="presupuesto-nifCliente"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div class="md:col-span-1">
-                      <label
-                        for="presupuesto-observaciones"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Observaciones</label
-                      >
-                      <input
-                        type="text"
-                        id="presupuesto-observaciones"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
+                  <div>
+                    <label for="presupuesto-nifCliente" class="block font-medium text-gray-700"
+                      >NIF/CIF</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-nifCliente"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-numeroPresupuesto"
+                      class="block font-medium text-gray-700"
+                      >Nº Presup.</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-numeroPresupuesto"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-fechaPresupuesto"
+                      class="block font-medium text-gray-700"
+                      >Fecha</label
+                    >
+                    <input
+                      type="date"
+                      id="presupuesto-fechaPresupuesto"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-distribuidor" class="block font-medium text-gray-700"
+                      >Distribuidor</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-distribuidor"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-1 text-xs">
+                  <div>
+                    <label for="presupuesto-observaciones" class="block font-medium text-gray-700"
+                      >Observaciones</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-observaciones"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-descripcion" class="block font-medium text-gray-700"
+                      >Descripción (Calendar)</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-descripcion"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
               </form>
             </div>
           </div>
 
-          <!-- Añadir productos moderno -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200" id="productos-view">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                <i class="material-icons text-green-600 mr-2">add_shopping_cart</i>
-                Añadir Productos
+          <!-- Añadir productos ultra-compacto -->
+          <div
+            class="bg-white rounded border border-gray-300 flex-1 flex flex-col min-h-0"
+            id="productos-view"
+          >
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <h2 class="text-sm font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-sm text-green-600 mr-1">add_shopping_cart</i>
+                Productos
               </h2>
             </div>
-            <div class="p-6">
+            <div class="p-2 flex-1 flex flex-col min-h-0">
               <form id="producto-form" onsubmit="return false;">
-                <div class="grid grid-cols-1 md:grid-cols-8 gap-3 mb-4">
-                  <div class="md:col-span-2">
-                    <label
-                      for="presupuesto-medida"
-                      class="block text-sm font-medium text-gray-700 mb-1"
+                <div class="grid grid-cols-8 gap-1 mb-2 text-xs">
+                  <div class="col-span-2">
+                    <label for="presupuesto-medida" class="block font-medium text-gray-700"
                       >Medida</label
                     >
                     <input
                       type="text"
                       id="presupuesto-medida"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label
-                      for="presupuesto-cantidad"
-                      class="block text-sm font-medium text-gray-700 mb-1"
+                    <label for="presupuesto-cantidad" class="block font-medium text-gray-700"
                       >Cant.</label
                     >
                     <input
@@ -307,66 +281,58 @@
                       id="presupuesto-cantidad"
                       min="1"
                       value="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
-                  <div class="md:col-span-2">
-                    <label
-                      for="presupuesto-marca-temp"
-                      class="block text-sm font-medium text-gray-700 mb-1"
+                  <div class="col-span-2">
+                    <label for="presupuesto-marca-temp" class="block font-medium text-gray-700"
                       >Marca</label
                     >
                     <input
                       type="text"
                       id="presupuesto-marca-temp"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label
-                      for="presupuesto-neto-temp"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Precio Neto</label
+                    <label for="presupuesto-neto-temp" class="block font-medium text-gray-700"
+                      >Neto</label
                     >
                     <input
                       type="number"
                       id="presupuesto-neto-temp"
                       step="0.01"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label
-                      for="presupuesto-ganancia"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Ganancia</label
+                    <label for="presupuesto-ganancia" class="block font-medium text-gray-700"
+                      >Gan.</label
                     >
                     <input
                       type="number"
                       id="presupuesto-ganancia"
                       step="0.01"
                       value="0"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label
-                      for="presupuesto-ecotasa"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Ecotasa</label
+                    <label for="presupuesto-ecotasa" class="block font-medium text-gray-700"
+                      >Eco</label
                     >
                     <input
                       type="number"
                       id="presupuesto-ecotasa"
                       step="0.01"
                       value="0"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
+                </div>
+                <div class="grid grid-cols-8 gap-1 mb-2 text-xs">
                   <div>
-                    <label
-                      for="presupuesto-iva"
-                      class="block text-sm font-medium text-gray-700 mb-1"
+                    <label for="presupuesto-iva" class="block font-medium text-gray-700"
                       >IVA %</label
                     >
                     <input
@@ -374,130 +340,95 @@
                       id="presupuesto-iva"
                       step="0.01"
                       value="21"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
-                  <div class="flex items-end">
+                  <div class="col-span-2">
+                    <label class="block font-medium text-gray-700">&nbsp;</label>
                     <button
                       type="button"
                       id="btnAgregarMarca"
-                      class="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      class="w-full px-2 py-0.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700"
                     >
-                      <i class="material-icons text-sm mr-1">add</i>
-                      Añadir
+                      <i class="material-icons text-xs">add</i>Añadir
                     </button>
                   </div>
-                </div>
-
-                <!-- Sugerencias modernas -->
-                <div class="space-y-4">
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Sugerencias por Medida</h3>
-                    <div class="flex flex-wrap gap-2" id="precios-por-medida"></div>
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Códigos Filtrados</h3>
-                    <div class="flex flex-wrap gap-2" id="precios-filtros-codigo"></div>
-                  </div>
-                </div>
-
-                <!-- Marcas temporales modernas -->
-                <div class="mt-6 space-y-4">
-                  <div id="lista-marcas-temp"></div>
-                  <div id="lista-otros-trabajos-temp"></div>
-
-                  <!-- Botones de acción principales -->
-                  <div class="flex gap-3">
+                  <div class="col-span-2">
+                    <label class="block font-medium text-gray-700">&nbsp;</label>
                     <button
                       type="button"
                       id="btnAgregarOtroTrabajo"
-                      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                      class="w-full px-2 py-0.5 bg-purple-600 text-white text-xs font-medium rounded hover:bg-purple-700"
                     >
-                      <i class="material-icons text-sm mr-1">build</i>
-                      Otro Trabajo
+                      <i class="material-icons text-xs">build</i>Otro Trabajo
                     </button>
+                  </div>
+                  <div class="col-span-3">
+                    <label class="block font-medium text-gray-700">&nbsp;</label>
                     <button
                       type="button"
                       id="btnAgregarGrupo"
-                      class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      class="w-full px-2 py-0.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700"
                     >
-                      <i class="material-icons text-sm mr-1">playlist_add</i>
-                      Agregar Grupo
+                      <i class="material-icons text-xs">playlist_add</i>Agregar Grupo
                     </button>
                   </div>
                 </div>
+
+                <!-- Sugerencias y marcas temporales ultra-compactas -->
+                <div class="text-xs space-y-1">
+                  <div>
+                    <div class="font-medium text-gray-700 mb-1">Sugerencias</div>
+                    <div class="flex flex-wrap gap-1" id="precios-por-medida"></div>
+                    <div class="flex flex-wrap gap-1" id="precios-filtros-codigo"></div>
+                  </div>
+                  <div id="lista-marcas-temp"></div>
+                  <div id="lista-otros-trabajos-temp"></div>
+                </div>
               </form>
+
+              <!-- Tabla de productos ultra-compacta -->
+              <div class="flex-1 min-h-0 mt-2">
+                <div class="h-full overflow-auto">
+                  <table class="w-full text-xs border-collapse">
+                    <thead class="bg-gray-100 sticky top-0">
+                      <tr class="border-b border-gray-300">
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Medida</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Cant.</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Marca</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">P.Unit.</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Total</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Acc.</th>
+                      </tr>
+                    </thead>
+                    <tbody id="items-list" class="divide-y divide-gray-200">
+                      <!-- Productos dinámicos -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Tabla de productos moderna -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                <i class="material-icons text-blue-600 mr-2">list</i>
-                Lista de Productos
-              </h2>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Medida
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Cant.
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Marca
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Precio Unit.
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Total
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Acc.
-                    </th>
-                  </tr>
-                </thead>
-                <tbody id="items-list" class="bg-white divide-y divide-gray-200">
-                  <!-- Productos dinámicos -->
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
 
-        <!-- Panel derecho moderno -->
-        <div class="lg:col-span-1 space-y-6">
-          <!-- Presupuesto final moderno -->
+        <!-- Panel derecho ultra-compacto -->
+        <div class="lg:col-span-1 flex flex-col gap-2 overflow-hidden">
+          <!-- Presupuesto final ultra-compacto -->
           <div
-            class="bg-white rounded-lg shadow-sm border border-gray-200"
+            class="bg-white rounded border border-gray-300 flex-1 flex flex-col min-h-0"
             id="presupuesto-final-view"
           >
-            <div class="px-6 py-4 border-b border-gray-200">
-              <div class="flex justify-between items-start">
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <div class="flex justify-between items-center text-xs">
                 <div>
-                  <h3 class="text-lg font-bold text-gray-900">NEUMÁTICOS PALMONES</h3>
-                  <p class="text-sm text-gray-600">C/GALEON 25 - Tel: 659 718 809</p>
+                  <div class="font-bold text-gray-900">NEUMÁTICOS PALMONES</div>
+                  <div class="text-gray-600">C/GALEON 25 - Tel: 659 718 809</div>
                 </div>
                 <div class="text-right">
-                  <h3 class="text-lg font-bold text-gray-900">PRESUPUESTO</h3>
-                  <p class="text-sm text-gray-600" id="presupuesto-numero-display">Nº: ---</p>
+                  <div class="font-bold text-gray-900">PRESUPUESTO</div>
+                  <div class="text-gray-600" id="presupuesto-numero-display">Nº: ---</div>
                 </div>
               </div>
             </div>
@@ -505,130 +436,108 @@
             <!-- Meta información del cliente -->
             <div
               id="presupuesto-meta"
-              class="px-6 py-2 text-sm text-gray-600 border-b border-gray-200"
+              class="px-2 py-1 text-xs text-gray-600 border-b border-gray-200 flex-shrink-0"
             ></div>
 
-            <div class="p-6" id="presupuesto-final-content">
+            <div class="p-2 flex-1 overflow-auto" id="presupuesto-final-content">
               <!-- Contenido dinámico del presupuesto -->
               <div id="presupuesto-final-render"></div>
             </div>
           </div>
 
-          <!-- Acciones rápidas modernas -->
+          <!-- Acciones y Calendar ultra-compactos -->
           <div
-            class="bg-white rounded-lg shadow-sm border border-gray-200"
+            class="bg-white rounded border border-gray-300 flex-shrink-0"
             id="acciones-finales-view"
           >
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-semibold text-gray-900">Acciones Rápidas</h3>
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50">
+              <h3 class="text-sm font-semibold text-gray-900">Acciones</h3>
             </div>
-            <div class="p-4">
-              <div class="grid grid-cols-2 gap-2">
+            <div class="p-2">
+              <!-- Acciones en grid compacto -->
+              <div class="grid grid-cols-3 gap-1 mb-2 text-xs">
                 <button
-                  class="hidden w-full px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  class="hidden px-1 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
                   id="btnGuardarComoNuevo"
                 >
-                  <i class="material-icons text-sm mr-1">content_copy</i>
-                  Guardar como Nuevo
+                  <i class="material-icons text-xs">content_copy</i>
                 </button>
                 <button
-                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   id="btnVaciarTemporales"
                 >
-                  <i class="material-icons text-sm mr-1">delete_sweep</i>
-                  Vaciar Temp.
+                  <i class="material-icons text-xs">delete_sweep</i>
                 </button>
                 <button
-                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   id="btnDescargarPDF"
                 >
-                  <i class="material-icons text-sm mr-1">picture_as_pdf</i>
-                  PDF
+                  <i class="material-icons text-xs">picture_as_pdf</i>
                 </button>
                 <button
-                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   id="btnCapturaWhatsApp"
                 >
-                  <i class="material-icons text-sm mr-1">photo_camera</i>
-                  Captura
+                  <i class="material-icons text-xs">photo_camera</i>
                 </button>
                 <button
-                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   id="btnCopiarCalendar"
                 >
-                  <i class="material-icons text-sm mr-1">event</i>
-                  Copiar Cal.
+                  <i class="material-icons text-xs">event</i>
                 </button>
                 <button
-                  class="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   id="btnAbrirCalendar"
                 >
-                  <i class="material-icons text-sm mr-1">open_in_new</i>
-                  Abrir Cal.
+                  <i class="material-icons text-xs">open_in_new</i>
                 </button>
                 <button
-                  class="hidden w-full px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors col-span-2"
+                  class="hidden px-1 py-1 text-white bg-orange-600 rounded hover:bg-orange-700 col-span-3"
                   id="btnCancelarEdicion"
                 >
-                  <i class="material-icons text-sm mr-1">undo</i>
-                  Cancelar Edición
+                  <i class="material-icons text-xs">undo</i>
                 </button>
               </div>
-            </div>
-          </div>
 
-          <!-- Calendar rápido moderno -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-semibold text-gray-900">Programar Cita</h3>
-            </div>
-            <div class="p-4 space-y-4">
-              <div>
-                <label for="calendar-fecha" class="block text-sm font-medium text-gray-700 mb-1"
-                  >Fecha cita</label
-                >
-                <input
-                  type="date"
-                  id="calendar-fecha"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label for="calendar-hora" class="block text-sm font-medium text-gray-700 mb-1"
-                    >Hora</label
-                  >
-                  <input
-                    type="time"
-                    id="calendar-hora"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
+              <!-- Calendar ultra-compacto -->
+              <div class="border-t border-gray-200 pt-2">
+                <div class="text-xs font-medium text-gray-700 mb-1">Cita</div>
+                <div class="grid grid-cols-2 gap-1 text-xs">
+                  <div>
+                    <input
+                      type="date"
+                      id="calendar-fecha"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="time"
+                      id="calendar-hora"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      id="calendar-duracion"
+                      value="60"
+                      min="5"
+                      step="5"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      placeholder="Duración"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      id="calendar-proveedor"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      placeholder="Distribuidor"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label
-                    for="calendar-duracion"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >Duración (min)</label
-                  >
-                  <input
-                    type="number"
-                    id="calendar-duracion"
-                    value="60"
-                    min="5"
-                    step="5"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-              <div>
-                <label for="calendar-proveedor" class="block text-sm font-medium text-gray-700 mb-1"
-                  >Distribuidor (opcional)</label
-                >
-                <input
-                  type="text"
-                  id="calendar-proveedor"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
               </div>
             </div>
           </div>
