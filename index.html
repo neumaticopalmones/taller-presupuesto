@@ -410,17 +410,12 @@
             </div>
           </div>
 
-          <!-- Tabla de productos moderna -->
-        </div>
-
-        <!-- Panel derecho ultra-compacto -->
-        <div class="lg:col-span-1 flex flex-col gap-2 overflow-hidden">
-          <!-- Presupuesto final ultra-compacto -->
+          <!-- Resumen del presupuesto (debajo, no a la derecha) -->
           <div
-            class="bg-white rounded border border-gray-300 flex-1 flex flex-col min-h-0"
+            class="bg-white rounded border border-gray-300 flex-shrink-0"
             id="presupuesto-final-view"
           >
-            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50">
               <div class="flex justify-between items-center text-xs">
                 <div>
                   <div class="font-bold text-gray-900">NEUMÁTICOS PALMONES</div>
@@ -439,12 +434,15 @@
               class="px-2 py-1 text-xs text-gray-600 border-b border-gray-200 flex-shrink-0"
             ></div>
 
-            <div class="p-2 flex-1 overflow-auto" id="presupuesto-final-content">
+            <div class="p-2" id="presupuesto-final-content">
               <!-- Contenido dinámico del presupuesto -->
               <div id="presupuesto-final-render"></div>
             </div>
           </div>
+        </div>
 
+        <!-- Panel derecho ultra-compacto -->
+        <div class="lg:col-span-1 flex flex-col gap-2 overflow-hidden">
           <!-- Acciones y Calendar ultra-compactos -->
           <div
             class="bg-white rounded border border-gray-300 flex-shrink-0"
