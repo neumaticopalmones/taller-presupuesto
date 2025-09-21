@@ -321,7 +321,7 @@ body {
 
 .table-content {
   /* no depender del 100% de un contenedor con altura fija */
-  max-height: 50vh;
+  max-height: 40vh;
   overflow-y: auto;
 }
 
@@ -1038,4 +1038,34 @@ tr:hover {
 .loader-content p {
   margin-top: 10px;
   font-weight: 600;
+}
+
+/* ===== Compactación tipo ERP ===== */
+input,
+select,
+button {
+  font-size: 11px !important;
+  padding: 2px 4px !important;
+  height: 22px !important;
+}
+label {
+  font-size: 10px !important;
+  margin-bottom: 1px !important;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.table-content {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+#presupuesto-final-view {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+#acciones-finales-view {
+  max-height: 200px;
+  overflow-y: auto;
 }
