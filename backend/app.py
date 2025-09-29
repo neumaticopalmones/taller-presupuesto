@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover - entorno sin dependencia
         return None
 
 
-from flask import Flask, abort, jsonify, request, send_file, send_from_directory, render_template
+from flask import Flask, abort, jsonify, request, send_file, send_from_directory, render_template, redirect, url_for
 from flask_cors import CORS
 
 try:
@@ -246,7 +246,13 @@ app.register_blueprint(bp_stats)
 @limiter.exempt
 @app.route("/")
 def serve_index():
-    return send_file("index.html")
+    """Redirige la raíz a la nueva interfaz de presupuesto.
+
+    Si quieres conservar el index.html antiguo, comenta el return redirect y
+    deja el send_file.
+    """
+    # return send_file("index.html")  # <- descomenta para usar el antiguo front
+    return redirect(url_for("view_presupuesto"))
 
 
 @app.get("/presupuesto")
@@ -257,6 +263,7 @@ def view_presupuesto():
     contexto al template.
     """
     try:
+        app.logger.info("Renderizando vista /presupuesto (classic/moderno)")
         return render_template("presupuesto.html")
     except Exception as e:  # pragma: no cover - render error improbable
         abort(500, description=f"No se pudo renderizar la vista presupuesto: {e}")
