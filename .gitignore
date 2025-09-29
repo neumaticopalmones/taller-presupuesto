@@ -1,57 +1,86 @@
-# Python
+#############################################
+# Raíz .gitignore consolidado
+# Mantén este archivo ordenado por secciones.
+#############################################
+
+### Python
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.so
 *.egg-info/
+.eggs/
 dist/
 build/
 .venv/
 venv/
-.env
+ENV/
+env/
+pip-wheel-metadata/
 
-# VS Code
+### Entornos / Config
+.env
+.env.*
+!.env.example
+
+### Logs y diagnósticos
+*.log
+logs/
+*.tmp
+
+### Bases de datos locales / SQLite
+*.db
+*.sqlite3
+instance/*.db
+!/migrations/README
+
+### Alembic cache
+migrations/__pycache__/
+
+### Node / Frontend
+node_modules/
+*.tsbuildinfo
+
+### Build artefacts front
+frontend-ng/dist/
+frontend-ng/.angular/
+frontend-backup/dist/
+
+### Editor / IDE
 .vscode/
 .history/
+*.code-workspace
 
-# Node
-node_modules/
-
-# OS
+### OS
 .DS_Store
 Thumbs.db
 
-# Docker / logs
-*.log
-
-# Local helpers
-host_ip.txt
-
-# Caddy certs
+### Caddy certs
 caddy/certs/
 
-# Alembic cache
-migrations/__pycache__/
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.egg-info/
-.eggs/
-.venv/
-venv/
-.env
+### Local helpers
+host_ip.txt
 
-# VS Code
-.vscode/
+### Backups manuales
+manual-aplicacion/BACKUP_*/
+arranque-y-copias-seguridad/respaldos.log
 
-# Node/web (por si acaso)
-node_modules/
+### Docker
+tmp/
+docker-data/
 
-# OS
-.DS_Store
-Thumbs.db
-venv/
-.env
+### Coverage / Testing
+.coverage*
+htmlcov/
+coverage.xml
+pytest_cache/
+
+### Pyproject build
+*.egg
+*.manifest
+*.spec
+
+#############################################
+# Fin .gitignore
+#############################################

@@ -1,0 +1,23 @@
+<div class="classic-toolbar">
+  <button
+    class="classic-button primary"
+    onclick="location.href='{{ url_for('view_presupuesto') }}'"
+  >
+    Presupuesto
+  </button>
+  <button class="classic-button">Ventas</button>
+  <button class="classic-button">Clientes</button>
+  <div class="classic-separator"></div>
+  <button class="classic-button" id="toggle-modo">Modo</button>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("toggle-modo");
+    btn?.addEventListener("click", () => {
+      const root = document.querySelector(".classic-app-window");
+      if (root) {
+        root.classList.toggle("modern");
+      }
+    });
+  });
+</script>

@@ -1,0 +1,162 @@
+{% extends 'base.html' %} {% block title %}Presupuesto{% endblock %} {% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/classic.css') }}" />
+<style>
+  body {
+    font-family: "Inter", sans-serif;
+  }
+</style>
+{% endblock %} {% block main_classes %}p-0 m-0 flex-1 w-full h-screen overflow-hidden{% endblock %}
+{% block content %}
+<div class="classic-app-window modern" style="height: 100vh; border-top: none; border-radius: 0">
+  {% include 'components/toolbar-principal.html' %} {% include 'components/toolbar-acciones.html' %}
+  <div class="classic-main-panel" style="overflow: auto; padding-top: 11px">
+    <div class="classic-form-header"><h2 style="font-size: 14px; margin: 0">Presupuesto</h2></div>
+    <div class="classic-two-col">
+      <div class="classic-left">
+        <div style="display: flex; font-size: 11px; margin-bottom: 0px">
+          <label style="width: 9%">Número:</label>
+          <input class="input-field" style="width: 17%" value="25 / 01552" />
+          <label style="width: 7%">Fecha:</label>
+          <input id="fecha-presupuesto" class="input-field" style="width: 17%" type="date" />
+          <label style="width: 7%">Distrib:</label>
+          <input class="input-field" style="width: 17%" value="" />
+          <label style="width: 7%">Observ:</label>
+          <input class="input-field" style="width: 17%" value="" />
+        </div>
+        <div style="display: flex; font-size: 11px; margin-bottom: 2px">
+          <label style="width: 9%">Matrícula:</label>
+          <input class="input-field" style="width: 17%" value="NO EXISTE !!" />
+          <label style="width: 7%">cliente:</label>
+          <input
+            id="cliente-presupuesto"
+            class="input-field"
+            style="width: 17%"
+            placeholder="Nombre del cliente"
+          />
+          <label style="width: 7%">tlf:</label>
+          <input class="input-field" style="width: 17%" value="0" />
+          <label style="width: 7%">Descrip:</label>
+          <input class="input-field" style="width: 17%" value="" />
+        </div>
+      </div>
+      <div class="classic-right">
+        <div style="display: flex; font-size: 11px; margin-bottom: 2px">
+          <label style="width: 12%">Medida:</label>
+          <input id="medida-input" data-field="medida" class="input-field" style="width: 32%" />
+          <label style="width: 9%">Cant.:</label>
+          <input id="cantidad-input" data-field="cantidad" class="input-field" style="width: 7%" />
+          <label style="width: 9%">Gana:</label>
+          <input id="ganancia-input" data-field="ganancia" class="input-field" style="width: 7%" />
+          <label style="width: 7%">Eco:</label>
+          <input id="ecotasa-input" data-field="ecotasa" class="input-field" style="width: 7%" />
+        </div>
+        <div style="display: flex; font-size: 11px; margin-bottom: 2px">
+          <label style="width: 7%">IVA:</label>
+          <input
+            id="iva-porcentaje"
+            data-field="iva"
+            class="input-field"
+            style="width: 7%"
+            value="21"
+          />
+          <label style="width: 9%">Marca:</label>
+          <input id="marca-input" data-field="marca" class="input-field" style="width: 53%" />
+          <label style="width: 9%">Neto:</label>
+          <input id="neto-input" data-field="neto" class="input-field" style="width: 9%" />
+        </div>
+        <div class="classic-side-buttons" style="margin-top: 8px">
+          <button
+            class="classic-button success"
+            style="background: var(--modern-success); color: #fff"
+          >
+            Nuevo Artículo
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="classic-lines-wrapper" style="display: flex; gap: 8px; align-items: stretch">
+      <div
+        class="classic-lines-table"
+        style="flex: 1; display: flex; flex-direction: column; min-height: 420px"
+      >
+        <div class="classic-lines-head" style="background: #4096eb">
+          <span style="width: 32%; text-align: left">Descripción</span>
+          <span style="width: 8%">Cant.</span>
+          <span style="width: 8%">Pre/uni</span>
+          <span style="width: 8%">Total</span>
+        </div>
+        <div class="classic-lines-body" id="line-items" style="flex: 1">
+          <div class="classic-row">
+            <input class="input-field" style="width: 32%" value="Entrada de neumáticos" />
+            <input class="input-field" style="width: 8%; text-align: right" value="1.00" />
+            <input class="input-field" style="width: 8%; text-align: right" value="1.00" />
+            <input class="input-field" style="width: 8%; text-align: right" value="0.00" />
+            <button class="classic-button danger">Eliminar</button>
+            <button class="classic-button danger">Elegir/marca</button>
+          </div>
+          <div class="classic-row">
+            <input class="input-field" style="width: 32%" value="Mano de Obra (Horas)" />
+            <input class="input-field" style="width: 8%; text-align: right" value="2.50" />
+            <input class="input-field" style="width: 8%; text-align: right" value="34.00" />
+            <input class="input-field" style="width: 8%; text-align: right" value="0.00" />
+          </div>
+        </div>
+        <div class="classic-observ" style="border-top: 1px solid #b4b4b4; padding-top: 4px">
+          <label style="font-size: 11px; display: block">Obser:</label>
+          <textarea class="input-field" style="width: 100%; height: 70px"></textarea>
+        </div>
+      </div>
+      <div style="width: 360px; display: flex; flex-direction: column; gap: 8px">
+        <div
+          id="panel-medidas"
+          style="
+            flex: 1;
+            border: 1px dashed #9ca3af;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            padding: 4px;
+            color: #374151;
+            font-size: 12px;
+            font-style: normal;
+            background: repeating-linear-gradient(
+              45deg,
+              #f3f4f6,
+              #f3f4f6 10px,
+              #ffffff 10px,
+              #ffffff 20px
+            );
+            overflow: auto;
+          "
+        >
+          <div
+            style="text-align: center; color: #6b7280; font-style: italic; margin: 4px 0"
+            id="panel-medidas-empty"
+          >
+            (Panel reservado para medidas / marcas guardadas)
+          </div>
+          <ul
+            id="panel-medidas-list"
+            style="list-style: none; padding: 0; margin: 0; display: none"
+          ></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const fechaInput = document.getElementById("fecha-presupuesto");
+    if (fechaInput && !fechaInput.value) {
+      fechaInput.value = new Date().toISOString().split("T")[0];
+    }
+  });
+</script>
+{% endblock %}

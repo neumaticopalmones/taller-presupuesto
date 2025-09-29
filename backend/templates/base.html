@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}App{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" />
+    {% block extra_head %}{% endblock %}
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f5f6f8;
+        font-family: system-ui, Arial, sans-serif;
+      }
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body class="app-shell {% block body_class %}{% endblock %}">
+    {% block site_header %}
+    <header style="display: none"></header>
+    {% endblock %}
+    <main
+      class="{% block main_classes %}flex-1{% endblock %}"
+      style="display: flex; flex-direction: column"
+    >
+      {% block content %}{% endblock %}
+    </main>
+    {% block site_footer %}
+    <footer style="display: none"></footer>
+    {% endblock %} {% block scripts %}{% endblock %}
+  </body>
+</html>
