@@ -1,14 +1,10 @@
-<div class="classic-toolbar">
-  <button
-    class="classic-button primary"
-    onclick="location.href='{{ url_for('view_presupuesto') }}'"
-  >
-    Presupuesto
-  </button>
-  <button class="classic-button">Ventas</button>
-  <button class="classic-button">Clientes</button>
-  <div class="classic-separator"></div>
-  <button class="classic-button" id="toggle-modo">Modo</button>
+<div class="top-tabs-bar">
+  <div class="top-tab" data-tab="ventas">Ventas</div>
+  <div class="top-tab active" data-tab="presupuesto">Presupuesto</div>
+  <div class="top-tab" data-tab="facturas">Facturas</div>
+  <div class="top-tab" data-tab="pedidos">Pedidos</div>
+  <div class="top-tab" data-tab="tesoreria">Tesorería</div>
+  <button class="classic-button btn-compact float-right" id="toggle-modo" style="margin-left:auto;">Modo</button>
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -18,6 +14,12 @@
       if (root) {
         root.classList.toggle("modern");
       }
+    });
+    document.querySelectorAll('.top-tab').forEach(t => {
+      t.addEventListener('click', () => {
+        if(t.dataset.tab === 'presupuesto') return; // demo
+        alert('Sección "' + t.dataset.tab + '" aún no implementada');
+      });
     });
   });
 </script>

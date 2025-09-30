@@ -1,12 +1,31 @@
-<div class="classic-subtoolbar">
-  <button class="classic-button success" id="btn-guardar">Guardar</button>
-  <button class="classic-button" id="btn-nuevo">Nuevo</button>
-  <button class="classic-button danger" id="btn-eliminar">Eliminar</button>
+<div class="sub-actions-bar">
+  <button class="classic-button primary btn-compact" id="btn-nuevo">+ Nuevo</button>
+  <button class="classic-button success btn-compact" id="btn-guardar">💾 Guardar</button>
+  <button class="classic-button btn-compact" id="btn-historial">📜 Historial</button>
+  <button class="classic-button btn-compact" id="btn-pedidos">🗂️ Pedidos</button>
+  <button class="classic-button btn-compact" id="btn-pdf">📄 PDF</button>
+  <button class="classic-button btn-compact" id="btn-whatsapp">💬 WhatsApp</button>
+  <button class="classic-button btn-compact" id="btn-calendario">📅 Calendario</button>
+  <div class="classic-separator"></div>
+  <button class="classic-button btn-compact" id="btn-vaciar">🗑️ Vaciar</button>
+  <button class="classic-button btn-compact" id="btn-sugerencias">💡 Sugerencias</button>
+  <div class="classic-separator"></div>
+  <button class="classic-button btn-compact" id="btn-salir">⬅️ Salir</button>
+  <button class="classic-button danger btn-compact" id="btn-cerrar">✖ Cerrar</button>
 </div>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    document
-      .getElementById("btn-guardar")
-      ?.addEventListener("click", () => alert("Guardar no implementado aún"));
+  document.addEventListener('DOMContentLoaded', () => {
+    const info = (id, msg) => document.getElementById(id)?.addEventListener('click', () => alert(msg));
+    info('btn-guardar','Acción Guardar (pendiente de implementación backend API)');
+    info('btn-nuevo','Limpia el formulario (no implementado)');
+    info('btn-historial','Abrir historial (pendiente)');
+    info('btn-pedidos','Ir a pedidos (pendiente)');
+    info('btn-pdf','Generar PDF (pendiente)');
+    info('btn-whatsapp','Compartir por WhatsApp (pendiente)');
+    info('btn-calendario','Calendario (pendiente)');
+    info('btn-vaciar','Vaciar líneas (pendiente)');
+    info('btn-sugerencias','Mostrar panel sugerencias (pendiente)');
+    info('btn-salir','Simular salir (pendiente)');
+    info('btn-cerrar','Cerrar ventana (pendiente)');
   });
 </script>
