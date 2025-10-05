@@ -1,42 +1,56 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Iniciando aplicación en Render..."
+echo "🚀 Iniciando aplicación..."
 
-# Verificar variables de entorno críticas - más flexible
+# Asegurar carpeta para SQLite relativa (si se usa fallback)
+mkdir -p tmp || true
+
+# Construir DATABASE_URL desde variables individuales si no está definida
+if [ -z "$DATABASE_URL" ] && [ -n "$POSTGRES_HOST" ] && [ -n "$POSTGRES_USER" ] && [ -n "$POSTGRES_PASSWORD" ] && [ -n "$POSTGRES_DB" ]; then
+    POSTGRES_PORT_USE=${POSTGRES_PORT:-5432}
+    export DATABASE_URL="postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT_USE/$POSTGRES_DB"
+    echo "� Construida DATABASE_URL desde variables POSTGRES_*"
+fi
+
+# Si aún no hay DATABASE_URL ni variables de Postgres suficientes, activar fallback SQLite
 if [ -z "$DATABASE_URL" ] && [ -z "$POSTGRES_HOST" ]; then
-    echo "❌ ERROR: Ni DATABASE_URL ni POSTGRES_HOST están definidas"
-    echo "💡 Se requiere DATABASE_URL o las variables individuales (POSTGRES_HOST, POSTGRES_USER, etc.)"
-    exit 1
+    echo "⚠️ No hay configuración de Postgres. Usando SQLite de respaldo en tmp/fallback.db"
+    export DATABASE_URL="sqlite:///tmp/fallback.db"
 fi
 
 if [ -n "$DATABASE_URL" ]; then
-    echo "✅ Usando DATABASE_URL para conexión a la base de datos"
+    echo "✅ Usando DATABASE_URL: ${DATABASE_URL%%:*}://..."
 else
-    echo "✅ Usando variables individuales para conexión a la base de datos"
-    echo "   POSTGRES_HOST: ${POSTGRES_HOST}"
-    echo "   POSTGRES_DB: ${POSTGRES_DB}"
-    echo "   POSTGRES_USER: ${POSTGRES_USER}"
+    echo "ℹ️ Sin DATABASE_URL; el backend decidirá la conexión"
 fi
 
-# Usar nuestro script inteligente para manejar migraciones
-echo "🔧 Ejecutando script inteligente de migraciones..."
-python fix_migrations.py
+# Preparar entorno Flask para comandos CLI de migraciones
+export FLASK_APP=app:app
+export PYTHONPATH="/app/backend:${PYTHONPATH}"
 
-if [ $? -ne 0 ]; then
-    echo "❌ ERROR: Falló el manejo de migraciones"
-    exit 1
+# Ejecutar migraciones de forma condicional
+echo "🔧 Ejecutando migraciones (si aplica)..."
+pushd backend >/dev/null
+if [[ "$DATABASE_URL" == sqlite:* ]]; then
+    # En SQLite las migraciones son opcionales; no bloquear el arranque si fallan
+    python -m flask db upgrade || echo "⚠️ Migraciones SQLite fallaron (no bloqueante)"
+else
+    # Corregir ruta del script (está en la raíz del proyecto)
+    python ../fix_migrations.py
 fi
+popd >/dev/null
 
-echo "✅ Migraciones manejadas correctamente"
+echo "✅ Paso de migraciones finalizado"
 
 # Configurar número de workers para Gunicorn
 WORKERS=${WEB_CONCURRENCY:-4}
 echo "👥 Iniciando Gunicorn con $WORKERS workers"
 
 echo "🌟 Iniciando servidor con gunicorn..."
+cd backend
 exec gunicorn \
-    --bind 0.0.0.0:$PORT \
+    --bind 0.0.0.0:${PORT:-5000} \
     --workers $WORKERS \
     --timeout 120 \
     --keep-alive 2 \

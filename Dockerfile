@@ -8,12 +8,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements desde backend/
-COPY backend/requirements.txt ./
+COPY backend/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar todo el código
-COPY backend/ ./backend/
-COPY frontend-backup/ ./frontend-backup/
+COPY . .
 
 # Copiar y hacer ejecutable el script de inicio
 COPY start.sh ./
