@@ -2,7 +2,7 @@ import pathlib
 import re
 from datetime import date
 
-APP_FILE = pathlib.Path(__file__).parent.parent / "app.py"
+APP_FILE = pathlib.Path(__file__).parent.parent / "backend" / "app.py"
 _CODE = APP_FILE.read_text(encoding="utf-8")
 
 

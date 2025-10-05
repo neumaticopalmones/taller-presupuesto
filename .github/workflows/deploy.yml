@@ -31,19 +31,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install dependencies
+      - name: Install dependencies (backend)
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
           pip install pytest pytest-cov flake8
 
       - name: Lint with flake8
@@ -57,14 +51,17 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
           FLASK_ENV: testing
+          FLASK_APP: backend.app:app
         run: |
-          export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db
-          python -c "import os; print('DATABASE_URL:', os.environ.get('DATABASE_URL')); print('FLASK_ENV:', os.environ.get('FLASK_ENV'))"
+          echo "DATABASE_URL=$DATABASE_URL"
+          echo "FLASK_ENV=$FLASK_ENV"
+          echo "FLASK_APP=$FLASK_APP"
 
       - name: Run database migrations
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
           FLASK_ENV: testing
+          FLASK_APP: backend.app:app
         run: |
           python -m flask db upgrade
 
@@ -72,8 +69,9 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
           FLASK_ENV: testing
+          PYTHONPATH: ${{ github.workspace }}/backend
         run: |
-          pytest tests/ -v --cov=. --cov-report=xml
+          pytest tests/ -v --cov=backend --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -92,6 +90,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Deploy to Render
+        if: ${{ secrets.RENDER_API_KEY != '' && secrets.RENDER_SERVICE_ID != '' }}
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}

@@ -14,18 +14,19 @@
   <button class="classic-button danger btn-compact" id="btn-cerrar">✖ Cerrar</button>
 </div>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const info = (id, msg) => document.getElementById(id)?.addEventListener('click', () => alert(msg));
-    info('btn-guardar','Acción Guardar (pendiente de implementación backend API)');
-    info('btn-nuevo','Limpia el formulario (no implementado)');
-    info('btn-historial','Abrir historial (pendiente)');
-    info('btn-pedidos','Ir a pedidos (pendiente)');
-    info('btn-pdf','Generar PDF (pendiente)');
-    info('btn-whatsapp','Compartir por WhatsApp (pendiente)');
-    info('btn-calendario','Calendario (pendiente)');
-    info('btn-vaciar','Vaciar líneas (pendiente)');
-    info('btn-sugerencias','Mostrar panel sugerencias (pendiente)');
-    info('btn-salir','Simular salir (pendiente)');
-    info('btn-cerrar','Cerrar ventana (pendiente)');
+  document.addEventListener("DOMContentLoaded", () => {
+    const info = (id, msg) =>
+      document.getElementById(id)?.addEventListener("click", () => alert(msg));
+    info("btn-guardar", "Acción Guardar (pendiente de implementación backend API)");
+    info("btn-nuevo", "Limpia el formulario (no implementado)");
+    info("btn-historial", "Abrir historial (pendiente)");
+    info("btn-pedidos", "Ir a pedidos (pendiente)");
+    info("btn-pdf", "Generar PDF (pendiente)");
+    info("btn-whatsapp", "Compartir por WhatsApp (pendiente)");
+    info("btn-calendario", "Calendario (pendiente)");
+    info("btn-vaciar", "Vaciar líneas (pendiente)");
+    info("btn-sugerencias", "Mostrar panel sugerencias (pendiente)");
+    info("btn-salir", "Simular salir (pendiente)");
+    info("btn-cerrar", "Cerrar ventana (pendiente)");
   });
 </script>

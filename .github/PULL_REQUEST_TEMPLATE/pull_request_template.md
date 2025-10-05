@@ -23,3 +23,5 @@
 
 - Si falla el pre-commit, arregla con `npm run lint:fix` o corrige manualmente.
 - Python usa línea máxima 100.
+
+

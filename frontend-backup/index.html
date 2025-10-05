@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neumáticos Palmones - Presupuestos</title>
+
+    <!-- Materialize CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <!-- Tailwind CSS para modernizar diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Favicon inline para evitar 404 en /favicon.ico -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%230b63f6' width='64' height='64' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='36' font-family='Segoe UI, Arial' fill='white'%3EN%3C/text%3E%3C/svg%3E"
+    />
+
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Toolbar ultra-compacto estilo ERP -->
+    <div class="bg-white border-b border-gray-300 shadow-sm">
+      <div class="flex items-center justify-between px-2 py-1">
+        <!-- Marca y badge compactos -->
+        <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-1">
+            <div class="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
+              <span class="text-white font-bold text-xs">N</span>
+            </div>
+            <h1 class="text-gray-900 font-semibold text-sm">Neumáticos Palmones</h1>
+          </div>
+          <span
+            id="loaded-presupuesto-badge"
+            class="hidden px-1 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded"
+            data-badge-caption=""
+          ></span>
+        </div>
+
+        <!-- Grupos de botones ultra-compactos -->
+        <div class="flex items-center space-x-3">
+          <!-- Presupuestos -->
+          <div class="flex items-center gap-1">
+            <button
+              id="btnNuevoPresupuesto"
+              class="px-2 py-1 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
+            >
+              <i class="material-icons text-sm">add</i>Nuevo
+            </button>
+            <button
+              id="btnGuardarPresupuesto"
+              class="px-2 py-1 text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700"
+            >
+              <i class="material-icons text-sm">save</i>Guardar
+            </button>
+            <button
+              id="btnCancelarEdicionTop"
+              class="hidden px-2 py-1 text-xs font-medium rounded text-white bg-orange-600 hover:bg-orange-700"
+            >
+              <i class="material-icons text-sm">cancel</i>Cancelar
+            </button>
+          </div>
+
+          <!-- Navegación -->
+          <div class="flex items-center gap-1">
+            <button
+              id="btnVerHistorial"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="material-icons text-sm">history</i>Historial
+            </button>
+            <button
+              id="btnVerPedidos"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="material-icons text-sm">shopping_cart</i>Pedidos
+            </button>
+          </div>
+
+          <!-- Exportar -->
+          <div class="flex items-center gap-1">
+            <button
+              id="btnImprimirPresupuesto"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="material-icons text-sm">print</i>PDF
+            </button>
+            <button
+              id="btnCompartirWhatsApp"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="material-icons text-sm">message</i>WhatsApp
+            </button>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex items-center gap-1">
+            <button
+              id="btnVaciarGrupos"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="material-icons text-sm">clear_all</i>Vaciar
+            </button>
+            <button
+              id="btnCargarSugerencias"
+              class="px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="material-icons text-sm">lightbulb_outline</i>Sugerencias
+            </button>
+          </div>
+
+          <!-- Vista y herramientas -->
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-1 text-xs text-gray-700 cursor-pointer">
+              <input
+                type="checkbox"
+                id="toggleExtraCompactoTop"
+                class="h-3 w-3 text-blue-600 border-gray-300 rounded"
+              />
+              <span>Extra</span>
+            </label>
+
+            <div class="flex items-center gap-1 pl-2 border-l border-gray-200">
+              <span id="connDot" class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+              <span id="connText" class="text-xs text-gray-500">OK</span>
+              <button
+                id="btnCopyHostURL"
+                class="p-1 border border-gray-300 text-xs rounded text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <i class="material-icons text-sm">link</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container principal ultra-compacto -->
+    <div class="bg-gray-100 h-screen overflow-hidden">
+      <div class="h-full p-2 grid grid-cols-1 lg:grid-cols-3 gap-2">
+        <!-- Sección izquierda: Cliente y productos -->
+        <div class="lg:col-span-2 flex flex-col gap-2 overflow-hidden" id="presupuestos-view">
+          <!-- Datos cliente ultra-compactos -->
+          <div class="bg-white rounded border border-gray-300 flex-shrink-0">
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50">
+              <h2 class="text-sm font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-sm text-blue-600 mr-1">person</i>
+                Cliente
+              </h2>
+            </div>
+            <div class="p-2">
+              <form id="cliente-form" onsubmit="return false;">
+                <div class="grid grid-cols-6 gap-2 text-xs">
+                  <div>
+                    <label for="presupuesto-nombreCliente" class="block font-medium text-gray-700"
+                      >Nombre</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-nombreCliente"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-telefonoCliente" class="block font-medium text-gray-700"
+                      >Teléfono</label
+                    >
+                    <input
+                      type="tel"
+                      id="presupuesto-telefonoCliente"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-nifCliente" class="block font-medium text-gray-700"
+                      >NIF/CIF</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-nifCliente"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-numeroPresupuesto"
+                      class="block font-medium text-gray-700"
+                      >Nº Presup.</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-numeroPresupuesto"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="presupuesto-fechaPresupuesto"
+                      class="block font-medium text-gray-700"
+                      >Fecha</label
+                    >
+                    <input
+                      type="date"
+                      id="presupuesto-fechaPresupuesto"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-distribuidor" class="block font-medium text-gray-700"
+                      >Distribuidor</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-distribuidor"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-1 text-xs">
+                  <div>
+                    <label for="presupuesto-observaciones" class="block font-medium text-gray-700"
+                      >Observaciones</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-observaciones"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-descripcion" class="block font-medium text-gray-700"
+                      >Descripción (Calendar)</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-descripcion"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Añadir productos ultra-compacto -->
+          <div
+            class="bg-white rounded border border-gray-300 flex-1 flex flex-col min-h-0"
+            id="productos-view"
+          >
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <h2 class="text-sm font-semibold text-gray-900 flex items-center">
+                <i class="material-icons text-sm text-green-600 mr-1">add_shopping_cart</i>
+                Productos
+              </h2>
+            </div>
+            <div class="p-2 flex-1 flex flex-col min-h-0">
+              <form id="producto-form" onsubmit="return false;">
+                <div class="grid grid-cols-8 gap-1 mb-2 text-xs">
+                  <div class="col-span-2">
+                    <label for="presupuesto-medida" class="block font-medium text-gray-700"
+                      >Medida</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-medida"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-cantidad" class="block font-medium text-gray-700"
+                      >Cant.</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-cantidad"
+                      min="1"
+                      value="2"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div class="col-span-2">
+                    <label for="presupuesto-marca-temp" class="block font-medium text-gray-700"
+                      >Marca</label
+                    >
+                    <input
+                      type="text"
+                      id="presupuesto-marca-temp"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-neto-temp" class="block font-medium text-gray-700"
+                      >Neto</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-neto-temp"
+                      step="0.01"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-ganancia" class="block font-medium text-gray-700"
+                      >Gan.</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-ganancia"
+                      step="0.01"
+                      value="0"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label for="presupuesto-ecotasa" class="block font-medium text-gray-700"
+                      >Eco</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-ecotasa"
+                      step="0.01"
+                      value="0"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                <div class="grid grid-cols-8 gap-1 mb-2 text-xs">
+                  <div>
+                    <label for="presupuesto-iva" class="block font-medium text-gray-700"
+                      >IVA %</label
+                    >
+                    <input
+                      type="number"
+                      id="presupuesto-iva"
+                      step="0.01"
+                      value="21"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block font-medium text-gray-700">&nbsp;</label>
+                    <button
+                      type="button"
+                      id="btnAgregarMarca"
+                      class="w-full px-2 py-0.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700"
+                    >
+                      <i class="material-icons text-xs">add</i>Añadir
+                    </button>
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block font-medium text-gray-700">&nbsp;</label>
+                    <button
+                      type="button"
+                      id="btnAgregarOtroTrabajo"
+                      class="w-full px-2 py-0.5 bg-purple-600 text-white text-xs font-medium rounded hover:bg-purple-700"
+                    >
+                      <i class="material-icons text-xs">build</i>Otro Trabajo
+                    </button>
+                  </div>
+                  <div class="col-span-3">
+                    <label class="block font-medium text-gray-700">&nbsp;</label>
+                    <button
+                      type="button"
+                      id="btnAgregarGrupo"
+                      class="w-full px-2 py-0.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700"
+                    >
+                      <i class="material-icons text-xs">playlist_add</i>Agregar Grupo
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sugerencias y marcas temporales ultra-compactas -->
+                <div class="text-xs space-y-1">
+                  <div>
+                    <div class="font-medium text-gray-700 mb-1">Sugerencias</div>
+                    <div class="flex flex-wrap gap-1" id="precios-por-medida"></div>
+                    <div class="flex flex-wrap gap-1" id="precios-filtros-codigo"></div>
+                  </div>
+                  <div id="lista-marcas-temp"></div>
+                  <div id="lista-otros-trabajos-temp"></div>
+                </div>
+              </form>
+
+              <!-- Tabla de productos ultra-compacta -->
+              <div class="flex-1 min-h-0 mt-2">
+                <div class="h-full overflow-auto">
+                  <table class="w-full text-xs border-collapse">
+                    <thead class="bg-gray-100 sticky top-0">
+                      <tr class="border-b border-gray-300">
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Medida</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Cant.</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Marca</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">P.Unit.</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Total</th>
+                        <th class="px-1 py-1 text-left font-medium text-gray-700">Acc.</th>
+                      </tr>
+                    </thead>
+                    <tbody id="items-list" class="divide-y divide-gray-200">
+                      <!-- Productos dinámicos -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen del presupuesto (debajo, no a la derecha) -->
+          <div
+            class="bg-white rounded border border-gray-300 flex-shrink-0"
+            id="presupuesto-final-view"
+          >
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50">
+              <div class="flex justify-between items-center text-xs">
+                <div>
+                  <div class="font-bold text-gray-900">NEUMÁTICOS PALMONES</div>
+                  <div class="text-gray-600">C/GALEON 25 - Tel: 659 718 809</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-gray-900">PRESUPUESTO</div>
+                  <div class="text-gray-600" id="presupuesto-numero-display">Nº: ---</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meta información del cliente -->
+            <div
+              id="presupuesto-meta"
+              class="px-2 py-1 text-xs text-gray-600 border-b border-gray-200 flex-shrink-0"
+            ></div>
+
+            <div class="p-2" id="presupuesto-final-content">
+              <!-- Contenido dinámico del presupuesto -->
+              <div id="presupuesto-final-render"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel derecho ultra-compacto -->
+        <div class="lg:col-span-1 flex flex-col gap-2 overflow-hidden">
+          <!-- Acciones y Calendar ultra-compactos -->
+          <div
+            class="bg-white rounded border border-gray-300 flex-shrink-0"
+            id="acciones-finales-view"
+          >
+            <div class="px-3 py-1 border-b border-gray-200 bg-gray-50">
+              <h3 class="text-sm font-semibold text-gray-900">Acciones</h3>
+            </div>
+            <div class="p-2">
+              <!-- Acciones en grid compacto -->
+              <div class="grid grid-cols-3 gap-1 mb-2 text-xs">
+                <button
+                  class="hidden px-1 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                  id="btnGuardarComoNuevo"
+                >
+                  <i class="material-icons text-xs">content_copy</i>
+                </button>
+                <button
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+                  id="btnVaciarTemporales"
+                >
+                  <i class="material-icons text-xs">delete_sweep</i>
+                </button>
+                <button
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+                  id="btnDescargarPDF"
+                >
+                  <i class="material-icons text-xs">picture_as_pdf</i>
+                </button>
+                <button
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+                  id="btnCapturaWhatsApp"
+                >
+                  <i class="material-icons text-xs">photo_camera</i>
+                </button>
+                <button
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+                  id="btnCopiarCalendar"
+                >
+                  <i class="material-icons text-xs">event</i>
+                </button>
+                <button
+                  class="px-1 py-1 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+                  id="btnAbrirCalendar"
+                >
+                  <i class="material-icons text-xs">open_in_new</i>
+                </button>
+                <button
+                  class="hidden px-1 py-1 text-white bg-orange-600 rounded hover:bg-orange-700 col-span-3"
+                  id="btnCancelarEdicion"
+                >
+                  <i class="material-icons text-xs">undo</i>
+                </button>
+              </div>
+
+              <!-- Calendar ultra-compacto -->
+              <div class="border-t border-gray-200 pt-2">
+                <div class="text-xs font-medium text-gray-700 mb-1">Cita</div>
+                <div class="grid grid-cols-2 gap-1 text-xs">
+                  <div>
+                    <input
+                      type="date"
+                      id="calendar-fecha"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="time"
+                      id="calendar-hora"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      id="calendar-duracion"
+                      value="60"
+                      min="5"
+                      step="5"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      placeholder="Duración"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      id="calendar-proveedor"
+                      class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      placeholder="Distribuidor"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modales del sistema -->
+
+    <!-- Modal Historial -->
+    <div id="historial-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content-historial">
+        <div class="modal-header-historial">
+          <h3>
+            <i class="material-icons">history</i>
+            Historial de Presupuestos
+          </h3>
+          <button
+            id="btnVolverPresupuestos"
+            class="modal-back"
+            title="Volver a Presupuestos"
+            style="margin-right: 8px"
+          >
+            <i class="material-icons">arrow_back</i>
+          </button>
+          <button class="modal-close" data-modal="historial-modal">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+
+        <!-- Panel de búsqueda -->
+        <div class="search-panel-historial">
+          <div class="search-inputs">
+            <input type="text" id="hist-buscar-nombre" placeholder="Nombre cliente..." />
+            <input type="text" id="hist-buscar-telefono" placeholder="Teléfono..." />
+            <input type="text" id="hist-buscar-medida" placeholder="Medida..." />
+            <input type="text" id="hist-buscar-numero" placeholder="Nº presupuesto..." />
+            <button id="hist-buscar-btn" class="btn-search">
+              <i class="material-icons">search</i>Buscar
+            </button>
+            <button id="hist-limpiar-btn" class="btn-clear">
+              <i class="material-icons">clear</i>Limpiar
+            </button>
+          </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-panel-historial">
+          <div class="stat-item">
+            <div class="stat-number" id="stat-total">156</div>
+            <div class="stat-label">Total Presupuestos</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="stat-monto">€12,450</div>
+            <div class="stat-label">Monto Total</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="stat-mes">23</div>
+            <div class="stat-label">Este Mes</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="stat-clientes">89</div>
+            <div class="stat-label">Clientes Únicos</div>
+          </div>
+        </div>
+
+        <!-- Lista de presupuestos -->
+        <div class="presupuestos-list-historial">
+          <div class="list-header">
+            <span>Mostrando resultados de búsqueda</span>
+            <div class="list-actions">
+              <button class="btn-export">
+                <i class="material-icons">file_download</i>Exportar
+              </button>
+            </div>
+          </div>
+          <div class="list-content" id="lista-historial">
+            <!-- Lista dinámica de presupuestos -->
+          </div>
+        </div>
+
+        <!-- Navegación -->
+        <div class="modal-navigation">
+          <div id="paginacion-container"></div>
+        </div>
+        <div
+          class="modal-footer"
+          style="display: flex; justify-content: flex-end; gap: 8px; padding: 10px 0"
+        >
+          <button id="btnVolverPresupuestosBottom" class="btn-clear" title="Volver a Presupuestos">
+            <i class="material-icons">arrow_back</i>Volver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Pedidos -->
+    <div id="pedidos-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content-pedidos">
+        <div class="modal-header-pedidos">
+          <h3>
+            <i class="material-icons">shopping_cart</i>
+            Gestión de Pedidos
+          </h3>
+          <button
+            id="ped-btn-volver"
+            class="modal-back"
+            title="Volver a Presupuestos"
+            style="margin-right: 8px"
+          >
+            <i class="material-icons">arrow_back</i>
+          </button>
+          <button class="modal-close" data-modal="pedidos-modal">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+
+        <!-- Filtros de pedidos -->
+        <div class="filters-panel-pedidos">
+          <div class="filters-row">
+            <input type="text" id="ped-filtro-texto" placeholder="Buscar..." />
+            <input type="text" id="ped-filtro-proveedor" placeholder="Proveedor..." />
+            <select id="ped-filtro-estado">
+              <option value="">Todos los estados</option>
+              <option value="pending">Pendientes</option>
+              <option value="ordered">Pedidos</option>
+              <option value="received">Recibidos</option>
+            </select>
+            <input type="date" id="ped-filtro-desde" />
+            <input type="date" id="ped-filtro-hasta" />
+            <button id="ped-btn-filtrar" class="btn-filter">
+              <i class="material-icons">filter_alt</i>Filtrar
+            </button>
+          </div>
+          <div class="actions-row">
+            <button id="ped-btn-nuevo" class="btn-new-pedido">
+              <i class="material-icons">add</i>Nuevo Pedido
+            </button>
+            <button id="ped-btn-limpiar" class="btn-clear">
+              <i class="material-icons">clear</i>Limpiar
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de pedidos -->
+        <div class="pedidos-list">
+          <div class="list-content" id="pedidos-lista">
+            <!-- Lista dinámica de pedidos -->
+          </div>
+        </div>
+
+        <!-- Paginación de pedidos -->
+        <div class="modal-navigation">
+          <div id="pedidos-paginacion"></div>
+        </div>
+        <div
+          class="modal-footer"
+          style="display: flex; justify-content: flex-end; gap: 8px; padding: 10px 0"
+        >
+          <button id="ped-btn-volver-bottom" class="btn-clear" title="Volver a Presupuestos">
+            <i class="material-icons">arrow_back</i>Volver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script type="module" src="assets/js/main.js"></script>
+    <script type="module" src="assets/js/modal.js"></script>
+
+    <!-- Loader Overlay -->
+    <div id="loader-overlay" class="loader-overlay">
+      <div class="loader-content">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+        <p id="loader-text">Procesando...</p>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación Genérico -->
+    <div id="confirm-modal" class="modal-modern">
+      <div class="modal-overlay" id="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h4 id="confirm-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">help_outline</i>
+            Confirmar Acción
+          </h4>
+          <button class="modal-close-btn" id="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-content-wrapper">
+            <div class="modal-icon-large" id="modal-icon-large">
+              <i class="material-icons">help_outline</i>
+            </div>
+            <div class="modal-text">
+              <p id="confirm-modal-content" class="modal-message">
+                ¿Estás seguro de realizar esta acción?
+              </p>
+              <p id="confirm-modal-subtitle" class="modal-subtitle" style="display: none">
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern secondary" id="confirm-modal-cancel">
+            <i class="material-icons left">close</i>
+            Cancelar
+          </button>
+          <button class="btn-modal-modern primary" id="confirm-modal-accept">
+            <i class="material-icons left">check</i>
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Información/Éxito -->
+    <div id="info-modal" class="modal-modern">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h4 id="info-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">info</i>
+            Información
+          </h4>
+          <button class="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-content-wrapper">
+            <div class="modal-icon-large success" id="info-modal-icon">
+              <i class="material-icons">check_circle</i>
+            </div>
+            <div class="modal-text">
+              <p id="info-modal-content" class="modal-message">
+                Operación completada exitosamente.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern primary modal-close">
+            <i class="material-icons left">done</i>
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div id="error-modal" class="modal-modern">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header error">
+          <h4 id="error-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">error</i>
+            Error
+          </h4>
+          <button class="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-content-wrapper">
+            <div class="modal-icon-large error">
+              <i class="material-icons">error</i>
+            </div>
+            <div class="modal-text">
+              <p id="error-modal-content" class="modal-message">Ha ocurrido un error inesperado.</p>
+              <p id="error-modal-details" class="modal-details" style="display: none"></p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern secondary modal-close">
+            <i class="material-icons left">close</i>
+            Cerrar
+          </button>
+          <button class="btn-modal-modern primary" id="error-modal-retry" style="display: none">
+            <i class="material-icons left">refresh</i>
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Formulario -->
+    <div id="form-modal" class="modal-modern modal-large">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h4 id="form-modal-title" class="modal-title">
+            <i class="material-icons left modal-icon">edit</i>
+            Editar Información
+          </h4>
+          <button class="modal-close-btn">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="form-modal-form" class="modal-form">
+            <div id="form-modal-content" class="form-content">
+              <!-- Contenido dinámico del formulario -->
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer-modern">
+          <button class="btn-modal-modern secondary modal-close">
+            <i class="material-icons left">close</i>
+            Cancelar
+          </button>
+          <button class="btn-modal-modern primary" id="form-modal-submit">
+            <i class="material-icons left">save</i>
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

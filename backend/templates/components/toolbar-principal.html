@@ -4,7 +4,9 @@
   <div class="top-tab" data-tab="facturas">Facturas</div>
   <div class="top-tab" data-tab="pedidos">Pedidos</div>
   <div class="top-tab" data-tab="tesoreria">Tesorería</div>
-  <button class="classic-button btn-compact float-right" id="toggle-modo" style="margin-left:auto;">Modo</button>
+  <button class="classic-button btn-compact float-right" id="toggle-modo" style="margin-left: auto">
+    Modo
+  </button>
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -15,9 +17,9 @@
         root.classList.toggle("modern");
       }
     });
-    document.querySelectorAll('.top-tab').forEach(t => {
-      t.addEventListener('click', () => {
-        if(t.dataset.tab === 'presupuesto') return; // demo
+    document.querySelectorAll(".top-tab").forEach((t) => {
+      t.addEventListener("click", () => {
+        if (t.dataset.tab === "presupuesto") return; // demo
         alert('Sección "' + t.dataset.tab + '" aún no implementada');
       });
     });

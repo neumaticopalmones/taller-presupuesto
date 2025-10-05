@@ -10,11 +10,14 @@ import pytest
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
 try:
-    from app import Cliente, Presupuesto, app, db  # type: ignore
+    # Importar app desde backend y modelos desde models
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "backend"))
+    from app import app, db  # type: ignore
+    from models import Cliente, Presupuesto  # type: ignore
 except ModuleNotFoundError:
     # Carga manual si el import directo falla (nombre de carpeta con espacios, etc.)
     ROOT = pathlib.Path(__file__).resolve().parents[1]
-    app_path = ROOT / "app.py"
+    app_path = ROOT / "backend" / "app.py"
     spec = importlib.util.spec_from_file_location("app", app_path)
     module = importlib.util.module_from_spec(spec)  # type: ignore
     sys.modules["app"] = module  # type: ignore

@@ -1,0 +1,26 @@
+{
+  "/health": {
+    "target": "http://localhost:5001",
+    "secure": false
+  },
+  "/stats": {
+    "target": "http://localhost:5001",
+    "secure": false
+  },
+  "/presupuestos": {
+    "target": "http://localhost:5001",
+    "secure": false
+  },
+  "/precios": {
+    "target": "http://localhost:5001",
+    "secure": false
+  },
+  "/test-create": {
+    "target": "http://localhost:5001",
+    "secure": false
+  },
+  "/api": {
+    "target": "http://localhost:5001",
+    "secure": false
+  }
+}

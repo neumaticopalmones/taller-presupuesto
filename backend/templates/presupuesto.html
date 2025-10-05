@@ -16,105 +16,139 @@
 <div class="classic-app-window modern" style="height: 100vh; border-top: none; border-radius: 0">
   {% include 'components/toolbar-principal.html' %} {% include 'components/toolbar-acciones.html' %}
   <div class="classic-main-panel" style="overflow: auto; padding-top: 11px">
-        <div class="header-grid">
-          <label>Número:</label><input class="input-field field-small" value="25 / 01552" />
-          <label>Fecha:</label><input id="fecha-presupuesto" class="input-field field-small" type="date" />
-          <label>Distrib:</label><input class="input-field field-small" />
-          <label>cliente:</label><input id="cliente-presupuesto" class="input-field field-small" placeholder="Nombre del cliente" />
-          <label>tlf:</label><input class="input-field field-small" value="0" />
-          <label>Observ:</label><input class="input-field field-small" />
-          <label>Matrícula:</label><input class="input-field field-small" value="NO EXISTE !!" />
-          <label>Medida:</label><input id="medida-input" data-field="medida" class="input-field field-small" />
-          <label>Cant.:</label><input id="cantidad-input" data-field="cantidad" class="input-field field-small" />
-          <label>Gana:</label><input id="ganancia-input" data-field="ganancia" class="input-field field-small" />
-          <label>Eco:</label><input id="ecotasa-input" data-field="ecotasa" class="input-field field-small" />
-          <label>IVA:</label><input id="iva-porcentaje" data-field="iva" class="input-field field-small" value="21" />
-          <label>Marca:</label><input id="marca-input" data-field="marca" class="input-field field-small" />
-          <label>Neto:</label><input id="neto-input" data-field="neto" class="input-field field-small" />
-        </div>
-        <div style="display: flex; gap: 8px; align-items: stretch">
-          <div style="flex: 1; display: flex; flex-direction: column">
-            <div class="lines-table-wrapper" style="flex: 1; min-height: 420px">
-              <div class="classic-lines-head">
-                <span style="width: 40%; text-align: left">Descripción</span>
-                <span style="width: 10%">Cant.</span>
-                <span style="width: 10%">Pre/uni</span>
-                <span style="width: 10%">Total</span>
-                <span style="width: 10%"></span>
-                <span style="width: 10%"></span>
-              </div>
-              <div class="classic-lines-body" id="line-items">
-                <div class="classic-row" data-row="1" style="align-items: center;">
-                  <input class="input-field" style="width: 40%" value="habilied 205/55/16" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="2.00" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="80.08" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="160.16" />
-                  <button class="mini-btn danger">Eliminar</button>
-                  <span></span>
-                </div>
-                <div class="classic-row line-total-row">
-                  <input class="input-field" style="width: 40%; font-weight: 700;" value="Total habilied" />
-                  <span style="width: 10%"></span>
-                  <span style="width: 10%"></span>
-                  <input class="input-field" style="width: 10%; text-align: right; font-weight: 700;" value="160.16" />
-                  <span style="width: 10%"></span><span style="width: 10%"></span>
-                </div>
-                <div class="classic-row" data-row="2" style="align-items: center;">
-                  <input class="input-field" style="width: 40%" value="goodyatrr 205/55/16" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="2.00" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="130.90" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="261.80" />
-                  <button class="mini-btn danger">Eliminar</button>
-                  <span></span>
-                </div>
-                <div class="classic-row line-total-row">
-                  <input class="input-field" style="width: 40%; font-weight: 700;" value="Total goodyatrr" />
-                  <span style="width: 10%"></span>
-                  <span style="width: 10%"></span>
-                  <input class="input-field" style="width: 10%; text-align: right; font-weight: 700;" value="271.80" />
-                  <span style="width: 10%"></span><span style="width: 10%"></span>
-                </div>
-                <div class="classic-row" data-row="3" style="align-items: center;">
-                  <input class="input-field" style="width: 40%" value="permutado" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="1.00" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="10.00" />
-                  <input class="input-field" style="width: 10%; text-align: right" value="10.00" />
-                  <button class="mini-btn danger">Eliminar</button>
-                  <span></span>
-                </div>
-              </div>
-              <div style="border-top: 1px solid #b4b4b4; padding: 4px;">
-                <label style="font-size: 11px; display: block; margin-bottom: 2px;">Obser:</label>
-                <textarea class="input-field" style="width: 100%; height: 60px;"></textarea>
-              </div>
+    <div class="header-grid">
+      <label>Número:</label><input class="input-field field-small" value="25 / 01552" />
+      <label>Fecha:</label
+      ><input id="fecha-presupuesto" class="input-field field-small" type="date" />
+      <label>Distrib:</label><input class="input-field field-small" /> <label>cliente:</label
+      ><input
+        id="cliente-presupuesto"
+        class="input-field field-small"
+        placeholder="Nombre del cliente"
+      />
+      <label>tlf:</label><input class="input-field field-small" value="0" /> <label>Observ:</label
+      ><input class="input-field field-small" /> <label>Matrícula:</label
+      ><input class="input-field field-small" value="NO EXISTE !!" /> <label>Medida:</label
+      ><input id="medida-input" data-field="medida" class="input-field field-small" />
+      <label>Cant.:</label
+      ><input id="cantidad-input" data-field="cantidad" class="input-field field-small" />
+      <label>Gana:</label
+      ><input id="ganancia-input" data-field="ganancia" class="input-field field-small" />
+      <label>Eco:</label
+      ><input id="ecotasa-input" data-field="ecotasa" class="input-field field-small" />
+      <label>IVA:</label
+      ><input id="iva-porcentaje" data-field="iva" class="input-field field-small" value="21" />
+      <label>Marca:</label
+      ><input id="marca-input" data-field="marca" class="input-field field-small" />
+      <label>Neto:</label
+      ><input id="neto-input" data-field="neto" class="input-field field-small" />
+    </div>
+    <div style="display: flex; gap: 8px; align-items: stretch">
+      <div style="flex: 1; display: flex; flex-direction: column">
+        <div class="lines-table-wrapper" style="flex: 1; min-height: 420px">
+          <div class="classic-lines-head">
+            <span style="width: 40%; text-align: left">Descripción</span>
+            <span style="width: 10%">Cant.</span>
+            <span style="width: 10%">Pre/uni</span>
+            <span style="width: 10%">Total</span>
+            <span style="width: 10%"></span>
+            <span style="width: 10%"></span>
+          </div>
+          <div class="classic-lines-body" id="line-items">
+            <div class="classic-row" data-row="1" style="align-items: center">
+              <input class="input-field" style="width: 40%" value="habilied 205/55/16" />
+              <input class="input-field" style="width: 10%; text-align: right" value="2.00" />
+              <input class="input-field" style="width: 10%; text-align: right" value="80.08" />
+              <input class="input-field" style="width: 10%; text-align: right" value="160.16" />
+              <button class="mini-btn danger">Eliminar</button>
+              <span></span>
+            </div>
+            <div class="classic-row line-total-row">
+              <input
+                class="input-field"
+                style="width: 40%; font-weight: 700"
+                value="Total habilied"
+              />
+              <span style="width: 10%"></span>
+              <span style="width: 10%"></span>
+              <input
+                class="input-field"
+                style="width: 10%; text-align: right; font-weight: 700"
+                value="160.16"
+              />
+              <span style="width: 10%"></span><span style="width: 10%"></span>
+            </div>
+            <div class="classic-row" data-row="2" style="align-items: center">
+              <input class="input-field" style="width: 40%" value="goodyatrr 205/55/16" />
+              <input class="input-field" style="width: 10%; text-align: right" value="2.00" />
+              <input class="input-field" style="width: 10%; text-align: right" value="130.90" />
+              <input class="input-field" style="width: 10%; text-align: right" value="261.80" />
+              <button class="mini-btn danger">Eliminar</button>
+              <span></span>
+            </div>
+            <div class="classic-row line-total-row">
+              <input
+                class="input-field"
+                style="width: 40%; font-weight: 700"
+                value="Total goodyatrr"
+              />
+              <span style="width: 10%"></span>
+              <span style="width: 10%"></span>
+              <input
+                class="input-field"
+                style="width: 10%; text-align: right; font-weight: 700"
+                value="271.80"
+              />
+              <span style="width: 10%"></span><span style="width: 10%"></span>
+            </div>
+            <div class="classic-row" data-row="3" style="align-items: center">
+              <input class="input-field" style="width: 40%" value="permutado" />
+              <input class="input-field" style="width: 10%; text-align: right" value="1.00" />
+              <input class="input-field" style="width: 10%; text-align: right" value="10.00" />
+              <input class="input-field" style="width: 10%; text-align: right" value="10.00" />
+              <button class="mini-btn danger">Eliminar</button>
+              <span></span>
             </div>
           </div>
-          <div style="width: 380px; display: flex; flex-direction: column; gap: 8px">
-            <div class="panel-staging" style="flex: 1;">
-              <div class="panel-header"><input type="checkbox" checked /> Staging artículos</div>
-              <div class="staging-actions">
-                <button class="classic-button success btn-full" style="font-size: 12px;">Añadir todos</button>
-              </div>
-              <div class="work-row" style="border-bottom: 1px solid #d0d7e2;">
-                <input class="input-field field-small" placeholder="Concepto trabajo" />
-                <input class="input-field field-small" placeholder="Ud" />
-                <input class="input-field field-small" placeholder="Importe" />
-                <button class="classic-button btn-compact" style="grid-column: span 2;">Añadir Trabajo</button>
-              </div>
-              <ul class="staging-list" id="panel-medidas-list">
-                <li class="staging-item">
-                  <span>× permutado</span><span>10.00</span><span>x1</span><span>T</span><span class="badge-green">✓</span><button class="mini-btn danger">X</button>
-                </li>
-                <li class="staging-item">
-                  <span>goodyatrr 205/55/16</span><span>87.00</span><span>x2</span><span>E:3</span><span class="badge-green">✓</span><button class="mini-btn danger">X</button>
-                </li>
-                <li class="staging-item">
-                  <span>habilied 205/55/16</span><span>45.00</span><span>x2</span><span>E:3</span><span class="badge-green">✓</span><button class="mini-btn danger">X</button>
-                </li>
-              </ul>
-            </div>
+          <div style="border-top: 1px solid #b4b4b4; padding: 4px">
+            <label style="font-size: 11px; display: block; margin-bottom: 2px">Obser:</label>
+            <textarea class="input-field" style="width: 100%; height: 60px"></textarea>
           </div>
         </div>
+      </div>
+      <div style="width: 380px; display: flex; flex-direction: column; gap: 8px">
+        <div class="panel-staging" style="flex: 1">
+          <div class="panel-header"><input type="checkbox" checked /> Staging artículos</div>
+          <div class="staging-actions">
+            <button class="classic-button success btn-full" style="font-size: 12px">
+              Añadir todos
+            </button>
+          </div>
+          <div class="work-row" style="border-bottom: 1px solid #d0d7e2">
+            <input class="input-field field-small" placeholder="Concepto trabajo" />
+            <input class="input-field field-small" placeholder="Ud" />
+            <input class="input-field field-small" placeholder="Importe" />
+            <button class="classic-button btn-compact" style="grid-column: span 2">
+              Añadir Trabajo
+            </button>
+          </div>
+          <ul class="staging-list" id="panel-medidas-list">
+            <li class="staging-item">
+              <span>× permutado</span><span>10.00</span><span>x1</span><span>T</span
+              ><span class="badge-green">✓</span><button class="mini-btn danger">X</button>
+            </li>
+            <li class="staging-item">
+              <span>goodyatrr 205/55/16</span><span>87.00</span><span>x2</span><span>E:3</span
+              ><span class="badge-green">✓</span><button class="mini-btn danger">X</button>
+            </li>
+            <li class="staging-item">
+              <span>habilied 205/55/16</span><span>45.00</span><span>x2</span><span>E:3</span
+              ><span class="badge-green">✓</span><button class="mini-btn danger">X</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %} {% block scripts %}
