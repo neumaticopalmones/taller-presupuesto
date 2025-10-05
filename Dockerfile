@@ -7,10 +7,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libpq-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./
+# Copiar requirements desde backend/
+COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copiar todo el código
+COPY backend/ ./backend/
+COPY frontend-backup/ ./frontend-backup/
 
 # Copiar y hacer ejecutable el script de inicio
 COPY start.sh ./
