@@ -257,14 +257,13 @@ def serve_index():
 
 @app.get("/presupuesto")
 def view_presupuesto():
-    """Vista HTML con el estilo classic/moderno para presupuestos.
+    """Vista HTML funcional con JS completo para presupuestos.
 
-    Por ahora es estática (demo). Futuro: cargar datos reales del modelo y pasar
-    contexto al template.
+    Usa la versión funcional del frontend con todos los controles y APIs.
     """
     try:
-        app.logger.info("Renderizando vista /presupuesto (classic/moderno)")
-        return render_template("presupuesto.html")
+        app.logger.info("Renderizando vista /presupuesto (funcional con JS)")
+        return render_template("presupuesto_funcional.html")
     except Exception as e:  # pragma: no cover - render error improbable
         abort(500, description=f"No se pudo renderizar la vista presupuesto: {e}")
 
